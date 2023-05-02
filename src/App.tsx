@@ -1,7 +1,10 @@
+import Score from "./components/Score";
+
 function App() {
-  return (
-    <div>test</div>
-  )
+  return (<>
+    <Score/>
+    <div>options</div>
+  </>);
 };
 
 export default App;
