@@ -25,14 +25,16 @@ const midiWrap = function(m: number) {
     return m;
 }
 
-/* Recall that all majors and minor keys are the same series of half 
+/*
+Recall that all majors and minor keys are the same series of half 
 and whole steps. We can easily create a map of midi values and notes
 for each key by simply starting with the root pitch. For the major
 and minor functions, the rootMidi is the base midi value of the 
 root of the scale, and the rootStaff is the index of the root
 on the staff. The accidental arr is one of the two arrays above, which
 defines the scale as using flats or sharps. Accidental_num is the number
-of elements from this array that are included in the key. */
+of elements from this array that are included in the key.
+*/
 
 const getAccidentalArray = function(accidental_arr: Array<string>, accidental_num: number) {
     let arr = new Array(accidental_num + 1);
