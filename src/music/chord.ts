@@ -217,7 +217,7 @@ const getChordOptions = function (key = "C", min = -15, max = 15, harmony: strin
 class Chord { 
     pitches: Array<Pitch>;
     duration: number;
-    path: HTMLElement | null;
+    path: Element | null;
     timingIndex: number | null;
     staffIndexLowest: number | null;
     staffIndexHighest: number | null;
@@ -391,4 +391,4 @@ const generateNotes = (key = "C",
     return [arrTop, arrBot];
 };
 
-export { generateNotes, getPitchStringFromIndex };
+export { generateNotes, getPitchStringFromIndex, Chord };
