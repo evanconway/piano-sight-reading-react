@@ -1,6 +1,7 @@
 import "react";
 import { useEffect } from "react";
 import { makeMusic } from "../music/abcmusic";
+import abcjs  from "abcjs";
 
 const Score = () => {
     useEffect(makeMusic);

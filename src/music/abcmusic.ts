@@ -242,7 +242,8 @@ const makeMusic = (resetHarmony = true) => {
 	The renderAbc function accepts an object filled with options for abcjs. 
 	It's important to understand why we've chosen the options we have...  
 	if we decide to use them */
-    abcjs.renderAbc("score", generateABC(), {
+    const abcString = generateABC();
+    abcjs.renderAbc("score", abcString, {
         add_classes: true,
         staffwidth: window.innerWidth * 0.95,
     })
