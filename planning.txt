@@ -55,3 +55,22 @@ The first thing that throws me off about doing that is keeping track of when key
 Then, given this, I saw we proceed with making this custom music data, a way to track it in state, and a system of rendering it with abcjs. We could easily create dummy data that's just a bunch of quarter notes of the same note. Later we'll worry about creating logic to randomly generate it.
 
 Quick note, I don't think using the entity adapter makes sense for most of this app. We don't have lot's of pieces of data that will be individuall updated, added, or removed.
+
+
+
+31st of May, 2023
+
+Need to get head on straight after the break. Last time we were considering how to store the music data. Since we committed to keeping track of changes in time/key signature, we'll have to store things measure by measure. I think we have a pretty straightforward strategy for storing data. Each measure will have 2 arrays of chords objects, one for bottom staff and one for top. It will also store the key and time signature of the measure.
+
+The chords I'm a bit stumped by because I want to allow for correct accidentals. This means we can't only store the midi values of notes in the chords. We have to store the exact scale degree and any accidentals on it. But when it comes time to determine the exact midi value of a note, we'll need the key signature as well as the scale degree to find it. So, at least for now, we'll store pitch data as just scale degree, register, and accidental. 
+
+Given this, a chord will be an array of pitch ojbects. The chord will also store duration, and we'll have a flag to determine if it's a rest or not. Or perhaps we should use an empty pitch array to signify the chord is a rest? Not sure, we'll worry about that later. I think I've got what I need to progress:
+
+music state is an array of measures
+measures store time/key signature and array of top and bottom staff chords
+chords store duration and array of pitches
+pitches store scale degree, register, and accidentals
+
+Ah, but I want to think a little bit more about how we're handling duration. Since we want a cursor to be able to essentially "iterate" over the notes, we need a way to connect the duration of the top staff notes to the bottom. In our old system we simply set a "resolution" for each measure. I think it was 192 because it accomodated many divisions of 4 and 3. This way we could be sure the same number referenced the same spot in both the top and bottom staff array. And there would be empty spots in the array after each note to indicate its duration. Although that system would work here, I dislike it because it doesn't accomodate all possible rhythm combinations, and it feels ugly to have two different concepts represent duration of a note.
+
+Ugh, ya know what let's just do that for now. I can't think of a better system atm, and honestly we'll probably never revisit this since it's more of a portfolio piece. Let's say eigth notes have a value of 12 (since that should cover most common values), which gives quarters a value of 24, and regular 4/4 measures a whole value of 96. We'll adjust these values if I find something wrong. 

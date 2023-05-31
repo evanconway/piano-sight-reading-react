@@ -248,7 +248,7 @@ const makeMusic = (resetHarmony = true) => {
         staffwidth: window.innerWidth * 0.95,
     })
 
-    /* This is a hack to remove the build-in red highlighting effect. After the abcjs.renderAbc
+    /* This is a hack to remove the built-in red highlighting effect. After the abcjs.renderAbc
     function creates the html, the rect tags are setup to listen for click events. When clicked, 
     they color the path tag (note) beneath them red. Cloned tags do not retain the event listeners.
     So by replacing each tag with a clone of itself, we remove those listeners. */
