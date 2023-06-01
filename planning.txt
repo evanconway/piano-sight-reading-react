@@ -74,3 +74,10 @@ pitches store scale degree, register, and accidentals
 Ah, but I want to think a little bit more about how we're handling duration. Since we want a cursor to be able to essentially "iterate" over the notes, we need a way to connect the duration of the top staff notes to the bottom. In our old system we simply set a "resolution" for each measure. I think it was 192 because it accomodated many divisions of 4 and 3. This way we could be sure the same number referenced the same spot in both the top and bottom staff array. And there would be empty spots in the array after each note to indicate its duration. Although that system would work here, I dislike it because it doesn't accomodate all possible rhythm combinations, and it feels ugly to have two different concepts represent duration of a note.
 
 Ugh, ya know what let's just do that for now. I can't think of a better system atm, and honestly we'll probably never revisit this since it's more of a portfolio piece. Let's say eigth notes have a value of 12 (since that should cover most common values), which gives quarters a value of 24, and regular 4/4 measures a whole value of 96. We'll adjust these values if I find something wrong. 
+
+I'm realizing I'm not exactly sure how to handle random pitch selection. We need a way to cap what pitches we select from. But since our pitch object works using scale degree, we can't use a pitch object since that changes based on the chosen key signature. I think we need to instead store a pitch class and register for capping random selection.
+
+
+1st of June, 2023
+
+Still thinking on how to handle random pitch generation. We created a separate type to represent a pitch cap since it's a slightly different idea than a pitch within a key signature. The pitch cap is just a register and class, where as an actual pitch is a scale degree and register. 
