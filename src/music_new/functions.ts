@@ -1,52 +1,98 @@
 import abcjs from "abcjs";
-import { KeySignatureBase, Measure, NoteDuration, Pitch, PitchClass, PitchRegister, TimeSignature } from "./models";
+import { Chord, KeySignature, Measure, NoteDuration, Pitch, TimeSignature } from "./models";
 
-type PitchCap = { class: PitchClass, register: PitchRegister };
+const getMidiFromPitch = (keySignature: KeySignature, pitch: Pitch) => {
+    //const midiAtRegisterZero = 
+};
+
+/**
+ * Returns a chord of random pitches in the given key. Pitches will not be higher or lower than the given caps. Pitches
+ * will not be more than an octave apart. Pitches will be in given harmony if supplied.
+ * 
+ * @param duration 
+ * @param keySignature 
+ * @param highest highest possible note in the chord
+ * @param lowest lowest possible note in the chord
+ * @param harmony 
+ * @returns {Chord} 
+ */
+const getRandomChord = (
+    duration: NoteDuration,
+    keySignature: KeySignature,
+    numberOfPitches: number,
+    highest: Pitch,
+    lowest: Pitch,
+    harmony?: string
+) => {
+    const result: Chord = {
+        duration,
+        pitches: [],
+    };
+
+    //const allPitchesInKey = 
+
+    return result;
+};
 
 interface RandomMusicParams {
     numberOfMeasures?: number,
+    keySignatureBase?: KeySignature,
     timeSignature?: TimeSignature,
-    keySignatureBase?: KeySignatureBase,
-    minor?: boolean,
     topStaffDuration?: NoteDuration,
-    topStaffHighestPitch?: PitchCap,
-    topStaffLowestPitch?: PitchCap,
+    topStaffHighestPitch?: Pitch,
+    topStaffLowestPitch?: Pitch,
     topStaffNotesPerChord?: number,
     bottomStaffDuration?: NoteDuration,
-    bottomStaffHighestPitch?: PitchCap,
-    bottomStaffLowestPitch?: PitchCap,
+    bottomStaffHighestPitch?: Pitch,
+    bottomStaffLowestPitch?: Pitch,
     bottomStaffNotesPerChord?: number,
 }
 
-const generateRandomMusic = (params?: RandomMusicParams) => {
+export const generateRandomMusic = (params?: RandomMusicParams) => {
     // setup default values
     const numberOfMeasures = params?.numberOfMeasures !== undefined ? params.numberOfMeasures : 16;
+    const keySignature = params?.keySignatureBase ? params.keySignatureBase : "C";
     const timeSignature = params?.timeSignature ? params.timeSignature : "4/4";
-    const keySignatureBase = params?.keySignatureBase ? params.keySignatureBase : "C";
-    const minor = params?.minor !== undefined ? params.minor : false;
     const topStaffDuration = params?.topStaffDuration ? params.topStaffDuration : "quarter";
-    const topStaffHighestPitch: PitchCap = params?.topStaffHighestPitch ? params.topStaffHighestPitch : { class: "G", register: 5 };
-    const topStaffLowestPitch: PitchCap = params?.topStaffLowestPitch ? params.topStaffLowestPitch : { class: "C", register: 4 };
+    const topStaffHighestPitch: Pitch = params?.topStaffHighestPitch ? params.topStaffHighestPitch : { scaleDegree: 5, register: 5 };
+    const topStaffLowestPitch: Pitch = params?.topStaffLowestPitch ? params.topStaffLowestPitch : { scaleDegree: 1, register: 4 };
     const topStaffNotesPerChord = params?.topStaffNotesPerChord ? params.topStaffNotesPerChord : 2;
     const bottomStaffDuration = params?.bottomStaffDuration ? params.bottomStaffDuration : "quarter";
-    const bottomStaffHighestPitch: PitchCap = params?.bottomStaffHighestPitch ? params.bottomStaffHighestPitch : { class: "C", register: 4 };
-    const bottomStaffLowestPitch: PitchCap = params?.bottomStaffLowestPitch ? params.bottomStaffLowestPitch : { class: "E", register: 2 };
+    const bottomStaffHighestPitch: Pitch = params?.bottomStaffHighestPitch ? params.bottomStaffHighestPitch : { scaleDegree: 1, register: 4 };
+    const bottomStaffLowestPitch: Pitch = params?.bottomStaffLowestPitch ? params.bottomStaffLowestPitch : { scaleDegree: 3, register: 2 };
     const bottomStaffNotesPerChord = params?.bottomStaffNotesPerChord ? params.bottomStaffNotesPerChord : 2;
 
     // create array of all pitches possible on piano within the given key signature.
-    const allPossiblePitches = new Array<Pitch>(0);
+    const allPossiblePitches = new Array<Pitch>(0); // not finished/correct
 
     // top staff
     // filter out ones that don't fit within caps
-    const pitchesTop = allPossiblePitches.filter(p => {
+    const pitchOptionsTop = allPossiblePitches.filter(p => {
         // if p is lower than lowest pitch, return false
         // if p is higher than highest pitch, return false
+        // also account for harmony here when we get to that.
     });
 
     // bottom staff
-    const pitchesBot = allPossiblePitches.filter(p => {
+    const pitchOptionsBottom = allPossiblePitches.filter(p => {
         // same but with bottom staff values
     });
+
+    const result = new Array<Measure>(numberOfMeasures).map(() => {
+        let lowestPitch: Pitch | null = null;
+        let highestPitch: Pitch | null = null;
+
+        for (let i = 0; i < topStaffNotesPerChord; i++) {
+
+        }
+
+        return {
+            keySignature,
+            timeSignature,
+        } as Measure;
+    });
+
+    return [];
 };
 
 export const renderAbcjs = (measures: Measure[], width: number) => {

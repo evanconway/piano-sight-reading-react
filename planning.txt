@@ -80,4 +80,8 @@ I'm realizing I'm not exactly sure how to handle random pitch selection. We need
 
 1st of June, 2023
 
-Still thinking on how to handle random pitch generation. We created a separate type to represent a pitch cap since it's a slightly different idea than a pitch within a key signature. The pitch cap is just a register and class, where as an actual pitch is a scale degree and register. 
+Still thinking on how to handle random pitch generation. We created a separate type to represent a pitch cap since it's a slightly different idea than a pitch within a key signature. The pitch cap is just a register and class, where as an actual pitch is a scale degree and register. I have an idea of creating an array of possible pitches given a scale degree, then removing ones that don't fit within the given caps. The trick with this is determining if a pitch is above/below a cap. I'm willing to bet we can worry about that logic later.
+
+At the moment I'm actually distracted by displaying this data. Let's add the start of the random music generation logic just as comments, then focus on making the music displayable using dummy data.
+
+I have a new idea about caps for pitches, let's just use an actual pitch. Originally I wanted to keep the idea of caps and pitches separate so that users could choose a spot on the staff as their cap, instead of a specific pitch from the key. Otherwise I'd probably have to repopulate the cap list with pitches from the key evertime the user changed keys. Except I just realized that's not hard at all, and in-fact I think that's a clearer and better way to do it!

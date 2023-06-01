@@ -1,6 +1,6 @@
 import "react";
 import { useEffect } from "react";
-import { renderAbcjs } from "../music_new/functions";
+import { generateRandomMusic, renderAbcjs } from "../music_new/functions";
 
 const Score = () => {
     /*
@@ -9,10 +9,10 @@ const Score = () => {
     */
     const getWidth = () => Math.min(window.innerWidth * 0.9, 1100);
 
-    useEffect(() => renderAbcjs([], getWidth()), []);
-
     useEffect(() => {
-        window.addEventListener("resize", () => renderAbcjs([], getWidth()));
+        const newMusic = generateRandomMusic(); // change later to use selector from state
+        renderAbcjs(newMusic, getWidth());
+        window.addEventListener("resize", () => renderAbcjs(newMusic, getWidth()));
     }, []);
 
     return <div id="score" style={{
