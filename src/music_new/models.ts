@@ -41,7 +41,7 @@ export type KeySignature =
 export interface Pitch {
     scaleDegree: ScaleDegree,
     register: PitchRegister,
-    accidental?: Accidental,
+    accidental: Accidental,
 }
 
 export interface Chord {
@@ -57,7 +57,7 @@ export interface Measure {
 }
 
 //A mapping of key signatures to a mapping of scale degrees to base midi values.
-const KeyScaleMidiMap = new Map<KeySignature, Map<ScaleDegree, number>>();
+export const KeyScaleMidiMap = new Map<KeySignature, Map<ScaleDegree, number>>();
 
 KeyScaleMidiMap.set("C", new Map([[1, 0], [2, 2], [3, 4], [4, 5], [5, 7], [6, 9], [7, 11]]));
 KeyScaleMidiMap.set("G", new Map([[1, 7], [2, 9], [3, 11], [4, 0], [5, 2], [6, 4], [7, 6]]));

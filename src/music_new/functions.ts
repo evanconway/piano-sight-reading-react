@@ -1,8 +1,11 @@
 import abcjs from "abcjs";
-import { Chord, KeySignature, Measure, NoteDuration, Pitch, TimeSignature } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature } from "./models";
 
-const getMidiFromPitch = (keySignature: KeySignature, pitch: Pitch) => {
-    //const midiAtRegisterZero = 
+const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
+    const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
+    const baseMidi = scaleMidiMap?.get(pitch.scaleDegree);
+    if (!baseMidi) return 0;
+    return baseMidi + pitch.accidental + pitch.register;
 };
 
 /**
@@ -10,7 +13,7 @@ const getMidiFromPitch = (keySignature: KeySignature, pitch: Pitch) => {
  * will not be more than an octave apart. Pitches will be in given harmony if supplied.
  * 
  * @param duration 
- * @param keySignature 
+ * @param keySig 
  * @param highest highest possible note in the chord
  * @param lowest lowest possible note in the chord
  * @param harmony 
@@ -18,18 +21,39 @@ const getMidiFromPitch = (keySignature: KeySignature, pitch: Pitch) => {
  */
 const getRandomChord = (
     duration: NoteDuration,
-    keySignature: KeySignature,
+    keySig: KeySignature,
     numberOfPitches: number,
     highest: Pitch,
     lowest: Pitch,
-    harmony?: string
+    harmony?: string, // not implemented yet
 ) => {
-    const result: Chord = {
-        duration,
-        pitches: [],
-    };
+    const result: Chord = { duration, pitches: [] };
 
-    //const allPitchesInKey = 
+    // prepare array of pitches in given key starting at lowest pitch and ending at highest
+    let possiblePitches: Pitch[] = [];
+    let pitchToAdd = {...lowest};
+    while (midiOfPitch(keySig, pitchToAdd) <= midiOfPitch(keySig, highest)) {
+        possiblePitches.push(pitchToAdd);
+        pitchToAdd = {...pitchToAdd};
+        pitchToAdd.scaleDegree++;
+        if (pitchToAdd.scaleDegree > 7) {
+            pitchToAdd.scaleDegree = 1;
+            pitchToAdd.register++;
+        }
+    }
+
+    // add pitches to result, ensuring already added pitches, and pitches outside of octave limit are removed
+    for (let i = 0; i < numberOfPitches; i++) {
+        const newPitchIndex = Math.floor(Math.random() * possiblePitches.length);
+        result.pitches.push(possiblePitches[newPitchIndex]);
+        result.pitches.sort((a, b) => midiOfPitch(keySig, a) - midiOfPitch(keySig, b));
+        possiblePitches = possiblePitches.filter((p, i) => {
+            if (i === newPitchIndex) return false;
+            if (midiOfPitch(keySig, p) > (midiOfPitch(keySig, result.pitches[0]) + 12)) return false;
+            if (midiOfPitch(keySig, p) < (midiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12)) return false;
+            return true;
+        });
+    }
 
     return result;
 };
@@ -54,45 +78,21 @@ export const generateRandomMusic = (params?: RandomMusicParams) => {
     const keySignature = params?.keySignatureBase ? params.keySignatureBase : "C";
     const timeSignature = params?.timeSignature ? params.timeSignature : "4/4";
     const topStaffDuration = params?.topStaffDuration ? params.topStaffDuration : "quarter";
-    const topStaffHighestPitch: Pitch = params?.topStaffHighestPitch ? params.topStaffHighestPitch : { scaleDegree: 5, register: 5 };
-    const topStaffLowestPitch: Pitch = params?.topStaffLowestPitch ? params.topStaffLowestPitch : { scaleDegree: 1, register: 4 };
+    const topStaffHighestPitch: Pitch = params?.topStaffHighestPitch ? params.topStaffHighestPitch : { scaleDegree: 5, register: 5, accidental: 0 };
+    const topStaffLowestPitch: Pitch = params?.topStaffLowestPitch ? params.topStaffLowestPitch : { scaleDegree: 1, register: 4, accidental: 0 };
     const topStaffNotesPerChord = params?.topStaffNotesPerChord ? params.topStaffNotesPerChord : 2;
     const bottomStaffDuration = params?.bottomStaffDuration ? params.bottomStaffDuration : "quarter";
-    const bottomStaffHighestPitch: Pitch = params?.bottomStaffHighestPitch ? params.bottomStaffHighestPitch : { scaleDegree: 1, register: 4 };
-    const bottomStaffLowestPitch: Pitch = params?.bottomStaffLowestPitch ? params.bottomStaffLowestPitch : { scaleDegree: 3, register: 2 };
+    const bottomStaffHighestPitch: Pitch = params?.bottomStaffHighestPitch ? params.bottomStaffHighestPitch : { scaleDegree: 1, register: 4, accidental: 0 };
+    const bottomStaffLowestPitch: Pitch = params?.bottomStaffLowestPitch ? params.bottomStaffLowestPitch : { scaleDegree: 3, register: 2, accidental: 0 };
     const bottomStaffNotesPerChord = params?.bottomStaffNotesPerChord ? params.bottomStaffNotesPerChord : 2;
 
-    // create array of all pitches possible on piano within the given key signature.
-    const allPossiblePitches = new Array<Pitch>(0); // not finished/correct
-
-    // top staff
-    // filter out ones that don't fit within caps
-    const pitchOptionsTop = allPossiblePitches.filter(p => {
-        // if p is lower than lowest pitch, return false
-        // if p is higher than highest pitch, return false
-        // also account for harmony here when we get to that.
-    });
-
-    // bottom staff
-    const pitchOptionsBottom = allPossiblePitches.filter(p => {
-        // same but with bottom staff values
-    });
-
-    const result = new Array<Measure>(numberOfMeasures).map(() => {
-        let lowestPitch: Pitch | null = null;
-        let highestPitch: Pitch | null = null;
-
-        for (let i = 0; i < topStaffNotesPerChord; i++) {
-
-        }
+    return new Array<Measure>(numberOfMeasures).map(() => {
 
         return {
             keySignature,
             timeSignature,
         } as Measure;
     });
-
-    return [];
 };
 
 export const renderAbcjs = (measures: Measure[], width: number) => {
