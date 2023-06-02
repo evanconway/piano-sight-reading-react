@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature, getMeasureSize, getNoteDurationValue } from "./models";
 
 const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
@@ -86,11 +86,23 @@ export const generateRandomMusic = (params?: RandomMusicParams) => {
     const bottomStaffLowestPitch: Pitch = params?.bottomStaffLowestPitch ? params.bottomStaffLowestPitch : { scaleDegree: 3, register: 2, accidental: 0 };
     const bottomStaffNotesPerChord = params?.bottomStaffNotesPerChord ? params.bottomStaffNotesPerChord : 2;
 
+    // get duration values from duration type
+    const topValue = getNoteDurationValue(topStaffDuration);
+    const bottomValue = getNoteDurationValue(topStaffDuration);
+
     return new Array<Measure>(numberOfMeasures).map(() => {
+        /*
+        We assume an eigth note has a "value" of 12. Based on the given time signature
+        we ensure both the top and bottom staff chord arrays have enough entries. For
+        example a time signature of 4/4 yields an array size of 96.
+        */
+        const mSize = getMeasureSize(timeSignature);
 
         return {
             keySignature,
             timeSignature,
+            staffTop: new Array<Chord>(mSize).map((_, i) => i % topValue === 0 ? getRandomChord(topStaffDuration, keySignature, topStaffNotesPerChord, topStaffHighestPitch, topStaffLowestPitch) as Chord : null),
+            staffBottom: new Array<Chord>(mSize).map((_, i) => i % bottomValue === 0 ? getRandomChord(bottomStaffDuration, keySignature, bottomStaffNotesPerChord, bottomStaffHighestPitch, bottomStaffLowestPitch) as Chord : null),
         } as Measure;
     });
 };

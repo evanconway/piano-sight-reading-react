@@ -2,9 +2,28 @@ export type PitchRegister = 1 | 2| 3 | 4 | 5 | 6 | 7;
 export type ScaleDegree = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type Accidental = -2 | -1 | 0 | 1 | 2; // negative for flat, positive for sharp
 
-export type NoteDuration = "whole" | "half" | "quarter" | "eighter" | "sixteenth";
+export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth";
 
 export type TimeSignature = "4/4" | "3/4" | "6/8";
+
+const EIGHTH_BASE = 12;
+
+export const getMeasureSize = (timeSignature: TimeSignature) => {
+    if (timeSignature === "3/4") return EIGHTH_BASE * 2 * 3;
+    if (timeSignature === "4/4") return EIGHTH_BASE * 2 * 4;
+    if (timeSignature === "6/8") return EIGHTH_BASE * 6;
+    return 0;
+};
+
+export const getNoteDurationValue = (noteDuration: NoteDuration) => {
+    // I have genuinely forgotten so much about music, I can't remember if this remains true for all time signatures, review later
+    if (noteDuration === "sixteenth") return EIGHTH_BASE / 2;
+    if (noteDuration === "eighth") return EIGHTH_BASE;
+    if (noteDuration === "quarter") return EIGHTH_BASE * 2;
+    if (noteDuration === "half") return EIGHTH_BASE * 4;
+    if (noteDuration === "whole") return EIGHTH_BASE * 8;
+    return 0;
+};
 
 export type KeySignature = 
 "C" |
@@ -53,7 +72,7 @@ export interface Measure {
     keySignature: KeySignature,
     timeSignature: TimeSignature,
     staffTop: Chord[],
-    staffBot: Chord[],
+    staffBottom: Chord[],
 }
 
 //A mapping of key signatures to a mapping of scale degrees to base midi values.
