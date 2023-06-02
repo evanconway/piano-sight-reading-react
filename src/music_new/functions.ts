@@ -58,33 +58,34 @@ const getRandomChord = (
     return result;
 };
 
-interface RandomMusicParams {
-    numberOfMeasures?: number,
-    keySignatureBase?: KeySignature,
-    timeSignature?: TimeSignature,
-    topStaffDuration?: NoteDuration,
-    topStaffHighestPitch?: Pitch,
-    topStaffLowestPitch?: Pitch,
-    topStaffNotesPerChord?: number,
-    bottomStaffDuration?: NoteDuration,
-    bottomStaffHighestPitch?: Pitch,
-    bottomStaffLowestPitch?: Pitch,
-    bottomStaffNotesPerChord?: number,
+export interface RandomMusicParams {
+    numberOfMeasures: number,
+    keySignature: KeySignature,
+    timeSignature: TimeSignature,
+    topStaffDuration: NoteDuration,
+    topStaffHighestPitch: Pitch,
+    topStaffLowestPitch: Pitch,
+    topStaffNotesPerChord: number,
+    bottomStaffDuration: NoteDuration,
+    bottomStaffHighestPitch: Pitch,
+    bottomStaffLowestPitch: Pitch,
+    bottomStaffNotesPerChord: number,
 }
 
-export const generateRandomMusic = (params?: RandomMusicParams) => {
-    // setup default values
-    const numberOfMeasures = params?.numberOfMeasures !== undefined ? params.numberOfMeasures : 16;
-    const keySignature = params?.keySignatureBase ? params.keySignatureBase : "C";
-    const timeSignature = params?.timeSignature ? params.timeSignature : "4/4";
-    const topStaffDuration = params?.topStaffDuration ? params.topStaffDuration : "quarter";
-    const topStaffHighestPitch: Pitch = params?.topStaffHighestPitch ? params.topStaffHighestPitch : { scaleDegree: 5, register: 5, accidental: 0 };
-    const topStaffLowestPitch: Pitch = params?.topStaffLowestPitch ? params.topStaffLowestPitch : { scaleDegree: 1, register: 4, accidental: 0 };
-    const topStaffNotesPerChord = params?.topStaffNotesPerChord ? params.topStaffNotesPerChord : 2;
-    const bottomStaffDuration = params?.bottomStaffDuration ? params.bottomStaffDuration : "quarter";
-    const bottomStaffHighestPitch: Pitch = params?.bottomStaffHighestPitch ? params.bottomStaffHighestPitch : { scaleDegree: 1, register: 4, accidental: 0 };
-    const bottomStaffLowestPitch: Pitch = params?.bottomStaffLowestPitch ? params.bottomStaffLowestPitch : { scaleDegree: 3, register: 2, accidental: 0 };
-    const bottomStaffNotesPerChord = params?.bottomStaffNotesPerChord ? params.bottomStaffNotesPerChord : 2;
+export const generateRandomMusic = (params: RandomMusicParams) => {
+    const {
+        numberOfMeasures,
+        keySignature,
+        timeSignature,
+        topStaffDuration,
+        topStaffHighestPitch,
+        topStaffLowestPitch,
+        topStaffNotesPerChord,
+        bottomStaffDuration,
+        bottomStaffHighestPitch,
+        bottomStaffLowestPitch,
+        bottomStaffNotesPerChord,
+    } = params;
 
     // get duration values from duration type
     const topValue = getNoteDurationValue(topStaffDuration);
