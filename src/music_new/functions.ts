@@ -91,24 +91,91 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     const topValue = getNoteDurationValue(topStaffDuration);
     const bottomValue = getNoteDurationValue(topStaffDuration);
 
-    return new Array<Measure>(numberOfMeasures).map(() => {
-        /*
-        We assume an eigth note has a "value" of 12. Based on the given time signature
-        we ensure both the top and bottom staff chord arrays have enough entries. For
-        example a time signature of 4/4 yields an array size of 96.
-        */
-        const mSize = getMeasureSize(timeSignature);
+    /*
+    We assume an eigth note has a "value" of 12. Based on the given time signature
+    we ensure both the top and bottom staff chord arrays have enough entries. For
+    example a time signature of 4/4 yields an array size of 96.
+    */
+    const mSize = getMeasureSize(timeSignature);
 
-        return {
+    const result = new Array<Measure>(numberOfMeasures);
+
+    for (let i = 0; i < result.length; i++) {
+        const staffTop = new Array<Chord | null>(mSize);
+        for (let k = 0; k < staffTop.length; k++) {
+            staffTop[k] = k % topValue === 0 ? getRandomChord(
+                topStaffDuration,
+                keySignature,
+                topStaffNotesPerChord,
+                topStaffHighestPitch,
+                topStaffLowestPitch
+            ) as Chord : null;
+        }
+
+        const staffBottom = new Array<Chord | null>(mSize);
+        for (let k = 0; k < staffBottom.length; k++) {
+            staffBottom[k] = k % bottomValue === 0 ? getRandomChord(
+                bottomStaffDuration,
+                keySignature,
+                bottomStaffNotesPerChord,
+                bottomStaffHighestPitch,
+                bottomStaffLowestPitch
+            ) as Chord : null;
+        }
+
+        result[i] = {
             keySignature,
             timeSignature,
-            staffTop: new Array<Chord>(mSize).map((_, i) => i % topValue === 0 ? getRandomChord(topStaffDuration, keySignature, topStaffNotesPerChord, topStaffHighestPitch, topStaffLowestPitch) as Chord : null),
-            staffBottom: new Array<Chord>(mSize).map((_, i) => i % bottomValue === 0 ? getRandomChord(bottomStaffDuration, keySignature, bottomStaffNotesPerChord, bottomStaffHighestPitch, bottomStaffLowestPitch) as Chord : null),
+            staffTop,
+            staffBottom,
         } as Measure;
-    });
+    }
+
+    // this makes an array of the correct size but empty values? 
+    // const result = new Array(numberOfMeasures).map(() => {
+    //     return {
+    //         keySignature,
+    //         timeSignature,
+    //         staffTop: new Array<Chord | null>(mSize).map((_, i) => i % topValue === 0 ? getRandomChord(
+    //             topStaffDuration,
+    //             keySignature,
+    //             topStaffNotesPerChord,
+    //             topStaffHighestPitch,
+    //             topStaffLowestPitch
+    //         ) as Chord : null),
+    //         staffBottom: new Array<Chord | null>(mSize).map((_, i) => i % bottomValue === 0 ? getRandomChord(
+    //             bottomStaffDuration,
+    //             keySignature,
+    //             bottomStaffNotesPerChord,
+    //             bottomStaffHighestPitch,
+    //             bottomStaffLowestPitch
+    //         ) as Chord : null),
+    //     } as Measure;
+    // });
+
+    return result;
 };
 
 export const renderAbcjs = (measures: Measure[], width: number) => {
+    // generate string
+
+    // first measure to get values from
+    const firstM = measures[0];
+
+    let result = `
+        T:
+        M:${firstM.timeSignature}
+        L:1/48
+        K:${firstM.keySignature}
+        %%staves {1 2}
+    `;
+
+    const headerTop = `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
+    const headerBot = `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
+
+    debugger;
+
+    // working string for testing
     const abcjsString = `
         T:
         M:4/4

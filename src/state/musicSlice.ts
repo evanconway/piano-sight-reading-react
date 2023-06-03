@@ -42,5 +42,6 @@ export const musicSlice = createSlice({
 export const { setCursor } = musicSlice.actions;
 
 export const selectCursor = (state: RootState) => state.music.cursor;
+export const selectMusic = (state: RootState) => state.music.music;
 
 export default musicSlice.reducer;
