@@ -98,60 +98,27 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     */
     const mSize = getMeasureSize(timeSignature);
 
-    const result = new Array<Measure>(numberOfMeasures);
-
-    for (let i = 0; i < result.length; i++) {
-        const staffTop = new Array<Chord | null>(mSize);
-        for (let k = 0; k < staffTop.length; k++) {
-            staffTop[k] = k % topValue === 0 ? getRandomChord(
+    // this makes an array of the correct size but empty values? 
+    const result = [...Array(numberOfMeasures)].map(() => {
+        return {
+            keySignature,
+            timeSignature,
+            staffTop: [...Array(mSize)].map((_, i) => i % topValue === 0 ? getRandomChord(
                 topStaffDuration,
                 keySignature,
                 topStaffNotesPerChord,
                 topStaffHighestPitch,
                 topStaffLowestPitch
-            ) as Chord : null;
-        }
-
-        const staffBottom = new Array<Chord | null>(mSize);
-        for (let k = 0; k < staffBottom.length; k++) {
-            staffBottom[k] = k % bottomValue === 0 ? getRandomChord(
+            ) as Chord : null),
+            staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
                 bottomStaffDuration,
                 keySignature,
                 bottomStaffNotesPerChord,
                 bottomStaffHighestPitch,
                 bottomStaffLowestPitch
-            ) as Chord : null;
-        }
-
-        result[i] = {
-            keySignature,
-            timeSignature,
-            staffTop,
-            staffBottom,
+            ) as Chord : null),
         } as Measure;
-    }
-
-    // this makes an array of the correct size but empty values? 
-    // const result = new Array(numberOfMeasures).map(() => {
-    //     return {
-    //         keySignature,
-    //         timeSignature,
-    //         staffTop: new Array<Chord | null>(mSize).map((_, i) => i % topValue === 0 ? getRandomChord(
-    //             topStaffDuration,
-    //             keySignature,
-    //             topStaffNotesPerChord,
-    //             topStaffHighestPitch,
-    //             topStaffLowestPitch
-    //         ) as Chord : null),
-    //         staffBottom: new Array<Chord | null>(mSize).map((_, i) => i % bottomValue === 0 ? getRandomChord(
-    //             bottomStaffDuration,
-    //             keySignature,
-    //             bottomStaffNotesPerChord,
-    //             bottomStaffHighestPitch,
-    //             bottomStaffLowestPitch
-    //         ) as Chord : null),
-    //     } as Measure;
-    // });
+    });
 
     return result;
 };
@@ -173,8 +140,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     const headerTop = `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
     const headerBot = `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
 
-    debugger;
-
+    
     // working string for testing
     const abcjsString = `
         T:
