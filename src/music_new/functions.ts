@@ -108,14 +108,14 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
                 keySignature,
                 topStaffNotesPerChord,
                 topStaffHighestPitch,
-                topStaffLowestPitch
+                topStaffLowestPitch,
             ) as Chord : null),
             staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
                 bottomStaffDuration,
                 keySignature,
                 bottomStaffNotesPerChord,
                 bottomStaffHighestPitch,
-                bottomStaffLowestPitch
+                bottomStaffLowestPitch,
             ) as Chord : null),
         } as Measure;
     });
@@ -123,24 +123,68 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     return result;
 };
 
-export const renderAbcjs = (measures: Measure[], width: number) => {
-    // generate string
+const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
+    const pitchClasses = ["C", "D", "E", "F", "G", "A", "B"];
+    
+};
 
-    // first measure to get values from
-    const firstM = measures[0];
+export const renderAbcjs = (measures: Measure[], width: number) => {
+    //prepare string
+    const firstM = measures[0]; // first measure to get values from
 
     let result = `
         T:
         M:${firstM.timeSignature}
-        L:1/48
+        L:1/${getMeasureSize(firstM.timeSignature)}
         K:${firstM.keySignature}
         %%staves {1 2}
     `;
 
-    const headerTop = `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
-    const headerBot = `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
+    // prepare layout
+    const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
+    if (!scoreBoundingRect) return;
 
-    
+    const staffHeight = 100; // staffs are always this height, so we can rely on this for calculations
+
+    const numberOfLines = Math.ceil(scoreBoundingRect.height / staffHeight);
+    const measuresPerLine = Math.ceil(scoreBoundingRect.width / numberOfLines);
+
+    let measureStartingLine = 0;
+
+    /*
+    Because of how abcjs strings are written out, we have to write this out line by line, and staff
+    by staff. To be extra clear, we have to do top staff line 1, then bottom staff line 1, then top
+    staff line 2, then bottom staff line 2, and so on.
+    */
+
+    let writing = true;
+    while (writing) {
+        // top staff
+        result += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
+        for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
+            measures[i].staffTop.forEach(chord => {
+                if (!chord) return;
+                if (chord.pitches.length > 1) result += "[";
+                chord.pitches.forEach(p => {
+
+                });
+                if (chord.pitches.length > 1) result += "]";
+                result += getNoteDurationValue(chord.duration);
+            });
+            result += " |";
+        }
+        result += "\n";
+
+        // bottom staff
+        result += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
+        for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
+
+        }
+
+        // adjust starting index for next line
+        measureStartingLine = Math.min(measures.length, measureStartingLine + measuresPerLine);
+    }
+
     // working string for testing
     const abcjsString = `
         T:

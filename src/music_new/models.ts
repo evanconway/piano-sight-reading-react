@@ -1,6 +1,7 @@
 export type PitchRegister = 1 | 2| 3 | 4 | 5 | 6 | 7;
 export type ScaleDegree = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type Accidental = -2 | -1 | 0 | 1 | 2; // negative for flat, positive for sharp
+export type PitchClass = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
 export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth";
 
@@ -71,9 +72,11 @@ export interface Chord {
 export interface Measure {
     keySignature: KeySignature,
     timeSignature: TimeSignature,
-    staffTop: Chord[],
-    staffBottom: Chord[],
+    staffTop: (Chord | null)[],
+    staffBottom: (Chord | null)[],
 }
+
+
 
 //A mapping of key signatures to a mapping of scale degrees to base midi values.
 export const KeyScaleMidiMap = new Map<KeySignature, Map<ScaleDegree, number>>();
@@ -109,3 +112,4 @@ KeyScaleMidiMap.set("Fm", new Map([[3, 8], [4, 10], [5, 0], [6, 1], [7, 3], [1, 
 KeyScaleMidiMap.set("Bbm", new Map([[3, 1], [4, 3], [5, 5], [6, 6], [7, 8], [1, 10], [2, 0]]));
 KeyScaleMidiMap.set("Ebm", new Map([[3, 6], [4, 8], [5, 10], [6, 11], [7, 1], [1, 3], [2, 5]]));
 KeyScaleMidiMap.set("Abm", new Map([[3, 11], [4, 1], [5, 3], [6, 4], [7, 6], [1, 8], [2, 10]]));
+
