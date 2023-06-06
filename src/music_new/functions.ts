@@ -28,7 +28,6 @@ const getRandomChord = (
     harmony?: string, // not implemented yet
 ) => {
     const result: Chord = { duration, pitches: [] };
-
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
     let pitchToAdd = {...lowest};
@@ -41,7 +40,6 @@ const getRandomChord = (
             pitchToAdd.register++;
         }
     }
-
     // add pitches to result, ensuring already added pitches, and pitches outside of octave limit are removed
     for (let i = 0; i < numberOfPitches; i++) {
         const newPitchIndex = Math.floor(Math.random() * possiblePitches.length);
@@ -54,7 +52,6 @@ const getRandomChord = (
             return true;
         });
     }
-
     return result;
 };
 
@@ -119,7 +116,6 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
             ) as Chord : null),
         } as Measure;
     });
-
     return result;
 };
 
@@ -203,7 +199,9 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         }
 
         // adjust starting index for next line
-        measureStartingLine = Math.min(measures.length, measureStartingLine + measuresPerLine);
+        measureStartingLine = measureStartingLine + measuresPerLine;
+
+        if (measureStartingLine >= measures.length) writing = false;
     }
 
     // working string for testing
