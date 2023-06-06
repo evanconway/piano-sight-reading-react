@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature, getMeasureSize, getNoteDurationValue } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature, getMeasureDuration, getMeasureWidth, getNoteDurationValue } from "./models";
 
 const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
@@ -93,7 +93,7 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     we ensure both the top and bottom staff chord arrays have enough entries. For
     example a time signature of 4/4 yields an array size of 96.
     */
-    const mSize = getMeasureSize(timeSignature);
+    const mSize = getMeasureDuration(timeSignature);
 
     // this makes an array of the correct size but empty values? 
     const result = [...Array(numberOfMeasures)].map(() => {
@@ -156,13 +156,11 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     //prepare string
     const firstM = measures[0]; // first measure to get values from
 
-    let result = `
-        T:
-        M:${firstM.timeSignature}
-        L:1/${getMeasureSize(firstM.timeSignature)}
-        K:${firstM.keySignature}
-        %%staves {1 2}
-    `;
+    let result = "T:\n";
+    result += `M:${firstM.timeSignature}\n`;
+    result += `L:1/${getMeasureDuration(firstM.timeSignature)}\n`;
+    result += `K:${firstM.keySignature}\n`;
+    result += `%%staves {1 2}\n`;
 
     // prepare layout
     const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
@@ -171,7 +169,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     const staffHeight = 100; // staffs are always this height, so we can rely on this for calculations
 
     const numberOfLines = Math.ceil(scoreBoundingRect.height / staffHeight);
-    const measuresPerLine = Math.ceil(scoreBoundingRect.width / numberOfLines);
+    const measuresPerLine = Math.ceil(scoreBoundingRect.width / getMeasureWidth(firstM));
 
     let measureStartingLine = 0;
 
@@ -180,7 +178,6 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     by staff. To be extra clear, we have to do top staff line 1, then bottom staff line 1, then top
     staff line 2, then bottom staff line 2, and so on.
     */
-
     let writing = true;
     while (writing) {
         // top staff
@@ -192,11 +189,13 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         result += "\n";
 
         // bottom staff
+        // we're using the wrong notes right now, but that's because they're bugged
         result += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
             result += generateMeasureStaffAbcString(measures[i].staffTop, measures[i].keySignature);
             result += "|";
         }
+        result += "\n";
 
         // adjust starting index for next line
         measureStartingLine = measureStartingLine + measuresPerLine;
@@ -244,7 +243,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     `;
 
 	// https://paulrosen.github.io/abcjs/visual/render-abc-options.html
-    abcjs.renderAbc("score", abcjsString, {
+    abcjs.renderAbc("score", result, {
         add_classes: true,
         selectionColor: "#000",
         staffwidth: width,

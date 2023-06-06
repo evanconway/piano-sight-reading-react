@@ -9,14 +9,25 @@ export type TimeSignature = "4/4" | "3/4" | "6/8";
 
 const EIGHTH_BASE = 12;
 
-export const getMeasureSize = (timeSignature: TimeSignature) => {
+/**
+ * Returns the array size of a measure given a time signature.
+ * @param timeSignature
+ * @returns {number} Array size of given time signature.
+ */
+export const getMeasureDuration = (timeSignature: TimeSignature): number => {
     if (timeSignature === "3/4") return EIGHTH_BASE * 2 * 3;
     if (timeSignature === "4/4") return EIGHTH_BASE * 2 * 4;
     if (timeSignature === "6/8") return EIGHTH_BASE * 6;
     return 0;
 };
 
-export const getNoteDurationValue = (noteDuration: NoteDuration) => {
+/**
+ * Returns the value of a duration given a NoteDuration. This value is the number of entries in
+ * a chord array the duration occupies.
+ * @param noteDuration 
+ * @returns {number} Number of entries in chord array given note duration occupies.
+ */
+export const getNoteDurationValue = (noteDuration: NoteDuration): number => {
     // I have genuinely forgotten so much about music, I can't remember if this remains true for all time signatures, review later
     if (noteDuration === "sixteenth") return EIGHTH_BASE / 2;
     if (noteDuration === "eighth") return EIGHTH_BASE;
@@ -75,6 +86,18 @@ export interface Measure {
     staffTop: (Chord | null)[],
     staffBottom: (Chord | null)[],
 }
+
+/**
+ * Returns width of given measure in pixels.
+ * @param measure 
+ * @returns 
+ */
+export const getMeasureWidth = (measure: Measure) => {
+    const noteWidth = 65 as number; // arbitrary value
+    const topWidth = measure.staffTop.map(c => c ? noteWidth : 0).reduce((prev, curr) => prev + curr, 0);
+    const bottomWidth = measure.staffBottom.map(c => c ? noteWidth : 0).reduce((prev, curr) => prev + curr, 0);
+    return Math.max(topWidth, bottomWidth);
+};
 
 //A mapping of key signatures to a mapping of scale degrees to base midi values.
 export const KeyScaleMidiMap = new Map<KeySignature, Map<ScaleDegree, { midi: number, pitchClass: PitchClass }>>();
