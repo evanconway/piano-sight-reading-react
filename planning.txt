@@ -90,3 +90,15 @@ I have a new idea about caps for pitches, let's just use an actual pitch. Origin
 2nd of June, 2023
 
 I've realized I haven't thought out how I'm going to determine number of measures per line, or how we'll iterate over them to determine what the actual sheet music looks like.
+
+
+5th of June, 2023
+
+I was going to write out how I was going to generate the abc string, but I managed to write some code anyway.
+
+
+6th of June, 2023
+
+Last time we were working on finishing the abc js string creation. And to do that we decided to make a hard coded mapping of key signatures, scale degress, midi values and pitch classes. This way we also have easy access to the pitch class of a given pitch (which we need for notation). When we last looked at this we realized we needed to create each line staff by staff because of how abc notation works. We'll with our strategy from yesterday.
+
+We just added a small function to convert a pitch to an abc pitch. However it's not finished because it doesn't account for accidentals. That could be annoying since we'll have to determine the "natural" accidental on the pitch based on the key, and determine if we should use a natural/flat/sharp to adjust it based on that. But for now let's just see if this function works well enough to keep moving forward.

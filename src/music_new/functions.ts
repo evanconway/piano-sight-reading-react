@@ -3,7 +3,7 @@ import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, Tim
 
 const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
-    const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.m;
+    const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.midi;
     if (!baseMidi) return 0;
     return baseMidi + pitch.accidental + pitch.register;
 };
@@ -124,8 +124,36 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
 };
 
 const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
-    const pitchClasses = ["C", "D", "E", "F", "G", "A", "B"];
+    const pitchData = KeyScaleMidiMap.get(keySignature)?.get(pitch.scaleDegree);
+    if (!pitchData) return "";
+    let result = pitchData.pitchClass as string;
+    if (pitch.register === 0) result += ",,,,";
+    if (pitch.register === 1) result += ",,,";
+    if (pitch.register === 2) result += ",,";
+    if (pitch.register === 3) result += ",";
+    if (pitch.register >= 5) result = result.toLocaleLowerCase();
+    if (pitch.register === 6) result += "'";
+    if (pitch.register === 7) result += "''";
+    if (pitch.register === 8) result += "'''";
 
+    // need to add accidentals
+
+    return result;
+};
+
+const generateMeasureStaffAbcString = (staff: (Chord | null)[], keySignature: KeySignature) => {
+    let result = "";
+    staff.forEach(chord => {
+        if (!chord) return;
+        if (chord.pitches.length > 1) result += "[";
+        chord.pitches.forEach(p => {
+            result += getAbcPitchFromPitch(p, keySignature);
+        });
+        if (chord.pitches.length > 1) result += "]";
+        result += getNoteDurationValue(chord.duration);
+        result += " ";
+    });
+    return result;
 };
 
 export const renderAbcjs = (measures: Measure[], width: number) => {
@@ -162,23 +190,16 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         // top staff
         result += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            measures[i].staffTop.forEach(chord => {
-                if (!chord) return;
-                if (chord.pitches.length > 1) result += "[";
-                chord.pitches.forEach(p => {
-
-                });
-                if (chord.pitches.length > 1) result += "]";
-                result += getNoteDurationValue(chord.duration);
-            });
-            result += " |";
+            result += generateMeasureStaffAbcString(measures[i].staffTop, measures[i].keySignature);
+            result += "|";
         }
         result += "\n";
 
         // bottom staff
         result += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-
+            result += generateMeasureStaffAbcString(measures[i].staffTop, measures[i].keySignature);
+            result += "|";
         }
 
         // adjust starting index for next line
