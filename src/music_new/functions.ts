@@ -3,7 +3,7 @@ import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, Tim
 
 const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
-    const baseMidi = scaleMidiMap?.get(pitch.scaleDegree);
+    const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.m;
     if (!baseMidi) return 0;
     return baseMidi + pitch.accidental + pitch.register;
 };
@@ -125,7 +125,7 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
 
 const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
     const pitchClasses = ["C", "D", "E", "F", "G", "A", "B"];
-    
+
 };
 
 export const renderAbcjs = (measures: Measure[], width: number) => {
