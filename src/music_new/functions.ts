@@ -4,8 +4,8 @@ import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, Tim
 const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
     const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.midi;
-    if (!baseMidi) return 0;
-    return baseMidi + pitch.accidental + pitch.register;
+    if (baseMidi === undefined) return 0;
+    return baseMidi + pitch.accidental + pitch.register * 12;
 };
 
 /**
@@ -27,11 +27,14 @@ const getRandomChord = (
     lowest: Pitch,
     harmony?: string, // not implemented yet
 ) => {
+    //debugger;
     const result: Chord = { duration, pitches: [] };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
     let pitchToAdd = {...lowest};
-    while (midiOfPitch(keySig, pitchToAdd) <= midiOfPitch(keySig, highest)) {
+    const midiOfPitchHighest = midiOfPitch(keySig, highest);
+    let midiOfPitchToAdd = midiOfPitch(keySig, pitchToAdd);
+    while (midiOfPitchToAdd <= midiOfPitchHighest) {
         possiblePitches.push(pitchToAdd);
         pitchToAdd = {...pitchToAdd};
         pitchToAdd.scaleDegree++;
@@ -39,6 +42,7 @@ const getRandomChord = (
             pitchToAdd.scaleDegree = 1;
             pitchToAdd.register++;
         }
+        midiOfPitchToAdd = midiOfPitch(keySig, pitchToAdd);
     }
     // add pitches to result, ensuring already added pitches, and pitches outside of octave limit are removed
     for (let i = 0; i < numberOfPitches; i++) {
@@ -95,30 +99,43 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     */
     const mSize = getMeasureDuration(timeSignature);
 
+    const staffTop = [...Array(mSize)].map((_, i) => i % topValue === 0 ? getRandomChord(
+        topStaffDuration,
+        keySignature,
+        topStaffNotesPerChord,
+        topStaffHighestPitch,
+        topStaffLowestPitch,
+    ) as Chord : null);
+
+    //debugger;
+
+    const staffBottom = [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
+        bottomStaffDuration,
+        keySignature,
+        bottomStaffNotesPerChord,
+        bottomStaffHighestPitch,
+        bottomStaffLowestPitch,
+    ) as Chord : null);
+
     // this makes an array of the correct size but empty values? 
     const result = [...Array(numberOfMeasures)].map(() => {
         return {
             keySignature,
             timeSignature,
-            staffTop: [...Array(mSize)].map((_, i) => i % topValue === 0 ? getRandomChord(
-                topStaffDuration,
-                keySignature,
-                topStaffNotesPerChord,
-                topStaffHighestPitch,
-                topStaffLowestPitch,
-            ) as Chord : null),
-            staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
-                bottomStaffDuration,
-                keySignature,
-                bottomStaffNotesPerChord,
-                bottomStaffHighestPitch,
-                bottomStaffLowestPitch,
-            ) as Chord : null),
+            staffTop,
+            staffBottom,
         } as Measure;
     });
     return result;
 };
 
+/**
+ * Returns the abc notation of a pitch given a pitch and key signature.
+ * 
+ * @param pitch 
+ * @param keySignature 
+ * @returns 
+ */
 const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
     const pitchData = KeyScaleMidiMap.get(keySignature)?.get(pitch.scaleDegree);
     if (!pitchData) return "";
@@ -136,8 +153,14 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
 
     return result;
 };
-
-const generateMeasureStaffAbcString = (staff: (Chord | null)[], keySignature: KeySignature) => {
+/**
+ * Returns an abc string for a given array of chords.
+ * 
+ * @param staff 
+ * @param keySignature 
+ * @returns 
+ */
+const getAbcStringFromChordArray = (staff: (Chord | null)[], keySignature: KeySignature) => {
     let result = "";
     staff.forEach(chord => {
         if (!chord) return;
@@ -152,6 +175,13 @@ const generateMeasureStaffAbcString = (staff: (Chord | null)[], keySignature: Ke
     return result;
 };
 
+/**
+ * Renders the given array of measures to the score.
+ * 
+ * @param measures 
+ * @param width 
+ * @returns 
+ */
 export const renderAbcjs = (measures: Measure[], width: number) => {
     //prepare string
     const firstM = measures[0]; // first measure to get values from
@@ -166,9 +196,6 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
     if (!scoreBoundingRect) return;
 
-    const staffHeight = 100; // staffs are always this height, so we can rely on this for calculations
-
-    const numberOfLines = Math.ceil(scoreBoundingRect.height / staffHeight);
     const measuresPerLine = Math.ceil(scoreBoundingRect.width / getMeasureWidth(firstM));
 
     let measureStartingLine = 0;
@@ -183,7 +210,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         // top staff
         result += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            result += generateMeasureStaffAbcString(measures[i].staffTop, measures[i].keySignature);
+            result += getAbcStringFromChordArray(measures[i].staffTop, measures[i].keySignature);
             result += "|";
         }
         result += "\n";
@@ -192,7 +219,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         // we're using the wrong notes right now, but that's because they're bugged
         result += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            result += generateMeasureStaffAbcString(measures[i].staffTop, measures[i].keySignature);
+            result += getAbcStringFromChordArray(measures[i].staffBottom, measures[i].keySignature);
             result += "|";
         }
         result += "\n";
@@ -203,7 +230,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         if (measureStartingLine >= measures.length) writing = false;
     }
 
-    // working string for testing
+    // example abc string
     const abcjsString = `
         T:
         M:4/4
