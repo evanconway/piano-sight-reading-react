@@ -51,8 +51,8 @@ const getRandomChord = (
         result.pitches.sort((a, b) => midiOfPitch(keySig, a) - midiOfPitch(keySig, b));
         possiblePitches = possiblePitches.filter((p, i) => {
             if (i === newPitchIndex) return false;
-            if (midiOfPitch(keySig, p) > (midiOfPitch(keySig, result.pitches[0]) + 12)) return false;
-            if (midiOfPitch(keySig, p) < (midiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12)) return false;
+            if (midiOfPitch(keySig, p) > midiOfPitch(keySig, result.pitches[0]) + 12) return false;
+            if (midiOfPitch(keySig, p) <= midiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12) return false;
             return true;
         });
     }
@@ -90,7 +90,7 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
 
     // get duration values from duration type
     const topValue = getNoteDurationValue(topStaffDuration);
-    const bottomValue = getNoteDurationValue(topStaffDuration);
+    const bottomValue = getNoteDurationValue(bottomStaffDuration);
 
     /*
     We assume an eigth note has a "value" of 12. Based on the given time signature
@@ -99,31 +99,25 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     */
     const mSize = getMeasureDuration(timeSignature);
 
-    const staffTop = [...Array(mSize)].map((_, i) => i % topValue === 0 ? getRandomChord(
-        topStaffDuration,
-        keySignature,
-        topStaffNotesPerChord,
-        topStaffHighestPitch,
-        topStaffLowestPitch,
-    ) as Chord : null);
-
-    //debugger;
-
-    const staffBottom = [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
-        bottomStaffDuration,
-        keySignature,
-        bottomStaffNotesPerChord,
-        bottomStaffHighestPitch,
-        bottomStaffLowestPitch,
-    ) as Chord : null);
-
     // this makes an array of the correct size but empty values? 
     const result = [...Array(numberOfMeasures)].map(() => {
         return {
             keySignature,
             timeSignature,
-            staffTop,
-            staffBottom,
+            staffTop: [...Array(mSize)].map((_, i) => i % topValue === 0 ? getRandomChord(
+                topStaffDuration,
+                keySignature,
+                topStaffNotesPerChord,
+                topStaffHighestPitch,
+                topStaffLowestPitch,
+            ) as Chord : null),
+            staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
+                bottomStaffDuration,
+                keySignature,
+                bottomStaffNotesPerChord,
+                bottomStaffHighestPitch,
+                bottomStaffLowestPitch,
+            ) as Chord : null),
         } as Measure;
     });
     return result;
@@ -229,6 +223,8 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
 
         if (measureStartingLine >= measures.length) writing = false;
     }
+
+    //debugger;
 
     // example abc string
     const abcjsString = `
