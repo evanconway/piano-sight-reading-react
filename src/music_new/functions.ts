@@ -1,6 +1,13 @@
 import abcjs from "abcjs";
 import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature, getMeasureDuration, getMeasureWidth, getNoteDurationValue } from "./models";
 
+/**
+ * Returns the midi value of the given pitch and key signature.
+ * 
+ * @param keySignature 
+ * @param pitch 
+ * @returns 
+ */
 const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
     const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.midi;
@@ -28,7 +35,7 @@ const getRandomChord = (
     harmony?: string, // not implemented yet
 ) => {
     //debugger;
-    const result: Chord = { duration, pitches: [] };
+    const result: Chord = { duration, pitches: [], htmlElement: null };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
     let pitchToAdd = {...lowest};
@@ -73,6 +80,12 @@ export interface RandomMusicParams {
     bottomStaffNotesPerChord: number,
 }
 
+/**
+ * Returns an array of measure objects with randomly generated music.
+ * 
+ * @param params 
+ * @returns 
+ */
 export const generateRandomMusic = (params: RandomMusicParams) => {
     const {
         numberOfMeasures,
@@ -99,7 +112,6 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     */
     const mSize = getMeasureDuration(timeSignature);
 
-    // this makes an array of the correct size but empty values? 
     const result = [...Array(numberOfMeasures)].map(() => {
         return {
             keySignature,
@@ -142,9 +154,7 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
     if (pitch.register === 6) result += "'";
     if (pitch.register === 7) result += "''";
     if (pitch.register === 8) result += "'''";
-
     // need to add accidentals
-
     return result;
 };
 /**
@@ -180,11 +190,11 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     //prepare string
     const firstM = measures[0]; // first measure to get values from
 
-    let result = "T:\n";
-    result += `M:${firstM.timeSignature}\n`;
-    result += `L:1/${getMeasureDuration(firstM.timeSignature)}\n`;
-    result += `K:${firstM.keySignature}\n`;
-    result += `%%staves {1 2}\n`;
+    let abcString = "T:\n";
+    abcString += `M:${firstM.timeSignature}\n`;
+    abcString += `L:1/${getMeasureDuration(firstM.timeSignature)}\n`;
+    abcString += `K:${firstM.keySignature}\n`;
+    abcString += `%%staves {1 2}\n`;
 
     // prepare layout
     const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
@@ -201,74 +211,92 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     */
     let writing = true;
     while (writing) {
-        // top staff
-        result += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
+        abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            result += getAbcStringFromChordArray(measures[i].staffTop, measures[i].keySignature);
-            result += "|";
+            abcString += getAbcStringFromChordArray(measures[i].staffTop, measures[i].keySignature);
+            abcString += "|";
+            if (i === measures.length - 1) abcString += "]";
         }
-        result += "\n";
-
-        // bottom staff
-        // we're using the wrong notes right now, but that's because they're bugged
-        result += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
+        abcString += "\n";
+        abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            result += getAbcStringFromChordArray(measures[i].staffBottom, measures[i].keySignature);
-            result += "|";
+            abcString += getAbcStringFromChordArray(measures[i].staffBottom, measures[i].keySignature);
+            abcString += "|";
+            if (i === measures.length - 1) abcString += "]";
         }
-        result += "\n";
-
-        // adjust starting index for next line
+        abcString += "\n";
         measureStartingLine = measureStartingLine + measuresPerLine;
-
         if (measureStartingLine >= measures.length) writing = false;
     }
 
-    //debugger;
-
-    // example abc string
-    const abcjsString = `
-        T:
-        M:4/4
-        L:1/48
-        K:C
-        %%staves {1 2}
-        V:1
-        [K:C clef=treble]
-        [CC']12 D'12 D12 A12 |F'12 F'12 D12 F'12 |G12 F12 C'12 C'12 |F'12 G'12 C'12 G'12 |
-        V:2
-        [K:C clef=bass]
-        E,24 C24 |A,,24 C24 |F,24 F,24 |C24 C24 |
-        V:1
-        [K:C clef=treble]
-        D12 G'12 F'12 G'12 |C'12 F'12 D12 [CEF]12 |[CBC']12 F12 A12 [CGB]12 |C'12 E'12 D12 F12 |
-        V:2
-        [K:C clef=bass]
-        A,24 B,,24 |G,24 E,24 |C,24 A,24 |C,24 F,,24 |
-        V:1
-        [K:C clef=treble]
-        F12 E'12 F12 F'12 |D'12 G'12 E12 E12 |D12 E'12 F'12 D'12 |F'12 E'12 F12 B12 |
-        V:2
-        [K:C clef=bass]
-        G,24 A,,24 |C,24 A,24 |E,24 F,24 |C24 F,,24 |
-        V:1
-        [K:C clef=treble]
-        G12 D'12 E12 D12 |G'12 G12 G'12 A12 |F12 F'12 [CBC']12 E12 |D'12 E12 F'12 [CC']12 |
-        V:2
-        [K:C clef=bass]
-        B,,24 C24 |G,24 B,24 |A,,24 G,,24 |F,,24 E,24 |
-        V:1
-        [K:C clef=treble]
-        C'12 [CEA]12 C'12 A12 |B12 G'12 C'12 F'12 |B12 C'12 G'12 B12 |E'12 D12 G'12 B12 |]
-        V:2
-        [K:C clef=bass]
-        B,24 C,24 |F,,24 E,24 |A,24 A,24 |E,24 B,,24 |]
-    `;
-
 	// https://paulrosen.github.io/abcjs/visual/render-abc-options.html
-    abcjs.renderAbc("score", result, {
+    abcjs.renderAbc("score", abcString, {
         add_classes: true,
         selectionColor: "#000",
         staffwidth: width,
     });
+
+    const pathsTop = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
+    const pathsBot = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
+
+    let pathsTopIndex = 0;
+    let pathsBotIndex = 0;
+
+    const result = measures.map(m => ({
+            ...m,
+            staffTop: m.staffTop.map(c => {
+                return c === null ? null :  {
+                    ...c,
+                    pitches: c.pitches.map(p => ({...p})),
+                    htmlElement: pathsTop[pathsTopIndex++],
+                } as Chord;
+            }),
+            staffBottom: m.staffBottom.map(c => {
+                return c === null ? null : {
+                    ...c,
+                    pitches: c.pitches.map(p => ({...p})),
+                    htmlElement: pathsBot[pathsBotIndex++],
+                } as Chord;
+            }),
+    } as Measure));
+
+    return result;
 };
+
+const exampleAbcString = `
+    T:
+    M:4/4
+    L:1/48
+    K:C
+    %%staves {1 2}
+    V:1
+    [K:C clef=treble]
+    [CC']12 D'12 D12 A12 |F'12 F'12 D12 F'12 |G12 F12 C'12 C'12 |F'12 G'12 C'12 G'12 |
+    V:2
+    [K:C clef=bass]
+    E,24 C24 |A,,24 C24 |F,24 F,24 |C24 C24 |
+    V:1
+    [K:C clef=treble]
+    D12 G'12 F'12 G'12 |C'12 F'12 D12 [CEF]12 |[CBC']12 F12 A12 [CGB]12 |C'12 E'12 D12 F12 |
+    V:2
+    [K:C clef=bass]
+    A,24 B,,24 |G,24 E,24 |C,24 A,24 |C,24 F,,24 |
+    V:1
+    [K:C clef=treble]
+    F12 E'12 F12 F'12 |D'12 G'12 E12 E12 |D12 E'12 F'12 D'12 |F'12 E'12 F12 B12 |
+    V:2
+    [K:C clef=bass]
+    G,24 A,,24 |C,24 A,24 |E,24 F,24 |C24 F,,24 |
+    V:1
+    [K:C clef=treble]
+    G12 D'12 E12 D12 |G'12 G12 G'12 A12 |F12 F'12 [CBC']12 E12 |D'12 E12 F'12 [CC']12 |
+    V:2
+    [K:C clef=bass]
+    B,,24 C24 |G,24 B,24 |A,,24 G,,24 |F,,24 E,24 |
+    V:1
+    [K:C clef=treble]
+    C'12 [CEA]12 C'12 A12 |B12 G'12 C'12 F'12 |B12 C'12 G'12 B12 |E'12 D12 G'12 B12 |]
+    V:2
+    [K:C clef=bass]
+    B,24 C,24 |F,,24 E,24 |A,24 A,24 |E,24 B,,24 |]
+`;

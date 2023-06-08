@@ -106,3 +106,10 @@ We just added a small function to convert a pitch to an abc pitch. However it's 
 Turns out we had some flaws in our logic for determining how many measures should be on 1 line. Firstly, I realized it won't actually be that hard to make a function with returns the width of a given measure. We'll have to use some magic numbers for this, but given that music notes are fixed size things regardless of screen size I think this is fine.
 
 Ah, a self note about some logic that I couldn't wrap my head around before. We use the width of the page and the width of measures to determine how many measures there are per line. But we never calculate how many lines there are. Instead we use the height of the page, and the probable width of measures to determine how many measures there should be.
+
+
+8th of June, 2023
+
+We managed to fix our random music generation, abc string generation, and managed to map the html elements drawing the notes to our music data. However I forgot that you can't store complex objects like HTMLElements in redux. So we need to redo this so it uses something serializable. My first idea is to store some sort of string we can query later to get the correct element when needed. I wonder if we can give the notes created by abcjs individaul ids. If so that would be ideal.
+
+Using id strings to refer to the html elements would be perfect because then we could create these ids during music creation, and assign them to the paths during render. This means our created music data would not need to be mutated, or a new version with correct path mappings created.
