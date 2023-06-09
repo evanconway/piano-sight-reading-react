@@ -35,7 +35,7 @@ const getRandomChord = (
     harmony?: string, // not implemented yet
 ) => {
     //debugger;
-    const result: Chord = { duration, pitches: [], htmlElement: null };
+    const result: Chord = { duration, pitches: [], pathId: "" };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
     let pitchToAdd = {...lowest};
@@ -112,26 +112,38 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     */
     const mSize = getMeasureDuration(timeSignature);
 
+    const pathIdBase = "abc-note-path-id-";
+    let pathIdCount = 0;
+
+    // this is not creating the id numbers we're expecting, but it still "works" so we'll go with it for now
+
     const result = [...Array(numberOfMeasures)].map(() => {
         return {
             keySignature,
             timeSignature,
-            staffTop: [...Array(mSize)].map((_, i) => i % topValue === 0 ? getRandomChord(
-                topStaffDuration,
-                keySignature,
-                topStaffNotesPerChord,
-                topStaffHighestPitch,
-                topStaffLowestPitch,
-            ) as Chord : null),
-            staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? getRandomChord(
-                bottomStaffDuration,
-                keySignature,
-                bottomStaffNotesPerChord,
-                bottomStaffHighestPitch,
-                bottomStaffLowestPitch,
-            ) as Chord : null),
+            staffTop: [...Array(mSize)].map((_, i) => i % topValue === 0 ? {
+                ...getRandomChord(
+                    topStaffDuration,
+                    keySignature,
+                    topStaffNotesPerChord,
+                    topStaffHighestPitch,
+                    topStaffLowestPitch,
+                ),
+                pathId: pathIdBase + pathIdCount++,
+            } as Chord : null),
+            staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? {
+                ...getRandomChord(
+                    bottomStaffDuration,
+                    keySignature,
+                    bottomStaffNotesPerChord,
+                    bottomStaffHighestPitch,
+                    bottomStaffLowestPitch,
+                ),
+                pathId: pathIdBase + pathIdCount++,
+            } as Chord : null),
         } as Measure;
     });
+
     return result;
 };
 
@@ -242,25 +254,35 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     let pathsTopIndex = 0;
     let pathsBotIndex = 0;
 
-    const result = measures.map(m => ({
-            ...m,
-            staffTop: m.staffTop.map(c => {
-                return c === null ? null :  {
-                    ...c,
-                    pitches: c.pitches.map(p => ({...p})),
-                    htmlElement: pathsTop[pathsTopIndex++],
-                } as Chord;
-            }),
-            staffBottom: m.staffBottom.map(c => {
-                return c === null ? null : {
-                    ...c,
-                    pitches: c.pitches.map(p => ({...p})),
-                    htmlElement: pathsBot[pathsBotIndex++],
-                } as Chord;
-            }),
-    } as Measure));
+    // iterate over all top staff chords
+    measures.forEach(m => m.staffTop.forEach(c => {
+        if (c === null) return;
+        pathsTop[pathsTopIndex++].id = c.pathId;
+    }));
+    measures.forEach(m => m.staffBottom.forEach(c => {
+        if (c === null) return;
+        pathsBot[pathsBotIndex++].id = c.pathId;
+    }));
 
-    return result;
+    // const result = measures.map(m => ({
+    //         ...m,
+    //         staffTop: m.staffTop.map(c => {
+    //             return c === null ? null :  {
+    //                 ...c,
+    //                 pitches: c.pitches.map(p => ({...p})),
+    //                 pathId: pathsTop[pathsTopIndex++],
+    //             } as Chord;
+    //         }),
+    //         staffBottom: m.staffBottom.map(c => {
+    //             return c === null ? null : {
+    //                 ...c,
+    //                 pitches: c.pitches.map(p => ({...p})),
+    //                 pathId: pathsBot[pathsBotIndex++],
+    //             } as Chord;
+    //         }),
+    // } as Measure));
+
+    // return result;
 };
 
 const exampleAbcString = `

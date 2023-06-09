@@ -78,7 +78,7 @@ export interface Pitch {
 export interface Chord {
     duration: NoteDuration,
     pitches: Pitch[],
-    htmlElement: Element | null, // reference to the html element that abcjs renders the note with
+    pathId: string, // reference to the html element that abcjs renders the note with
 }
 
 export interface Measure {
