@@ -2,7 +2,7 @@ import "react";
 import { useEffect } from "react";
 import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { advanceCursor, selectMusic } from "../state/musicSlice";
+import { advanceCursor, highlightCurrentChord, retreatCursor, selectMusic } from "../state/musicSlice";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -17,18 +17,17 @@ const Score = () => {
     useEffect(() => {
         const render = () => renderAbcjs(music, getWidth());
         render();
-        const onKeyRight = (e: KeyboardEvent) => {
-            if (e.code !== "ArrowRight") return;
-            console.log(e);
+        const onArrowKeys = (e: KeyboardEvent) => {
             // why is this an action creator and not an action???
-            dispatch(advanceCursor());
-            console.log("dispatch happened");
+            if (e.code === "ArrowRight") dispatch(advanceCursor);
+            if (e.code === "ArrowLeft") dispatch(retreatCursor);
         };
         window.addEventListener("resize", render);
-        window.addEventListener("keydown", onKeyRight);
+        window.addEventListener("keydown", onArrowKeys);
+        dispatch(highlightCurrentChord);
         return () => {
             window.removeEventListener("resize", render);
-            window.removeEventListener("keydown", onKeyRight);
+            window.removeEventListener("keydown", onArrowKeys);
         };
     }, [music]);
 

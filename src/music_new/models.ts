@@ -89,6 +89,26 @@ export interface Measure {
 }
 
 /**
+ * Sets color of paths of given measure array
+ * 
+ * @param measures 
+ */
+export const measuresSetPathColors = (measures: Measure[], color: string) => {
+    measures.forEach(m => {
+        m.staffTop.forEach(c => {
+            if (c === null) return;
+            const path = document.querySelector(`#${c.pathId}`);
+            path?.setAttribute("fill", color);
+        });
+        m.staffBottom.forEach(c => {
+            if (c === null) return;
+            const path = document.querySelector(`#${c.pathId}`);
+            path?.setAttribute("fill", color);
+        });
+    });
+};
+
+/**
  * Returns width of given measure in pixels.
  * @param measure 
  * @returns 

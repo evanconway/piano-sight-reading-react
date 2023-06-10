@@ -118,29 +118,39 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     // this is not creating the id numbers we're expecting, but it still "works" so we'll go with it for now
 
     const result = [...Array(numberOfMeasures)].map(() => {
+        const staffTop = [...Array(mSize)].map((_, i) => {
+            if (i % topValue !== 0) return null;
+            const chord = getRandomChord(
+                topStaffDuration,
+                keySignature,
+                topStaffNotesPerChord,
+                topStaffHighestPitch,
+                topStaffLowestPitch,
+            );
+            chord.pathId = pathIdBase + pathIdCount;
+            pathIdCount++;
+            return chord;
+        });
+
+        const staffBottom = [...Array(mSize)].map((_, i) => {
+            if (i % bottomValue !== 0) return null;
+            const chord = getRandomChord(
+                bottomStaffDuration,
+                keySignature,
+                bottomStaffNotesPerChord,
+                bottomStaffHighestPitch,
+                bottomStaffLowestPitch,
+            );
+            chord.pathId = pathIdBase + pathIdCount;
+            pathIdCount++;
+            return chord;
+        });
+
         return {
             keySignature,
             timeSignature,
-            staffTop: [...Array(mSize)].map((_, i) => i % topValue === 0 ? {
-                ...getRandomChord(
-                    topStaffDuration,
-                    keySignature,
-                    topStaffNotesPerChord,
-                    topStaffHighestPitch,
-                    topStaffLowestPitch,
-                ),
-                pathId: pathIdBase + pathIdCount++,
-            } as Chord : null),
-            staffBottom: [...Array(mSize)].map((_, i) => i % bottomValue === 0 ? {
-                ...getRandomChord(
-                    bottomStaffDuration,
-                    keySignature,
-                    bottomStaffNotesPerChord,
-                    bottomStaffHighestPitch,
-                    bottomStaffLowestPitch,
-                ),
-                pathId: pathIdBase + pathIdCount++,
-            } as Chord : null),
+            staffTop,
+            staffBottom,
         } as Measure;
     });
 
@@ -249,7 +259,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     });
 
     const pathsTop = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
-    const pathsBot = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
+    const pathsBot = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v1"));
 
     let pathsTopIndex = 0;
     let pathsBotIndex = 0;
@@ -263,26 +273,6 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         if (c === null) return;
         pathsBot[pathsBotIndex++].id = c.pathId;
     }));
-
-    // const result = measures.map(m => ({
-    //         ...m,
-    //         staffTop: m.staffTop.map(c => {
-    //             return c === null ? null :  {
-    //                 ...c,
-    //                 pitches: c.pitches.map(p => ({...p})),
-    //                 pathId: pathsTop[pathsTopIndex++],
-    //             } as Chord;
-    //         }),
-    //         staffBottom: m.staffBottom.map(c => {
-    //             return c === null ? null : {
-    //                 ...c,
-    //                 pitches: c.pitches.map(p => ({...p})),
-    //                 pathId: pathsBot[pathsBotIndex++],
-    //             } as Chord;
-    //         }),
-    // } as Measure));
-
-    // return result;
 };
 
 const exampleAbcString = `
