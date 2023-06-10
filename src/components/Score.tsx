@@ -1,10 +1,11 @@
 import "react";
 import { useEffect } from "react";
-import { generateRandomMusic, renderAbcjs } from "../music_new/functions";
-import { useAppSelector } from "../hooks";
-import { selectMusic } from "../state/musicSlice";
+import { renderAbcjs } from "../music_new/functions";
+import { useAppDispatch, useAppSelector } from "../hooks";
+import { advanceCursor, selectMusic } from "../state/musicSlice";
 
 const Score = () => {
+    const dispatch = useAppDispatch();
     const music = useAppSelector(selectMusic);
 
     /*
@@ -16,8 +17,18 @@ const Score = () => {
     useEffect(() => {
         const render = () => renderAbcjs(music, getWidth());
         render();
+        const onKeyRight = (e: KeyboardEvent) => {
+            if (e.code !== "ArrowRight") return;
+            console.log(e);
+            dispatch(advanceCursor);
+            console.log("dispatch happened");
+        };
         window.addEventListener("resize", render);
-        return () => window.removeEventListener("resize", render);
+        window.addEventListener("keydown", onKeyRight);
+        return () => {
+            window.removeEventListener("resize", render);
+            window.removeEventListener("keydown", onKeyRight);
+        };
     }, [music]);
 
     return <div id="score" style={{

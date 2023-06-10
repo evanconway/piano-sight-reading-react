@@ -113,3 +113,5 @@ Ah, a self note about some logic that I couldn't wrap my head around before. We 
 We managed to fix our random music generation, abc string generation, and managed to map the html elements drawing the notes to our music data. However I forgot that you can't store complex objects like HTMLElements in redux. So we need to redo this so it uses something serializable. My first idea is to store some sort of string we can query later to get the correct element when needed. I wonder if we can give the notes created by abcjs individaul ids. If so that would be ideal.
 
 Using id strings to refer to the html elements would be perfect because then we could create these ids during music creation, and assign them to the paths during render. This means our created music data would not need to be mutated, or a new version with correct path mappings created.
+
+As I'm writing out the logic for advance/retreating the music cursor, I'm realizing I'm not sure we ever needed to split out the bottom and top staff chords into separate arrays. This is something worth revisiting later. I think I had a good reason but I don't remember what it was.
