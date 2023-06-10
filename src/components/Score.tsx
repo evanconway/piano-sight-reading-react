@@ -20,7 +20,8 @@ const Score = () => {
         const onKeyRight = (e: KeyboardEvent) => {
             if (e.code !== "ArrowRight") return;
             console.log(e);
-            dispatch(advanceCursor);
+            // why is this an action creator and not an action???
+            dispatch(advanceCursor());
             console.log("dispatch happened");
         };
         window.addEventListener("resize", render);

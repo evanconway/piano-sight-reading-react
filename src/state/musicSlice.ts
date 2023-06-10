@@ -67,6 +67,7 @@ export const musicSlice = createSlice({
                     state.cursor.staffIndex--;
                 }
             }
+            debugger;
             const pathId = state.music[state.cursor.measureIndex].staffTop[state.cursor.staffIndex]?.pathId;
             if (pathId === undefined) return;
             const element = document.querySelector(`#${pathId}`);
