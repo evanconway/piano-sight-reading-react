@@ -37,6 +37,7 @@ const Score = () => {
         const addMidiHandlers = (ma: MIDIAccess) => {
             Array.from(ma.inputs.values()).forEach(input => {
                 input.onmidimessage = handleMidiEvent;
+                console.log("midi event handler added to input:", input);
             });
             // midiAccess.onstatechange = () => addMessagehandlers(inputs);
         };
@@ -48,7 +49,7 @@ const Score = () => {
             window.removeEventListener("keydown", onArrowKeys);
             navigator.requestMIDIAccess().then((ma: MIDIAccess) => {
                 Array.from(ma.inputs.values()).forEach(input => {
-                    console.log(input);
+                    console.log("input to remove events from:", input);
                 });
             });
         };
