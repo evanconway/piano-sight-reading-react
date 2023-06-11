@@ -25,9 +25,32 @@ const Score = () => {
         window.addEventListener("resize", render);
         window.addEventListener("keydown", onArrowKeys);
         dispatch(highlightCurrentChord);
+
+        const midiToIgnore = [248, 254];
+
+        const handleMidiEvent = (e: Event) => {
+            const midiMsg = e as MIDIMessageEvent;
+            if (midiMsg.data.length === 1 && midiToIgnore.includes(midiMsg.data[0])) return;
+            console.log(midiMsg);
+        };
+
+        const addMidiHandlers = (ma: MIDIAccess) => {
+            Array.from(ma.inputs.values()).forEach(input => {
+                input.onmidimessage = handleMidiEvent;
+            });
+            // midiAccess.onstatechange = () => addMessagehandlers(inputs);
+        };
+
+        navigator.requestMIDIAccess().then(addMidiHandlers).catch(e => console.log(e));
+        
         return () => {
             window.removeEventListener("resize", render);
             window.removeEventListener("keydown", onArrowKeys);
+            navigator.requestMIDIAccess().then((ma: MIDIAccess) => {
+                Array.from(ma.inputs.values()).forEach(input => {
+                    console.log(input);
+                });
+            });
         };
     }, [music]);
 

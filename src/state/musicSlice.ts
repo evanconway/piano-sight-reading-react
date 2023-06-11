@@ -89,8 +89,11 @@ const musicStateHighlightCursor = (musicState: MusicState) => {
     measuresSetPathColors(musicState.music, "#000");
     const pathIdTop = musicState.music[musicState.cursor.measureIndex].staffTop[musicState.cursor.staffIndex]?.pathId;
     const pathIdBottom = musicState.music[musicState.cursor.measureIndex].staffBottom[musicState.cursor.staffIndex]?.pathId;
-    document.querySelector(`#${pathIdTop}`)?.setAttribute("fill", "#0f0");
-    document.querySelector(`#${pathIdBottom}`)?.setAttribute("fill", "#0f0");
+    const topPaths = document.querySelector(`#${pathIdTop}`)?.children;
+    const bottomPaths = document.querySelector(`#${pathIdBottom}`)?.children;
+
+    if (topPaths !== undefined) Array.from(topPaths).forEach(p => p.setAttribute("fill", "#0f0"));
+    if (bottomPaths !== undefined) Array.from(bottomPaths).forEach(p => p.setAttribute("fill", "#0f0"));
 };
 
 const initialState: MusicState = {

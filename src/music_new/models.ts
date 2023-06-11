@@ -96,14 +96,12 @@ export interface Measure {
 export const measuresSetPathColors = (measures: Measure[], color: string) => {
     measures.forEach(m => {
         m.staffTop.forEach(c => {
-            if (c === null) return;
-            const path = document.querySelector(`#${c.pathId}`);
-            path?.setAttribute("fill", color);
+            const paths = document.querySelector(`#${c?.pathId}`)?.children;
+            if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
         });
         m.staffBottom.forEach(c => {
-            if (c === null) return;
-            const path = document.querySelector(`#${c.pathId}`);
-            path?.setAttribute("fill", color);
+            const paths = document.querySelector(`#${c?.pathId}`)?.children;
+            if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
         });
     });
 };
