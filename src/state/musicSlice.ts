@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Measure, measuresSetPathColors } from "../music_new/models";
 import { RootState } from "./store";
-import { RandomMusicParams, generateRandomMusic } from "../music_new/functions";
+import { RandomMusicParams, generateRandomMusic, midiOfPitch } from "../music_new/functions";
 import { DEFAULT_BOTTOM_STAFF_DURATION, DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH, DEFAULT_BOTTOM_STAFF_LOWEST_PITCH, DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD, DEFAULT_KEY_SIGNATURE, DEFAULT_TIME_SIGNATURE, DEFAULT_TOP_STAFF_DURATION, DEFAULT_TOP_STAFF_HIGHEST_PITCH, DEFAULT_TOP_STAFF_LOWEST_PITCH, DEFAULT_TOP_STAFF_NOTES_PER_CHORD } from "../music_new/defaults";
 
 interface MusicCursor {
@@ -156,11 +156,24 @@ export const musicSlice = createSlice({
     },
 });
 
+// why are these action creators and not actions??
 export const advanceCursor = musicSlice.actions.advanceCursor();
 export const retreatCursor = musicSlice.actions.retreatCursor();
 export const highlightCurrentChord = musicSlice.actions.highlightCurrentChord();
 
 export const selectCursor = (state: RootState) => state.music.cursor;
 export const selectMusic = (state: RootState) => state.music.music;
+export const selectMusicCurrentMidi = (state: RootState) => {
+    const music = state.music.music;
+    const measureIndex = state.music.cursor.measureIndex;
+    const staffIndex = state.music.cursor.staffIndex;
+    const pitchesTop = music[measureIndex].staffTop[staffIndex]?.pitches;
+    const pitchesBot = music[measureIndex].staffBottom[staffIndex]?.pitches;
+    const keySignature = music[measureIndex].keySignature;
+    const midiPitchesTop = pitchesTop ? pitchesTop.map(p => midiOfPitch(keySignature, p)) : [];
+    const midiPitchesBot = pitchesBot ? pitchesBot.map(p => midiOfPitch(keySignature, p)) : [];
+    // remove duplicates from returned array
+    return Array.from(new Set([...midiPitchesTop, ...midiPitchesBot])).sort();
+};
 
 export default musicSlice.reducer;

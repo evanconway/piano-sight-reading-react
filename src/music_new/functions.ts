@@ -8,11 +8,11 @@ import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, Tim
  * @param pitch 
  * @returns 
  */
-const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
+export const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
     const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.midi;
     if (baseMidi === undefined) return 0;
-    return baseMidi + pitch.accidental + pitch.register * 12;
+    return baseMidi + pitch.accidental + (pitch.register + 1) * 12;
 };
 
 /**
@@ -179,6 +179,7 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
     // need to add accidentals
     return result;
 };
+
 /**
  * Returns an abc string for a given array of chords.
  * 

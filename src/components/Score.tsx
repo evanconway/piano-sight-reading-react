@@ -1,8 +1,8 @@
 import "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { advanceCursor, highlightCurrentChord, retreatCursor, selectMusic } from "../state/musicSlice";
+import { advanceCursor, highlightCurrentChord, retreatCursor, selectMusic, selectMusicCurrentMidi } from "../state/musicSlice";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -14,46 +14,68 @@ const Score = () => {
     */
     const getWidth = () => Math.min(window.innerWidth * 0.9, 1100);
 
+    // render
     useEffect(() => {
         const render = () => renderAbcjs(music, getWidth());
         render();
+        dispatch(highlightCurrentChord);
+        window.addEventListener("resize", render);
+        return () => {
+            window.removeEventListener("resize", render);
+        };
+    }, [music]);
+
+    // arrow keys
+    useEffect(() => {
         const onArrowKeys = (e: KeyboardEvent) => {
-            // why is this an action creator and not an action???
             if (e.code === "ArrowRight") dispatch(advanceCursor);
             if (e.code === "ArrowLeft") dispatch(retreatCursor);
         };
-        window.addEventListener("resize", render);
         window.addEventListener("keydown", onArrowKeys);
-        dispatch(highlightCurrentChord);
+        return () => window.removeEventListener("keydown", onArrowKeys);
+    }, []);
 
-        const midiToIgnore = [248, 254];
+    // midi handling
+    const [midiAccess, setMidiAccess] = useState<MIDIAccess>();
+    const [playedMidi, setPlayedMidi] = useState<number[]>([]);
 
-        const handleMidiEvent = (e: Event) => {
-            const midiMsg = e as MIDIMessageEvent;
-            if (midiMsg.data.length === 1 && midiToIgnore.includes(midiMsg.data[0])) return;
-            console.log(midiMsg);
+    // the midi values the user is supposed to play
+    const musicCurrentMidi = useAppSelector(selectMusicCurrentMidi);
+
+    if (midiAccess === undefined) navigator.requestMIDIAccess()
+        .then(ma => setMidiAccess(ma))
+        .catch(e => console.log(e));
+
+    useEffect(() => {
+        if (midiAccess === undefined) return;
+        const handleMidi = (e: Event) => {
+            const midiData = (e as MIDIMessageEvent).data;
+            if (midiData.length === 1 && [248, 254].includes(midiData[0])) return;
+            if (midiData[0] === 144 && midiData[2] > 0) setPlayedMidi([...playedMidi, midiData[1]].sort());
+            if (midiData[0] === 144 && midiData[2] <= 0) setPlayedMidi(playedMidi.filter(m => m !== midiData[1]).sort());
+            if (midiData[0] === 128) setPlayedMidi(playedMidi.filter(m => m !== midiData[1]).sort());
         };
+        const addMidiHandlers = () => Array.from(midiAccess.inputs.values()).forEach(i => i.onmidimessage = handleMidi);
+        /*
+        Mindlessly add midi handles to all inputs whenever state changes. We don't really care what midi device plays the note,
+        and if the device is disconnected there's no harm done.
+        */
+        addMidiHandlers();
+        midiAccess.onstatechange = addMidiHandlers;
+        return () => Array.from(midiAccess.inputs.values()).forEach(input => input.onmidimessage = null);
+    }, [midiAccess, playedMidi, setPlayedMidi]);
 
-        const addMidiHandlers = (ma: MIDIAccess) => {
-            Array.from(ma.inputs.values()).forEach(input => {
-                input.onmidimessage = handleMidiEvent;
-                console.log("midi event handler added to input:", input);
-            });
-            // midiAccess.onstatechange = () => addMessagehandlers(inputs);
-        };
-
-        navigator.requestMIDIAccess().then(addMidiHandlers).catch(e => console.log(e));
-        
-        return () => {
-            window.removeEventListener("resize", render);
-            window.removeEventListener("keydown", onArrowKeys);
-            navigator.requestMIDIAccess().then((ma: MIDIAccess) => {
-                Array.from(ma.inputs.values()).forEach(input => {
-                    console.log("input to remove events from:", input);
-                });
-            });
-        };
-    }, [music]);
+    useEffect(() => {
+        console.log("played:", playedMidi);
+        console.log("target:", musicCurrentMidi);
+        if (playedMidi.length !== musicCurrentMidi.length) return;
+        debugger;
+        for (let i = 0; i < playedMidi.length; i++) {
+            if (playedMidi[i] !== musicCurrentMidi[i]) return;
+        }
+        setPlayedMidi([]);
+        dispatch(advanceCursor)
+    }, [playedMidi, musicCurrentMidi, dispatch]);
 
     return <div id="score" style={{
         backgroundColor: "#ffe0b3",
