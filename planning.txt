@@ -115,3 +115,16 @@ We managed to fix our random music generation, abc string generation, and manage
 Using id strings to refer to the html elements would be perfect because then we could create these ids during music creation, and assign them to the paths during render. This means our created music data would not need to be mutated, or a new version with correct path mappings created.
 
 As I'm writing out the logic for advance/retreating the music cursor, I'm realizing I'm not sure we ever needed to split out the bottom and top staff chords into separate arrays. This is something worth revisiting later. I think I had a good reason but I don't remember what it was.
+
+
+11th of June, 2023
+
+We made significant progress without needing to plan much. Now it correctly generates random music in C-major, there is a cursor which can be advanced/retreated, and playing the piano will trigger midi events which will advance the cursor. However right now we have an issue where the hook that checks for correct play is triggering on loop forever on the final chord. Additionally it appears to fire 3 times when the correct chord is played:
+
+1: final note of correct chord is played
+2: fires again for new target chord appearing because advanceCursor triggers updated musicCurrentMidi value
+3. fires again for new playedMidi value
+
+It appears the redux state and local react state don't update synchronously. Either way I think having this logic here is not react-idiomatic. So I'm going to try rigging everything in the midi handler instead.
+
+That fixed it. I'm guessing what was happening is that advancing the cursor, even if it didn't actually change the values, still changed the actual object selected by the selector, which updates the value musicCurrentMidi. And since hooks appear to trigger with the data they have, regardless of what it will eventually become, that meant that even though we had called setPlayedMidi([]), that same hook would still re-trigger for the updated musicCurrentMidi value with the old playedMidi value. So we would continuously trigger dispatch(advanceCursor) wich continuously created new musicCurrentMidi values which continuously re-triggered the hook.

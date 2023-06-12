@@ -92,8 +92,8 @@ const musicStateHighlightCursor = (musicState: MusicState) => {
     const topPaths = document.querySelector(`#${pathIdTop}`)?.children;
     const bottomPaths = document.querySelector(`#${pathIdBottom}`)?.children;
 
-    if (topPaths !== undefined) Array.from(topPaths).forEach(p => p.setAttribute("fill", "#0f0"));
-    if (bottomPaths !== undefined) Array.from(bottomPaths).forEach(p => p.setAttribute("fill", "#0f0"));
+    if (topPaths !== undefined) Array.from(topPaths).forEach(p => p.setAttribute("fill", "#0c0"));
+    if (bottomPaths !== undefined) Array.from(bottomPaths).forEach(p => p.setAttribute("fill", "#0c0"));
 };
 
 const initialState: MusicState = {
@@ -156,13 +156,11 @@ export const musicSlice = createSlice({
     },
 });
 
-// why are these action creators and not actions??
-export const advanceCursor = musicSlice.actions.advanceCursor();
-export const retreatCursor = musicSlice.actions.retreatCursor();
-export const highlightCurrentChord = musicSlice.actions.highlightCurrentChord();
+export const { advanceCursor, retreatCursor, highlightCurrentChord, randomizeMusic } = musicSlice.actions;
 
 export const selectCursor = (state: RootState) => state.music.cursor;
 export const selectMusic = (state: RootState) => state.music.music;
+export const selectCursorAtEndOfMusic = (state: RootState) => musicStateCursorIsAtEnd(state.music);
 export const selectMusicCurrentMidi = (state: RootState) => {
     const music = state.music.music;
     const measureIndex = state.music.cursor.measureIndex;
