@@ -62,12 +62,59 @@ const musicStateStepCursorBackward = (musicState: MusicState) => {
     }
 };
 
+/**
+ * Returns boolean indicating if the cursor of the given music state is at the final array
+ * position of the music.
+ * 
+ * @param musicState 
+ * @returns 
+ */
 const musicStateCursorIsAtEnd = (musicState: MusicState) => {
     const staffEnd = musicState.music[musicState.cursor.measureIndex].staffTop.length - 1;
     const musicEnd = musicState.music.length - 1;
-    if (musicState.cursor.measureIndex === musicEnd && musicState.cursor.staffIndex === staffEnd) return true;
-    return false;
+    return musicState.cursor.measureIndex === musicEnd && musicState.cursor.staffIndex === staffEnd;
 };
+
+/**
+ * Returns a MusicCursor set to the position of the final chord in the given music state.
+ * 
+ * @param musicState 
+ * @returns 
+ */
+const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
+    const result: MusicCursor = {
+        measureIndex: musicState.music.length - 1,
+        staffIndex: musicState.music[musicState.music.length - 1].staffTop.length - 1,
+    };
+    const chordValid = (c: MusicCursor) => {
+        const topChord = musicState.music[c.measureIndex].staffTop[c.staffIndex];
+        const bottomChord = musicState.music[c.measureIndex].staffBottom[c.staffIndex];
+        return topChord !== null && bottomChord !== null;
+    };
+    while (!chordValid(result) && result.measureIndex >= 0) {
+        result.staffIndex--;
+        if (result.staffIndex < 0) {
+            result.measureIndex--;
+            result.staffIndex = result.measureIndex >= 0 ? musicState.music[result.measureIndex].staffTop.length - 1 : 0;
+        }
+    }
+    return result;
+};
+
+/**
+ * Returns boolean indicating if the cursor the given music state is at the position
+ * of the last chord in the music.
+ * 
+ * @param musicState 
+ * @returns 
+ */
+const musicStateCursorIsAtFinalChord = (musicState: MusicState) => {
+    const finalChordCursor = musicStateGetFinalChordCursor(musicState);
+    const measureSame = finalChordCursor.measureIndex === musicState.cursor.measureIndex;
+    const staffSame = finalChordCursor.staffIndex === musicState.cursor.staffIndex;
+    // now measureIndex and staffIndex will be at position of final chord in the the music
+    return measureSame && staffSame;
+}
 
 const musicStateCursorIsAtStart = (musicState: MusicState) => {
     return musicState.cursor.staffIndex === 0 && musicState.cursor.measureIndex === 0;
@@ -153,14 +200,19 @@ export const musicSlice = createSlice({
         randomizeMusic: (state, action: PayloadAction<RandomMusicParams>) => {
             state.music = generateRandomMusic(action.payload);
         },
+        setCursorToStart: (state) => {
+            state.cursor.measureIndex = 0;
+            state.cursor.staffIndex = 0;
+            while(!musicStateChordAtCursorIsValid(state)) musicStateStepCursorForward(state);
+        },
     },
 });
 
-export const { advanceCursor, retreatCursor, highlightCurrentChord, randomizeMusic } = musicSlice.actions;
+export const { advanceCursor, retreatCursor, highlightCurrentChord, randomizeMusic, setCursorToStart } = musicSlice.actions;
 
 export const selectCursor = (state: RootState) => state.music.cursor;
 export const selectMusic = (state: RootState) => state.music.music;
-export const selectCursorAtEndOfMusic = (state: RootState) => musicStateCursorIsAtEnd(state.music);
+export const selectCursorAtFinalChord = (state: RootState) => musicStateCursorIsAtFinalChord(state.music);
 export const selectMusicCurrentMidi = (state: RootState) => {
     const music = state.music.music;
     const measureIndex = state.music.cursor.measureIndex;

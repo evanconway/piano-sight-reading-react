@@ -2,7 +2,7 @@ import "react";
 import { useEffect, useState } from "react";
 import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtEndOfMusic, selectMusic, selectMusicCurrentMidi } from "../state/musicSlice";
+import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences } from "../state/userPreferencesSlice";
 
 const Score = () => {
@@ -17,9 +17,11 @@ const Score = () => {
 
     // render
     useEffect(() => {
-        const render = () => renderAbcjs(music, getWidth());
+        const render = () => {
+            renderAbcjs(music, getWidth());
+            dispatch(highlightCurrentChord());
+        };
         render();
-        dispatch(highlightCurrentChord());
         window.addEventListener("resize", render);
         return () => {
             window.removeEventListener("resize", render);
@@ -43,7 +45,7 @@ const Score = () => {
     // the midi values the user is supposed to play
     const musicCurrentMidi = useAppSelector(selectMusicCurrentMidi);
 
-    const cursorAtEnd = useAppSelector(selectCursorAtEndOfMusic);
+    const cursorAtEnd = useAppSelector(selectCursorAtFinalChord);
 
     if (midiAccess === undefined) navigator.requestMIDIAccess()
         .then(ma => setMidiAccess(ma))
@@ -73,8 +75,10 @@ const Score = () => {
                 }
             }
             setPlayedMidi([]);
-            if (cursorAtEnd) dispatch(randomizeMusic(userPreferences));
-            else dispatch(advanceCursor());
+            if (cursorAtEnd) {
+                dispatch(randomizeMusic(userPreferences));
+                dispatch(setCursorToStart());
+            } else dispatch(advanceCursor());
         };
         const addMidiHandlers = () => Array.from(midiAccess.inputs.values()).forEach(i => i.onmidimessage = handleMidi);
         /*
