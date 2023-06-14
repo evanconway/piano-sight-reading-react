@@ -9,16 +9,16 @@ const Score = () => {
     const dispatch = useAppDispatch();
     const music = useAppSelector(selectMusic);
 
-    /*
-    The last staff doesn't stretch correctly when the width is greater than 1100 for some
-    unknown reason. This is a temporary hack until we fix that issue.
-    */
-    const getWidth = () => Math.min(window.innerWidth * 0.9, 1100);
-
     // render
     useEffect(() => {
         const render = () => {
-            renderAbcjs(music, getWidth());
+            /*
+            Without some sort of buffer the staff stretches too far, hence the -100. Need
+            to do research and understand this better. It's probably something to do with
+            the built-in padding of the svg rendered by abcjs. And maybe also the built-in
+            padding of the page.
+            */
+            renderAbcjs(music, window.innerWidth - 100);
             dispatch(highlightCurrentChord());
         };
         render();

@@ -213,7 +213,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
     //prepare string
     const firstM = measures[0]; // first measure to get values from
 
-    let abcString = "T:\n";
+    let abcString = "T:Sight Reading Practice\n";
     abcString += `M:${firstM.timeSignature}\n`;
     abcString += `L:1/${getMeasureDuration(firstM.timeSignature)}\n`;
     abcString += `K:${firstM.keySignature}\n`;
@@ -257,6 +257,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         add_classes: true,
         selectionColor: "#000",
         staffwidth: width,
+        scale: window.innerWidth > 400 ? 1 : 0.8,
     });
 
     const pathsTop = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
