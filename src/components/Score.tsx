@@ -1,5 +1,5 @@
 import "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToStart } from "../state/musicSlice";
@@ -10,25 +10,23 @@ const Score = () => {
     const dispatch = useAppDispatch();
     const music = useAppSelector(selectMusic);
 
+    const scoreRef = useRef<HTMLDivElement>(null);
+
     // render
     useEffect(() => {
-        const clearChildren = (element: Element) => {
-            while (element.firstChild) element.removeChild(element.firstChild);
-        };
         const render = () => {
-            const scoreElement = document.querySelector(`#${SCORE_ID}`);
-            if (scoreElement === null) return;
-            clearChildren(scoreElement); // remove old svg to be safe
-            renderAbcjs(music, scoreElement.getBoundingClientRect().width);
+            if (scoreRef.current === null) return;
+            renderAbcjs(music, scoreRef.current.getBoundingClientRect().width);
             dispatch(highlightCurrentChord());
         };
-        render();
         window.addEventListener("resize", render);
+        render();
         return () => {
             window.removeEventListener("resize", render);
-            const scoreElement = document.querySelector(`#${SCORE_ID}`);
-            if (scoreElement !== null) clearChildren(scoreElement);
-        }
+            while (scoreRef.current?.firstChild) {
+                scoreRef.current.removeChild(scoreRef.current.firstChild);
+            }
+        };
     }, [music]);
 
     // arrow keys
@@ -103,9 +101,9 @@ const Score = () => {
         userPreferences
     ]);
 
-    return <div id={SCORE_ID} style={{
+    return <div id={SCORE_ID} ref={scoreRef} style={{
         backgroundColor: "#ffe0b3",
-        textAlign: "center",
+        //textAlign: "center",
         maxWidth: "1100px",
         borderRadius: 8,
     }}/>;

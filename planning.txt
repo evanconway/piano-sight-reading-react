@@ -137,3 +137,5 @@ It's been a few days. Time to plan out the next feature. It should be music cust
 15th of June, 2023
 
 Going to work on making sure the score resizes correctly. In a way, user preferences are probably more important, but the lack of responsiveness is driving me crazy.
+
+We've encountered an interesting bug. When the scale of the abcjs render is set to anything less than one, the the music doesn't resize with the window. On resize, our logic is setup to get the width of the div the score should be rendered to, and passes it to our abcjsRender function. This works as expected with scale sizes of 1 or great. But when less than one the width of the div remains the same. It sticks the value it had when the page loaded. Why would this be happening? Is the abcjsRender somehow affecting the parent div when invoked with a scale less than 1?
