@@ -4,6 +4,7 @@ import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences } from "../state/userPreferencesSlice";
+import { SCORE_ID } from "../music_new/defaults";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -11,21 +12,23 @@ const Score = () => {
 
     // render
     useEffect(() => {
+        const clearChildren = (element: Element) => {
+            while (element.firstChild) element.removeChild(element.firstChild);
+        };
         const render = () => {
-            /*
-            Without some sort of buffer the staff stretches too far, hence the -100. Need
-            to do research and understand this better. It's probably something to do with
-            the built-in padding of the svg rendered by abcjs. And maybe also the built-in
-            padding of the page.
-            */
-            renderAbcjs(music, window.innerWidth - 100);
+            const scoreElement = document.querySelector(`#${SCORE_ID}`);
+            if (scoreElement === null) return;
+            clearChildren(scoreElement); // remove old svg to be safe
+            renderAbcjs(music, scoreElement.getBoundingClientRect().width);
             dispatch(highlightCurrentChord());
         };
         render();
         window.addEventListener("resize", render);
         return () => {
             window.removeEventListener("resize", render);
-        };
+            const scoreElement = document.querySelector(`#${SCORE_ID}`);
+            if (scoreElement !== null) clearChildren(scoreElement);
+        }
     }, [music]);
 
     // arrow keys
@@ -100,9 +103,11 @@ const Score = () => {
         userPreferences
     ]);
 
-    return <div id="score" style={{
+    return <div id={SCORE_ID} style={{
         backgroundColor: "#ffe0b3",
         textAlign: "center",
+        maxWidth: "1100px",
+        borderRadius: 8,
     }}/>;
 };
 

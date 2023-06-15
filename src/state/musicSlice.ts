@@ -146,7 +146,7 @@ const musicStateHighlightCursor = (musicState: MusicState) => {
 const initialState: MusicState = {
     cursor: { measureIndex: 0, staffIndex: 0 },
     music: generateRandomMusic({
-        numberOfMeasures: 16,
+        numberOfMeasures: 25,
         keySignature: DEFAULT_KEY_SIGNATURE,
         timeSignature: DEFAULT_TIME_SIGNATURE,
         topStaffDuration: DEFAULT_TOP_STAFF_DURATION,

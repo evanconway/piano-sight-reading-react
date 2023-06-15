@@ -128,3 +128,12 @@ We made significant progress without needing to plan much. Now it correctly gene
 It appears the redux state and local react state don't update synchronously. Either way I think having this logic here is not react-idiomatic. So I'm going to try rigging everything in the midi handler instead.
 
 That fixed it. I'm guessing what was happening is that advancing the cursor, even if it didn't actually change the values, still changed the actual object selected by the selector, which updates the value musicCurrentMidi. And since hooks appear to trigger with the data they have, regardless of what it will eventually become, that meant that even though we had called setPlayedMidi([]), that same hook would still re-trigger for the updated musicCurrentMidi value with the old playedMidi value. So we would continuously trigger dispatch(advanceCursor) wich continuously created new musicCurrentMidi values which continuously re-triggered the hook.
+
+14th of June, 2023
+
+It's been a few days. Time to plan out the next feature. It should be music customizability, or user preferences. Our random music generation logic should theoretically work for all
+
+
+15th of June, 2023
+
+Going to work on making sure the score resizes correctly. In a way, user preferences are probably more important, but the lack of responsiveness is driving me crazy.
