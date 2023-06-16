@@ -111,7 +111,8 @@ const Score = () => {
     return <div id={SCORE_ID} ref={scoreRef} style={{
         backgroundColor: "#fff", // "#ffe0b3"
         maxWidth: "1100px",
-        border: "4px solid #000",
+        border: "3px solid #000",
+        margin: "0 auto",
         borderRadius: 8,
     }}/>;
 };

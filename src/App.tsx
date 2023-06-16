@@ -1,10 +1,11 @@
 import Score from "./components/Score";
 
 function App() {
-  return (<>
-    <Score/>
-    <div>options</div>
-  </>);
+  return (
+    <>
+      <Score/>
+    </>
+  );
 };
 
 export default App;
