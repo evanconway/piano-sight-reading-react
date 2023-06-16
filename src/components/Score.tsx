@@ -23,13 +23,7 @@ const Score = () => {
             is less than 1, it adds a width style to the div. This breaks our resize logic.
             To fix this, we remove the width style if it exists.
             */
-            const existingStyle = scoreRef.current.getAttribute("style");
-            const widthStart = existingStyle?.indexOf(" width: ");
-            if (existingStyle !== null && widthStart !== undefined && widthStart >= 0) {
-                const widthEnd = existingStyle.indexOf(";", widthStart);
-                const newStyle = existingStyle.slice(0, widthStart) + existingStyle.slice(widthEnd + 1, existingStyle.length);
-                scoreRef.current.setAttribute("style", newStyle);
-            }
+            scoreRef.current.style.width = "";
             dispatch(highlightCurrentChord());
         };
         window.addEventListener("resize", render);
