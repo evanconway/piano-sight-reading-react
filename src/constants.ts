@@ -1,4 +1,4 @@
-import { KeySignature, NoteDuration, Pitch, TimeSignature } from "./models"
+import { KeySignature, NoteDuration, Pitch, TimeSignature } from "./music_new/models";
 
 export const SCORE_ID = "score";
 
@@ -13,7 +13,25 @@ export const DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH: Pitch = { scaleDegree: 1, regis
 export const DEFAULT_BOTTOM_STAFF_LOWEST_PITCH: Pitch = { scaleDegree: 3, register: 2, accidental: 0 };
 export const DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD: number = 2;
 
-export const SCORE_SCALE_PHONE = 0.7;
+export const SCREEN_SIZE_STYLES = {
+    DESKTOP: {
+        PADDING_X: 40,
+        PADDING_BOTTOM: 60,
+        SCALE: 1,
+    },
+    TABLET: {
+        SIZE: 800,
+        PADDING_X: 30,
+        PADDING_BOTTOM: 50,
+        SCALE: 0.75,
+    },
+    PHONE: {
+        SIZE: 500,
+        PADDING_X: 20,
+        PADDING_BOTTOM: 40,
+        SCALE: 0.5,
+    },
+};
 
 const exampleAbcString = `
     T:

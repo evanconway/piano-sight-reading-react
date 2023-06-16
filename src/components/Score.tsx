@@ -4,7 +4,7 @@ import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences } from "../state/userPreferencesSlice";
-import { SCORE_ID } from "../music_new/defaults";
+import { SCORE_ID } from "../constants";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -46,7 +46,6 @@ const Score = () => {
         return () => window.removeEventListener("keydown", onArrowKeys);
     }, []);
 
-    // midi handling
     const [midiAccess, setMidiAccess] = useState<MIDIAccess>();
     const [playedMidi, setPlayedMidi] = useState<number[]>([]);
 
@@ -61,6 +60,7 @@ const Score = () => {
 
     const userPreferences = useAppSelector(selectUserPreferences);
 
+    // midi handling
     useEffect(() => {
         if (midiAccess === undefined) return;
         const handleMidi = (e: Event) => {
@@ -109,9 +109,9 @@ const Score = () => {
     ]);
 
     return <div id={SCORE_ID} ref={scoreRef} style={{
-        backgroundColor: "#ffe0b3",
-        //textAlign: "center",
+        backgroundColor: "#fff", // "#ffe0b3"
         maxWidth: "1100px",
+        border: "4px solid #000",
         borderRadius: 8,
     }}/>;
 };
