@@ -108,15 +108,18 @@ const Score = () => {
         userPreferences
     ]);
 
-    return <div id={SCORE_ID} ref={scoreRef} style={{
-        backgroundColor: "#fff",
-        maxWidth: "1100px",
-        boxShadow: "10px 10px 10px #888",
-        margin: "0 auto",
-        borderRadius: 4,
-        animationName: "fade-rise",
-        animationDuration: "0.6s",
-    }}/>;
+    return <div
+        id={SCORE_ID}
+        ref={scoreRef}
+        style={{
+            backgroundColor: "#fff",
+            maxWidth: "1100px",
+            boxShadow: "10px 10px 10px #888",
+            margin: "0 auto",
+            borderRadius: 4,
+            animation: "animation-fadein 0.6s, animation-risein 0.6s",
+        }}
+    />;
 };
 
 export default Score;
