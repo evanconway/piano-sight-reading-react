@@ -114,6 +114,8 @@ const Score = () => {
         boxShadow: "10px 10px 10px #888",
         margin: "0 auto",
         borderRadius: 4,
+        animationName: "fade-rise",
+        animationDuration: "0.6s",
     }}/>;
 };
 
