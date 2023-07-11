@@ -132,10 +132,22 @@ const musicStateChordAtCursorIsValid = (musicState: MusicState) => {
     return (chordTop !== null || chordBottom !== null);
 };
 
-const musicStateHighlightCursor = (musicState: MusicState) => {
-    measuresSetPathColors(musicState.music, "#000");
+/**
+ * Return the path ids of the top and bottoms staffs at the cursor of the state.
+ * 
+ * @param musicState 
+ * @returns 
+ */
+const musicStateGetCursorPathIds = (musicState: MusicState) => {
     const pathIdTop = musicState.music[musicState.cursor.measureIndex].staffTop[musicState.cursor.staffIndex]?.pathId;
     const pathIdBottom = musicState.music[musicState.cursor.measureIndex].staffBottom[musicState.cursor.staffIndex]?.pathId;
+    return { pathIdTop, pathIdBottom };
+};
+
+const musicStateHighlightCursor = (musicState: MusicState) => {
+    measuresSetPathColors(musicState.music, "#000");
+    const pathIdTop = musicStateGetCursorPathIds(musicState).pathIdTop;
+    const pathIdBottom = musicStateGetCursorPathIds(musicState).pathIdBottom;
     const topPaths = document.querySelector(`#${pathIdTop}`)?.children;
     const bottomPaths = document.querySelector(`#${pathIdBottom}`)?.children;
 
@@ -194,6 +206,29 @@ export const musicSlice = createSlice({
             }
             musicStateHighlightCursor(state);
         },
+        setCursorToPathId: (state, action: PayloadAction<string>) => {
+            state.cursor.measureIndex = 0;
+            state.cursor.staffIndex = 0;
+            const working = (musicState: MusicState) => {
+                let result = true;
+                if (musicStateGetCursorPathIds(musicState).pathIdTop === action.payload) result = false;
+                if (musicStateGetCursorPathIds(musicState).pathIdBottom === action.payload) result = false;
+                if (musicStateCursorIsAtEnd(musicState)) result = false;
+                return result;
+            };
+            while (working(state)) musicStateStepCursorForward(state);
+            musicStateHighlightCursor(state);
+            // setCursorToStart();
+            // const getCurrentPathId = () => {
+            //     const measureIndex = state.cursor.measureIndex;
+            //     const staffIndex = state.cursor.staffIndex;
+            //     return {
+            //         topPathId: state.music[measureIndex].staffTop[staffIndex]?.pathId,
+            //         bottomPathId: state.music[measureIndex].staffBottom[staffIndex]?.pathId,
+            //     };
+            // };
+            // while (selectMusicCerrentPathId(state))
+        },
         highlightCurrentChord: (state) => {
             musicStateHighlightCursor(state);
         },
@@ -208,7 +243,14 @@ export const musicSlice = createSlice({
     },
 });
 
-export const { advanceCursor, retreatCursor, highlightCurrentChord, randomizeMusic, setCursorToStart } = musicSlice.actions;
+export const {
+    advanceCursor,
+    retreatCursor,
+    highlightCurrentChord,
+    randomizeMusic,
+    setCursorToStart,
+    setCursorToPathId,
+} = musicSlice.actions;
 
 export const selectCursor = (state: RootState) => state.music.cursor;
 export const selectMusic = (state: RootState) => state.music.music;
@@ -224,6 +266,15 @@ export const selectMusicCurrentMidi = (state: RootState) => {
     const midiPitchesBot = pitchesBot ? pitchesBot.map(p => midiOfPitch(keySignature, p)) : [];
     // remove duplicates from returned array
     return Array.from(new Set([...midiPitchesTop, ...midiPitchesBot])).sort();
+};
+export const selectMusicCerrentPathId = (state: RootState) => {
+    const music = state.music.music;
+    const measureIndex = state.music.cursor.measureIndex;
+    const staffIndex = state.music.cursor.staffIndex;
+    return {
+        topPathId: music[measureIndex].staffTop[staffIndex]?.pathId,
+        bottomPathId: music[measureIndex].staffBottom[staffIndex]?.pathId,
+    };
 };
 
 export default musicSlice.reducer;

@@ -2,7 +2,7 @@ import "react";
 import { useEffect, useRef, useState } from "react";
 import { renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToStart } from "../state/musicSlice";
+import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences } from "../state/userPreferencesSlice";
 import { SCORE_ID } from "../constants";
 
@@ -16,7 +16,11 @@ const Score = () => {
     useEffect(() => {
         const render = () => {
             if (scoreRef.current === null) return;
-            renderAbcjs(music, scoreRef.current.getBoundingClientRect().width);
+            renderAbcjs(
+                music,
+                scoreRef.current.getBoundingClientRect().width,
+                (e) => dispatch(setCursorToPathId(e.abselem.elemset[0].id)),
+            );
             /*
             Unfortunately, the abcjs.render function is not pure, and modifies the styles of
             the target element, which is the score in this case. When the scale of the render
@@ -71,7 +75,6 @@ const Score = () => {
             if (midiData[0] === 144 && midiData[2] <= 0) newPlayedMidi = playedMidi.filter(m => m !== midiData[1]).sort();
             if (midiData[0] === 128) newPlayedMidi = playedMidi.filter(m => m !== midiData[1]).sort();
 
-            console.log(`played: ${newPlayedMidi}\ntarget: ${musicCurrentMidi}`);
             if (newPlayedMidi.length !== musicCurrentMidi.length) {
                 setPlayedMidi(newPlayedMidi);
                 return;

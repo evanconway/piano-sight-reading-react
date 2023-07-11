@@ -228,7 +228,7 @@ const getAbcScaleFromWidth = (width: number) => {
  * @param width 
  * @returns 
  */
-export const renderAbcjs = (measures: Measure[], width: number) => {
+export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abcjs.AbcElem) => void) => {
     //prepare string
     const firstM = measures[0]; // first measure to get values from
 
@@ -279,6 +279,7 @@ export const renderAbcjs = (measures: Measure[], width: number) => {
         paddingright: getAbcPaddingXFromWidth(width),
         paddingbottom: getAbcPaddingBottomFromWidth(width),
         scale: getAbcScaleFromWidth(width),
+        clickListener: onClick,
     });
 
     const pathsTop = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
