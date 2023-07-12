@@ -1,7 +1,10 @@
 import "react";
 import { useEffect, useRef, useState } from "react";
-import { Modal, Button } from "@mui/material";
+import { Modal, Button, Typography } from "@mui/material";
 import TopStaffDurationSelector from "./TopStaffDurationSelector";
+import BottomStaffDurationSelector from "./BottomStaffDurationSelector";
+import TopStaffNotesPerChordSelector from "./TopStaffNotesPerChordSelector";
+import BottomStaffNotesPerChordSelector from "./BottomStaffNotesPerChordSelector";
 
 const Options = () => {
     const [exists, setExists] = useState(true);
@@ -50,9 +53,16 @@ const Options = () => {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
+                    minWidth: "350px",
+                    padding: "16px",
+                    borderRadius: 8,
                 }}
             >
+                <Typography variant="h4">Random Music Options</Typography>
                 <TopStaffDurationSelector/>
+                <BottomStaffDurationSelector/>
+                <TopStaffNotesPerChordSelector/>
+                <BottomStaffNotesPerChordSelector/>
             </div>
         </Modal>
     </>;

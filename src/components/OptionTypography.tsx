@@ -6,7 +6,7 @@ interface OptionTypographyProps {
 }
 
 const OptionTypography = ({ children }: OptionTypographyProps) => {
-    return <Typography sx={{ padding: "10px" }}>{children}</Typography>;
+    return <Typography sx={{}}>{children}</Typography>;
 };
 
 export default OptionTypography;

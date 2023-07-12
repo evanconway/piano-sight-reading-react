@@ -1,23 +1,23 @@
 import "react";
 import { Select, MenuItem } from "@mui/material";
 import { NoteDuration } from "../music_new/models";
-import { selectUserPreferences, userPreferencesSetTopStaffDuration } from "../state/userPreferencesSlice";
+import { selectUserPreferences, userPreferencesSetBottomStaffDuration } from "../state/userPreferencesSlice";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
 import OptionTypography from "./OptionTypography";
 
-const TopStaffDurationSelector = () => {
+const BottomStaffDurationSelector = () => {
     const dispatch = useAppDispatch();
     const userPreferences = useAppSelector(selectUserPreferences);
 
     return <OptionsFormControlWrapper>
-        <OptionTypography>Top Staff Duration</OptionTypography>
+        <OptionTypography>Bottom Staff Duration</OptionTypography>
         <Select
-            id="options-duration-top-staff"
-            value={userPreferences.topStaffDuration}
+            id="options-notes-per-chord-bottom-staff"
+            value={userPreferences.bottomStaffDuration}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
-                dispatch(userPreferencesSetTopStaffDuration(e.target.value as NoteDuration));
+                dispatch(userPreferencesSetBottomStaffDuration(e.target.value as NoteDuration));
             }}
         >
             <MenuItem value={"whole"}>Whole</MenuItem>
@@ -29,4 +29,4 @@ const TopStaffDurationSelector = () => {
     </OptionsFormControlWrapper>
 };
 
-export default TopStaffDurationSelector;
+export default BottomStaffDurationSelector;
