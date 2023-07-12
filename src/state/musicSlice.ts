@@ -218,16 +218,6 @@ export const musicSlice = createSlice({
             };
             while (working(state)) musicStateStepCursorForward(state);
             musicStateHighlightCursor(state);
-            // setCursorToStart();
-            // const getCurrentPathId = () => {
-            //     const measureIndex = state.cursor.measureIndex;
-            //     const staffIndex = state.cursor.staffIndex;
-            //     return {
-            //         topPathId: state.music[measureIndex].staffTop[staffIndex]?.pathId,
-            //         bottomPathId: state.music[measureIndex].staffBottom[staffIndex]?.pathId,
-            //     };
-            // };
-            // while (selectMusicCerrentPathId(state))
         },
         highlightCurrentChord: (state) => {
             musicStateHighlightCursor(state);

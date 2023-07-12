@@ -9,8 +9,13 @@ import { SCORE_ID } from "../constants";
 const Score = () => {
     const dispatch = useAppDispatch();
     const music = useAppSelector(selectMusic);
-
     const scoreRef = useRef<HTMLDivElement>(null);
+    const userPreferences = useAppSelector(selectUserPreferences);
+
+    // regenerage music on preferences change
+    useEffect(() => {
+        dispatch(randomizeMusic(userPreferences));
+    }, [userPreferences]);
 
     // render
     useEffect(() => {
@@ -61,8 +66,6 @@ const Score = () => {
     if (midiAccess === undefined) navigator.requestMIDIAccess()
         .then(ma => setMidiAccess(ma))
         .catch(e => console.log(e));
-
-    const userPreferences = useAppSelector(selectUserPreferences);
 
     // midi handling
     useEffect(() => {
