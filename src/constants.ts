@@ -33,6 +33,8 @@ export const SCREEN_SIZE_STYLES = {
     },
 };
 
+export type ReactChildren = string | JSX.Element | JSX.Element[];
+
 const exampleAbcString = `
     T:
     M:4/4
