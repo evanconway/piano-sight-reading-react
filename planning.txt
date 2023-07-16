@@ -160,3 +160,8 @@ style with scale less than 0:
     height: 891.77px;
 
 It looks like we've managed to fix this by adding some logic that, after invoking abcjs.render(), sets the style attribute of the score div with the width property parsed out.
+
+
+15th of July, 2023
+
+Been out of it for a while, but made some decent progress in the last week. Right now working on making sure min and max pitch values can be selected as user options. Originally I allowed the user to select the pitch itself relative to the key signature. But I've just realized this doesn't work well. For example if we're in the key of C and I set scale degree 5 register 5 as the highest possible pitch, that's the G above the staff in the treble clef, but if we change the key to F that's suddenly the C on the 3rd space of the treble clef. I think that instead the caps should reflext the lines/spaces on the staff. We'll have to work out a different system that's more intuitive.
