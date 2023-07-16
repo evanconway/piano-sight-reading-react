@@ -9,7 +9,7 @@ import { SCORE_ID, SCREEN_SIZE_STYLES } from "../constants";
  * @param pitch 
  * @returns 
  */
-export const midiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
+export const getMidiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
     const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.midi;
     if (baseMidi === undefined) return 0;
@@ -40,8 +40,8 @@ const getRandomChord = (
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
     let pitchToAdd = {...lowest};
-    const midiOfPitchHighest = midiOfPitch(keySig, highest);
-    let midiOfPitchToAdd = midiOfPitch(keySig, pitchToAdd);
+    const midiOfPitchHighest = getMidiOfPitch(keySig, highest);
+    let midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
     while (midiOfPitchToAdd <= midiOfPitchHighest) {
         possiblePitches.push(pitchToAdd);
         pitchToAdd = {...pitchToAdd};
@@ -50,17 +50,17 @@ const getRandomChord = (
             pitchToAdd.scaleDegree = 1;
             pitchToAdd.register++;
         }
-        midiOfPitchToAdd = midiOfPitch(keySig, pitchToAdd);
+        midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
     }
     // add pitches to result, ensuring already added pitches, and pitches outside of octave limit are removed
     for (let i = 0; i < numberOfPitches; i++) {
         const newPitchIndex = Math.floor(Math.random() * possiblePitches.length);
         result.pitches.push(possiblePitches[newPitchIndex]);
-        result.pitches.sort((a, b) => midiOfPitch(keySig, a) - midiOfPitch(keySig, b));
+        result.pitches.sort((a, b) => getMidiOfPitch(keySig, a) - getMidiOfPitch(keySig, b));
         possiblePitches = possiblePitches.filter((p, i) => {
             if (i === newPitchIndex) return false;
-            if (midiOfPitch(keySig, p) > midiOfPitch(keySig, result.pitches[0]) + 12) return false;
-            if (midiOfPitch(keySig, p) <= midiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12) return false;
+            if (getMidiOfPitch(keySig, p) > getMidiOfPitch(keySig, result.pitches[0]) + 12) return false;
+            if (getMidiOfPitch(keySig, p) <= getMidiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12) return false;
             return true;
         });
     }
@@ -179,6 +179,48 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
     if (pitch.register === 8) result += "'''";
     // need to add accidentals
     return result;
+};
+
+/**
+ * Returns array of diatonic pitch objects in given key in given range.
+ * 
+ * @param key 
+ * @param caps 
+ * @returns 
+ */
+export const getPitchRangeInKey = (key: KeySignature, min: Pitch, max: Pitch) => {
+    const capBottom = getMidiOfPitch(key, min);
+    const capTop = getMidiOfPitch(key, max);
+    const pitch: Pitch = { scaleDegree: 1, register: -1, accidental: 0 };
+    const result: Pitch[] = [];
+    while (getMidiOfPitch(key, pitch) <= capTop) {
+        if (getMidiOfPitch(key, pitch) >= capBottom) result.push({ ...pitch });
+        if (pitch.scaleDegree === 7) {
+            pitch.scaleDegree = 1;
+            pitch.register++;
+        } else {
+            pitch.scaleDegree++;
+        }
+    }
+    return result;
+};
+
+export const getStringFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
+    let result = KeyScaleMidiMap.get(keySignature)?.get(pitch.scaleDegree)?.pitchClass as string;
+    return result + pitch.register;
+};
+
+/**
+ * Returs array of diatonic pitch strings of given key and range.
+ * 
+ * @param key 
+ * @param min 
+ * @param max 
+ * @returns 
+ */
+export const getPitchStringsInRange = (key: KeySignature, min: Pitch, max: Pitch) => {
+    const pitches = getPitchRangeInKey(key, min, max);
+    return pitches.map(p => getStringFromPitch(p, key));
 };
 
 /**

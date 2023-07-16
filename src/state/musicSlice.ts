@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Measure, measuresSetPathColors } from "../music_new/models";
 import { RootState } from "./store";
-import { RandomMusicParams, generateRandomMusic, midiOfPitch } from "../music_new/functions";
+import { RandomMusicParams, generateRandomMusic, getMidiOfPitch } from "../music_new/functions";
 import { DEFAULT_BOTTOM_STAFF_DURATION, DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH, DEFAULT_BOTTOM_STAFF_LOWEST_PITCH, DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD, DEFAULT_KEY_SIGNATURE, DEFAULT_TIME_SIGNATURE, DEFAULT_TOP_STAFF_DURATION, DEFAULT_TOP_STAFF_HIGHEST_PITCH, DEFAULT_TOP_STAFF_LOWEST_PITCH, DEFAULT_TOP_STAFF_NOTES_PER_CHORD } from "../constants";
 
 interface MusicCursor {
@@ -252,8 +252,8 @@ export const selectMusicCurrentMidi = (state: RootState) => {
     const pitchesTop = music[measureIndex].staffTop[staffIndex]?.pitches;
     const pitchesBot = music[measureIndex].staffBottom[staffIndex]?.pitches;
     const keySignature = music[measureIndex].keySignature;
-    const midiPitchesTop = pitchesTop ? pitchesTop.map(p => midiOfPitch(keySignature, p)) : [];
-    const midiPitchesBot = pitchesBot ? pitchesBot.map(p => midiOfPitch(keySignature, p)) : [];
+    const midiPitchesTop = pitchesTop ? pitchesTop.map(p => getMidiOfPitch(keySignature, p)) : [];
+    const midiPitchesBot = pitchesBot ? pitchesBot.map(p => getMidiOfPitch(keySignature, p)) : [];
     // remove duplicates from returned array
     return Array.from(new Set([...midiPitchesTop, ...midiPitchesBot])).sort();
 };

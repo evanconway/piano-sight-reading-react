@@ -1,6 +1,7 @@
-export type PitchRegister = 0 | 1 | 2| 3 | 4 | 5 | 6 | 7 | 8;
+export type PitchRegister = -1 | 0 | 1 | 2| 3 | 4 | 5 | 6 | 7 | 8;
 export type ScaleDegree = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type Accidental = -2 | -1 | 0 | 1 | 2; // negative for flat, positive for sharp
+type AccidentalSymbol = "#" | "b";
 export type PitchClass = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
 export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth";
@@ -152,3 +153,73 @@ KeyScaleMidiMap.set("Fm", new Map([[3, {midi: 8, pitchClass: "F"}], [4, {midi: 1
 KeyScaleMidiMap.set("Bbm", new Map([[3, {midi: 1, pitchClass: "B"}], [4, {midi: 3, pitchClass: "C"}], [5, {midi: 5, pitchClass: "D"}], [6, {midi: 6, pitchClass: "E"}], [7, {midi: 8, pitchClass: "F"}], [1, {midi: 10, pitchClass: "G"}], [2, {midi: 0, pitchClass: "A"}]]));
 KeyScaleMidiMap.set("Ebm", new Map([[3, {midi: 6, pitchClass: "E"}], [4, {midi: 8, pitchClass: "F"}], [5, {midi: 10, pitchClass: "G"}], [6, {midi: 11, pitchClass: "A"}], [7, {midi: 1, pitchClass: "B"}], [1, {midi: 3, pitchClass: "C"}], [2, {midi: 5, pitchClass: "D"}]]));
 KeyScaleMidiMap.set("Abm", new Map([[3, {midi: 11, pitchClass: "A"}], [4, {midi: 1, pitchClass: "B"}], [5, {midi: 3, pitchClass: "C"}], [6, {midi: 4, pitchClass: "D"}], [7, {midi: 6, pitchClass: "E"}], [1, {midi: 8, pitchClass: "F"}], [2, {midi: 10, pitchClass: "G"}]]));
+
+const ORDER_OF_SHARPS: PitchClass[] = ["F", "C", "G", "D", "A", "E", "B"];
+const ORDER_OF_FLATS = ORDER_OF_SHARPS.reverse();
+
+type NumberOfSharpsFlats = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+const sharpsInKeyMap = new Map<KeySignature, NumberOfSharpsFlats>();
+sharpsInKeyMap.set("C", 0);
+sharpsInKeyMap.set("G", 1);
+sharpsInKeyMap.set("D", 2);
+sharpsInKeyMap.set("A", 3);
+sharpsInKeyMap.set("E", 4);
+sharpsInKeyMap.set("B", 5);
+sharpsInKeyMap.set("F#", 6);
+sharpsInKeyMap.set("C#", 7);
+sharpsInKeyMap.set("Am", 0);
+sharpsInKeyMap.set("Em", 1);
+sharpsInKeyMap.set("Bm", 2);
+sharpsInKeyMap.set("F#m", 3);
+sharpsInKeyMap.set("C#m", 4);
+sharpsInKeyMap.set("G#m", 5);
+sharpsInKeyMap.set("D#m", 6);
+sharpsInKeyMap.set("A#m", 7);
+
+const flatsInKeyMap = new Map<KeySignature, NumberOfSharpsFlats>();
+flatsInKeyMap.set("C", 0);
+flatsInKeyMap.set("F", 1);
+flatsInKeyMap.set("Bb", 2);
+flatsInKeyMap.set("Eb", 3);
+flatsInKeyMap.set("Ab", 4);
+flatsInKeyMap.set("Db", 5);
+flatsInKeyMap.set("Gb", 6);
+flatsInKeyMap.set("Cb", 7);
+flatsInKeyMap.set("Am", 0);
+flatsInKeyMap.set("Dm", 1);
+flatsInKeyMap.set("Gm", 2);
+flatsInKeyMap.set("Cm", 3);
+flatsInKeyMap.set("Fm", 4);
+flatsInKeyMap.set("Bbm", 5);
+flatsInKeyMap.set("Ebm", 6);
+flatsInKeyMap.set("Abm", 7);
+
+/**
+ * Get object with accidental type and array of pitch classes of accidentals within given key
+ * 
+ * @param key 
+ * @returns 
+ */
+export const getAccidentalsInKey = (key: KeySignature) => {
+    const sharpCount = sharpsInKeyMap.get(key);
+    const flatCount = flatsInKeyMap.get(key);
+
+    const accidentalType: AccidentalSymbol = sharpCount !== undefined ? "#" : "b";
+    const accidentals: PitchClass[] = [];
+
+    const result = {
+        accidentalType,
+        accidentals,
+    };
+
+    if (accidentalType === "#" && sharpCount !== undefined) {
+        for (let i = 0; i < sharpCount; i++) result.accidentals.push(ORDER_OF_SHARPS[i]);
+    }
+
+    if (accidentalType === "b" && flatCount !== undefined) {
+        for (let i = 0; i < flatCount; i++) result.accidentals.push(ORDER_OF_FLATS[i]);
+    }
+
+    return result;
+};
