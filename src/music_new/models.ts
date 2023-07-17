@@ -273,16 +273,20 @@ for (
     pitchCapOrder.push({ ...pitchCap });
 }
 
+const getIndexOfPitchCap = (cap: PitchCap) => {
+    return pitchCapOrder.findIndex(c => c.pitchClass === cap.pitchClass && c.register === cap.register);
+};
+
 export const pitchCapIsLowerThan = (cap: PitchCap, against: PitchCap) => {
-    const capIndex = pitchCapOrder.indexOf(cap);
-    const againstIndex = pitchCapOrder.indexOf(against);
+    const capIndex = getIndexOfPitchCap(cap)
+    const againstIndex = getIndexOfPitchCap(against);
     if (capIndex < 0 || againstIndex < 0) return false;
     return capIndex < againstIndex;
 };
 
 export const pitchCapIsHigherThan = (cap: PitchCap, against: PitchCap) => {
-    const capIndex = pitchCapOrder.indexOf(cap);
-    const againstIndex = pitchCapOrder.indexOf(against);
+    const capIndex = getIndexOfPitchCap(cap)
+    const againstIndex = getIndexOfPitchCap(against);
     if (capIndex < 0 || againstIndex < 0) return false;
     return capIndex > againstIndex;
 };
