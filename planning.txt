@@ -165,3 +165,8 @@ It looks like we've managed to fix this by adding some logic that, after invokin
 15th of July, 2023
 
 Been out of it for a while, but made some decent progress in the last week. Right now working on making sure min and max pitch values can be selected as user options. Originally I allowed the user to select the pitch itself relative to the key signature. But I've just realized this doesn't work well. For example if we're in the key of C and I set scale degree 5 register 5 as the highest possible pitch, that's the G above the staff in the treble clef, but if we change the key to F that's suddenly the C on the 3rd space of the treble clef. I think that instead the caps should reflext the lines/spaces on the staff. We'll have to work out a different system that's more intuitive.
+
+
+17th of July, 2023
+
+So, we could store pitch caps for random note selection as pitch class and register. When displaying these to the user we could add flats/sharps based on the key signature. When the user selects a note as a pitch cap, we'll simply find the pitch in the key with the same register and pitch class and set that pitch as the cap. We may need to create the pitch cap as a model and functions to translate caps to pitches given a key.

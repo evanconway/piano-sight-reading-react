@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, TimeSignature, getMeasureDuration, getMeasureWidth, getNoteDurationValue } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
 import { SCORE_ID, SCREEN_SIZE_STYLES } from "../constants";
 
 /**
@@ -72,12 +72,12 @@ export interface RandomMusicParams {
     keySignature: KeySignature,
     timeSignature: TimeSignature,
     topStaffDuration: NoteDuration,
-    topStaffHighestPitch: Pitch,
-    topStaffLowestPitch: Pitch,
+    topStaffHighestPitch: PitchCap,
+    topStaffLowestPitch: PitchCap,
     topStaffNotesPerChord: number,
     bottomStaffDuration: NoteDuration,
-    bottomStaffHighestPitch: Pitch,
-    bottomStaffLowestPitch: Pitch,
+    bottomStaffHighestPitch: PitchCap,
+    bottomStaffLowestPitch: PitchCap,
     bottomStaffNotesPerChord: number,
 }
 
@@ -125,8 +125,8 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
                 topStaffDuration,
                 keySignature,
                 topStaffNotesPerChord,
-                topStaffHighestPitch,
-                topStaffLowestPitch,
+                getPitchFromPitchCap(keySignature, topStaffHighestPitch),
+                getPitchFromPitchCap(keySignature, topStaffLowestPitch),
             );
             chord.pathId = pathIdBase + pathIdCount;
             pathIdCount++;
@@ -139,8 +139,8 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
                 bottomStaffDuration,
                 keySignature,
                 bottomStaffNotesPerChord,
-                bottomStaffHighestPitch,
-                bottomStaffLowestPitch,
+                getPitchFromPitchCap(keySignature, bottomStaffHighestPitch),
+                getPitchFromPitchCap(keySignature, bottomStaffLowestPitch),
             );
             chord.pathId = pathIdBase + pathIdCount;
             pathIdCount++;
@@ -182,45 +182,34 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
 };
 
 /**
- * Returns array of diatonic pitch objects in given key in given range.
+ * Return array of pitch cap objects within given range.
  * 
- * @param key 
- * @param caps 
- * @returns 
- */
-export const getPitchRangeInKey = (key: KeySignature, min: Pitch, max: Pitch) => {
-    const capBottom = getMidiOfPitch(key, min);
-    const capTop = getMidiOfPitch(key, max);
-    const pitch: Pitch = { scaleDegree: 1, register: -1, accidental: 0 };
-    const result: Pitch[] = [];
-    while (getMidiOfPitch(key, pitch) <= capTop) {
-        if (getMidiOfPitch(key, pitch) >= capBottom) result.push({ ...pitch });
-        if (pitch.scaleDegree === 7) {
-            pitch.scaleDegree = 1;
-            pitch.register++;
-        } else {
-            pitch.scaleDegree++;
-        }
-    }
-    return result;
-};
-
-export const getStringFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
-    let result = KeyScaleMidiMap.get(keySignature)?.get(pitch.scaleDegree)?.pitchClass as string;
-    return result + pitch.register;
-};
-
-/**
- * Returs array of diatonic pitch strings of given key and range.
- * 
- * @param key 
  * @param min 
  * @param max 
  * @returns 
  */
-export const getPitchStringsInRange = (key: KeySignature, min: Pitch, max: Pitch) => {
-    const pitches = getPitchRangeInKey(key, min, max);
-    return pitches.map(p => getStringFromPitch(p, key));
+export const getPitchCapsInRange = (min: PitchCap, max: PitchCap) => {
+    const result: PitchCap[] = [];
+    const pitchCap: PitchCap = { ...min };
+    while (pitchCap.pitchClass !== max.pitchClass && pitchCap.register !== max.register) {
+        result.push({...pitchCap});
+        raisePitchCap(pitchCap);
+    }
+    result.push({ ...max });
+    return result;
+};
+
+/**
+ * Get given pitch cap as string using given key signature.
+ * 
+ * @param pitchCap 
+ * @param key 
+ * @returns 
+ */
+export const getPitchCapString = (pitchCap: PitchCap, key: KeySignature) => {
+    const { accidentalType, accidentals } = getAccidentalsInKey(key);
+    const accidental = accidentals.includes(pitchCap.pitchClass) ? accidentalType : "";
+    return pitchCap.pitchClass + accidental + pitchCap.register;
 };
 
 /**

@@ -3,31 +3,35 @@ import OptionTypography from "./OptionTypography";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { selectUserPreferences, userPreferencesSetTopStaffHighestPitch } from "../state/userPreferencesSlice";
-import { getPitchRangeInKey, getStringFromPitch } from "../music_new/functions";
-import { Pitch } from "../music_new/models";
+
+import { PitchCap } from "../music_new/models";
+import { getPitchCapString, getPitchCapsInRange } from "../music_new/functions";
 
 const TopStaffHighestPitchSelector = () => {
     const dispatch = useAppDispatch();
-    const { keySignature, topStaffLowestPitch, topStaffHighestPitch } = useAppSelector(selectUserPreferences);
-    const pitchMap = new Map<string, Pitch>();
-    const pitches = getPitchRangeInKey(keySignature, topStaffLowestPitch, { scaleDegree: 1, register: 8, accidental: 0});
-    pitches.forEach(p => pitchMap.set(getStringFromPitch(p, keySignature), p));
+    const { keySignature, topStaffHighestPitch } = useAppSelector(selectUserPreferences);
+
+    const pitchCapMap = new Map<string, PitchCap>();
+    const pitchCaps = getPitchCapsInRange({ pitchClass: "G", register: 3 }, { pitchClass: "C", register: 6 });
+    pitchCaps.forEach(cap => pitchCapMap.set(getPitchCapString(cap, keySignature), cap));
 
     return <OptionsFormControlWrapper>
         <OptionTypography>Top Staff Highest Pitch</OptionTypography>
         <Select
             id="options-highest-pitch-top-staff"
-            value={getStringFromPitch(topStaffHighestPitch, keySignature)}
+            value={getPitchCapString(topStaffHighestPitch, keySignature)}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
-                const newPitchCap = pitchMap.get(e.target.value);
+                const target = e.target;
+                const value = target.value
+                const newPitchCap = pitchCapMap.get(value);
                 if (newPitchCap === undefined) return;
                 dispatch(userPreferencesSetTopStaffHighestPitch(newPitchCap));
             }}
         >
-            {pitches.map(p => {
-                const pitchString = getStringFromPitch(p, keySignature);
-                return <MenuItem value={pitchString}>{pitchString}</MenuItem>
+            {pitchCaps.map(cap => {
+                const capString = getPitchCapString(cap, keySignature);
+                return <MenuItem value={capString}>{capString}</MenuItem>
             }).reverse()}
         </Select>
     </OptionsFormControlWrapper>

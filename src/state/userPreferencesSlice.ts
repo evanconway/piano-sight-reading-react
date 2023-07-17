@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DEFAULT_BOTTOM_STAFF_DURATION, DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH, DEFAULT_BOTTOM_STAFF_LOWEST_PITCH, DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD, DEFAULT_KEY_SIGNATURE, DEFAULT_TIME_SIGNATURE, DEFAULT_TOP_STAFF_DURATION, DEFAULT_TOP_STAFF_HIGHEST_PITCH, DEFAULT_TOP_STAFF_LOWEST_PITCH, DEFAULT_TOP_STAFF_NOTES_PER_CHORD } from "../constants";
 import { RandomMusicParams } from "../music_new/functions";
-import { KeySignature, NoteDuration, Pitch, TimeSignature } from "../music_new/models";
+import { KeySignature, NoteDuration, Pitch, PitchCap, TimeSignature } from "../music_new/models";
 import { RootState } from "./store";
 
 const initialState: RandomMusicParams = {
@@ -34,10 +34,10 @@ const userPreferencesSlice = createSlice({
         userPreferencesSetTopStaffDuration: (state, action: PayloadAction<NoteDuration>) => {
             state.topStaffDuration = action.payload;
         },
-        userPreferencesSetTopStaffHighestPitch: (state, action: PayloadAction<Pitch>) => {
+        userPreferencesSetTopStaffHighestPitch: (state, action: PayloadAction<PitchCap>) => {
             state.topStaffHighestPitch = action.payload;
         },
-        userPreferencesSetTopStaffLowestPitch: (state, action: PayloadAction<Pitch>) => {
+        userPreferencesSetTopStaffLowestPitch: (state, action: PayloadAction<PitchCap>) => {
             state.topStaffLowestPitch = action.payload;
         },
         userPreferencesSetTopStaffNotesPerChord: (state, action: PayloadAction<number>) => {
@@ -46,10 +46,10 @@ const userPreferencesSlice = createSlice({
         userPreferencesSetBottomStaffDuration: (state, action: PayloadAction<NoteDuration>) => {
             state.bottomStaffDuration = action.payload;
         },
-        userPreferencesSetBottomStaffHighestPitch: (state, action: PayloadAction<Pitch>) => {
+        userPreferencesSetBottomStaffHighestPitch: (state, action: PayloadAction<PitchCap>) => {
             state.bottomStaffHighestPitch = action.payload;
         },
-        userPreferencesSetBottomStaffLowestPitch: (state, action: PayloadAction<Pitch>) => {
+        userPreferencesSetBottomStaffLowestPitch: (state, action: PayloadAction<PitchCap>) => {
             state.bottomStaffLowestPitch = action.payload;
         },
         userPreferencesSetBottomStaffNotesPerChord: (state, action: PayloadAction<number>) => {

@@ -4,6 +4,11 @@ export type Accidental = -2 | -1 | 0 | 1 | 2; // negative for flat, positive for
 type AccidentalSymbol = "#" | "b";
 export type PitchClass = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
+export type PitchCap = {
+    pitchClass: PitchClass,
+    register: PitchRegister,
+};
+
 export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth";
 
 export type TimeSignature = "4/4" | "3/4" | "6/8";
@@ -223,3 +228,47 @@ export const getAccidentalsInKey = (key: KeySignature) => {
 
     return result;
 };
+
+/**
+ * Given a key signature and pitch cap, return a pitch object.
+ * 
+ * @param key 
+ * @param cap 
+ * @returns 
+ */
+export const getPitchFromPitchCap = (key: KeySignature, cap: PitchCap) => {
+    const result: Pitch = { scaleDegree: 1, register: cap.register, accidental: 0};
+    const entries = KeyScaleMidiMap.get(key)?.entries();
+    if (!entries) return result;
+    result.scaleDegree = Array.from(entries).filter(entry => {
+        return entry[1].pitchClass === cap.pitchClass;
+    })[0][0];
+    return result;
+};
+
+// may need for quickly determing if a cap is lower/higher than another
+export const pitchCapOrder: PitchCap[] = [];
+
+const pitchClassOrder: PitchClass[] = ["C", "D", "E", "F", "G", "A", "B"];
+
+/**
+ * Mutate given pitch cap to next highest pitch.
+ * 
+ * @param cap 
+ */
+export const raisePitchCap = (cap: PitchCap) => {
+    if (cap.pitchClass === "B") {
+        cap.pitchClass = "C";
+        cap.register++;
+    }
+    const index = pitchClassOrder.indexOf(cap.pitchClass);
+    cap.pitchClass = pitchClassOrder[index + 1];
+};
+
+for (
+    const pitchCap: PitchCap = { pitchClass: "A", register: 0 };
+    pitchCap.pitchClass !== "C" && pitchCap.register !== 8;
+    raisePitchCap(pitchCap)
+) {
+    pitchCapOrder.push({ ...pitchCap });
+}
