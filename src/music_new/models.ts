@@ -246,9 +246,6 @@ export const getPitchFromPitchCap = (key: KeySignature, cap: PitchCap) => {
     return result;
 };
 
-// may need for quickly determing if a cap is lower/higher than another
-export const pitchCapOrder: PitchCap[] = [];
-
 const pitchClassOrder: PitchClass[] = ["C", "D", "E", "F", "G", "A", "B"];
 
 /**
@@ -260,15 +257,32 @@ export const raisePitchCap = (cap: PitchCap) => {
     if (cap.pitchClass === "B") {
         cap.pitchClass = "C";
         cap.register++;
+        return;
     }
     const index = pitchClassOrder.indexOf(cap.pitchClass);
     cap.pitchClass = pitchClassOrder[index + 1];
 };
 
+export const pitchCapOrder: PitchCap[] = [];
+
 for (
     const pitchCap: PitchCap = { pitchClass: "A", register: 0 };
-    pitchCap.pitchClass !== "C" && pitchCap.register !== 8;
+    pitchCap.pitchClass !== "D" || pitchCap.register !== 8;
     raisePitchCap(pitchCap)
 ) {
     pitchCapOrder.push({ ...pitchCap });
 }
+
+export const pitchCapIsLowerThan = (cap: PitchCap, against: PitchCap) => {
+    const capIndex = pitchCapOrder.indexOf(cap);
+    const againstIndex = pitchCapOrder.indexOf(against);
+    if (capIndex < 0 || againstIndex < 0) return false;
+    return capIndex < againstIndex;
+};
+
+export const pitchCapIsHigherThan = (cap: PitchCap, against: PitchCap) => {
+    const capIndex = pitchCapOrder.indexOf(cap);
+    const againstIndex = pitchCapOrder.indexOf(against);
+    if (capIndex < 0 || againstIndex < 0) return false;
+    return capIndex > againstIndex;
+};

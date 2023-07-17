@@ -4,15 +4,18 @@ import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { selectUserPreferences, userPreferencesSetTopStaffHighestPitch } from "../state/userPreferencesSlice";
 
-import { PitchCap } from "../music_new/models";
+import { PitchCap, pitchCapIsHigherThan, pitchCapOrder } from "../music_new/models";
 import { getPitchCapString, getPitchCapsInRange } from "../music_new/functions";
 
 const TopStaffHighestPitchSelector = () => {
     const dispatch = useAppDispatch();
-    const { keySignature, topStaffHighestPitch } = useAppSelector(selectUserPreferences);
+    const { keySignature, topStaffHighestPitch, topStaffLowestPitch, topStaffNotesPerChord } = useAppSelector(selectUserPreferences);
+
+    const indexOfTopStaffLowestPitch = pitchCapOrder.findIndex(cap => cap.pitchClass === topStaffLowestPitch.pitchClass && cap.register === topStaffLowestPitch.register);
+    const minimum = pitchCapOrder[indexOfTopStaffLowestPitch + topStaffNotesPerChord - 1];
 
     const pitchCapMap = new Map<string, PitchCap>();
-    const pitchCaps = getPitchCapsInRange({ pitchClass: "G", register: 3 }, { pitchClass: "C", register: 6 });
+    const pitchCaps = getPitchCapsInRange(minimum, { pitchClass: "C", register: 6 });
     pitchCaps.forEach(cap => pitchCapMap.set(getPitchCapString(cap, keySignature), cap));
 
     return <OptionsFormControlWrapper>
@@ -31,7 +34,7 @@ const TopStaffHighestPitchSelector = () => {
         >
             {pitchCaps.map(cap => {
                 const capString = getPitchCapString(cap, keySignature);
-                return <MenuItem value={capString}>{capString}</MenuItem>
+                return <MenuItem disabled={pitchCapIsHigherThan(cap, minimum)} value={capString}>{capString}</MenuItem>
             }).reverse()}
         </Select>
     </OptionsFormControlWrapper>

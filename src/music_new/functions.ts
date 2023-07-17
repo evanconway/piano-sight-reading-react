@@ -191,7 +191,7 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
 export const getPitchCapsInRange = (min: PitchCap, max: PitchCap) => {
     const result: PitchCap[] = [];
     const pitchCap: PitchCap = { ...min };
-    while (pitchCap.pitchClass !== max.pitchClass && pitchCap.register !== max.register) {
+    while (pitchCap.pitchClass !== max.pitchClass || pitchCap.register !== max.register) {
         result.push({...pitchCap});
         raisePitchCap(pitchCap);
     }
