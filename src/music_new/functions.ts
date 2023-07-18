@@ -227,23 +227,33 @@ export const getPitchCapString = (pitchCap: PitchCap, key: KeySignature) => {
 };
 
 /**
- * Returns an abc string for a given array of chords.
+ * Returns the ABC notation string for the top or bottom staff of the given measure.
  * 
+ * @param measure 
  * @param staff 
- * @param keySignature 
  * @returns 
  */
-const getAbcStringFromChordArray = (staff: (Chord | null)[], keySignature: KeySignature) => {
+const getAbcStringFromMeasureStaff = (measure: Measure, staff: "top" | "bottom") => {
+    const chords = staff === "top" ? measure.staffTop : measure.staffBottom;
     let result = "";
-    staff.forEach(chord => {
+
+    // logic to determine where to break beams
+    let beamBreakIndexes: number[] = [];
+    const divisions = measure.timeSignature === "4/4" ? 4 : measure.timeSignature === "3/4" ? 3 : 2;
+    const sdlkfjsdf = chords.length / divisions;
+    if (Math.floor(sdlkfjsdf) !== sdlkfjsdf) throw new Error("measure staff lengths must be multiples of 12");
+    for (let i = 1; i < divisions; i++) beamBreakIndexes.push(sdlkfjsdf * i);
+
+    // create staff string from chords
+    chords.forEach((chord, i) => {
+        if (beamBreakIndexes.includes(i)) result += " ";
         if (!chord) return;
         if (chord.pitches.length > 1) result += "[";
         chord.pitches.forEach(p => {
-            result += getAbcPitchFromPitch(p, keySignature);
+            result += getAbcPitchFromPitch(p, measure.keySignature);
         });
         if (chord.pitches.length > 1) result += "]";
         result += getNoteDurationValue(chord.duration);
-        result += " ";
     });
     return result;
 };
@@ -300,14 +310,14 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
     while (writing) {
         abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            abcString += getAbcStringFromChordArray(measures[i].staffTop, measures[i].keySignature);
+            abcString += getAbcStringFromMeasureStaff(measures[i], "top");// getAbcStringFromChordArray(measures[i].staffTop, measures[i].keySignature);
             abcString += "|";
             if (i === measures.length - 1) abcString += "]";
         }
         abcString += "\n";
         abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            abcString += getAbcStringFromChordArray(measures[i].staffBottom, measures[i].keySignature);
+            abcString += getAbcStringFromMeasureStaff(measures[i], "bottom");// getAbcStringFromChordArray(measures[i].staffBottom, measures[i].keySignature);
             abcString += "|";
             if (i === measures.length - 1) abcString += "]";
         }
