@@ -177,3 +177,5 @@ The logic currently breaks now when changing keys. I believe it has something to
 18th of July, 2023
 
 Looks like we got random music generation fixed, and correctly updating with key changes, but it looks like minor keys are bugged. Note detection does not occur. Also when the music regenerates the cursor is not reset to the starting position.
+
+Turns out we had just entered our data for minor keys incorrectly. Next we should look at the bug where differing durations in top and bottom staff don't advance cursor correctly.

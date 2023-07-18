@@ -89,7 +89,7 @@ const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
     const chordValid = (c: MusicCursor) => {
         const topChord = musicState.music[c.measureIndex].staffTop[c.staffIndex];
         const bottomChord = musicState.music[c.measureIndex].staffBottom[c.staffIndex];
-        return topChord !== null && bottomChord !== null;
+        return topChord !== null || bottomChord !== null;
     };
     while (!chordValid(result) && result.measureIndex >= 0) {
         result.staffIndex--;
