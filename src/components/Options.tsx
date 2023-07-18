@@ -7,6 +7,8 @@ import TopStaffNotesPerChordSelector from "./TopStaffNotesPerChordSelector";
 import BottomStaffNotesPerChordSelector from "./BottomStaffNotesPerChordSelector";
 import TopStaffHighestPitchSelector from "./TopStaffHighestPitchSelector";
 import TopStaffLowestPitchSelector from "./TopStaffLowestPitchSelector";
+import BottomStaffHighestPitchSelector from "./BottomStaffHighestPitchSelector";
+import BottomStaffLowestPitchSelector from "./BottomStaffLowestPitchSelector";
 
 const Options = () => {
     const [exists, setExists] = useState(true);
@@ -67,6 +69,8 @@ const Options = () => {
                 <BottomStaffNotesPerChordSelector/>
                 <TopStaffHighestPitchSelector/>
                 <TopStaffLowestPitchSelector/>
+                <BottomStaffHighestPitchSelector/>
+                <BottomStaffLowestPitchSelector/>
             </div>
         </Modal>
     </>;

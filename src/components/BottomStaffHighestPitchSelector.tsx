@@ -2,31 +2,31 @@ import { MenuItem, Select } from "@mui/material";
 import OptionTypography from "./OptionTypography";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { selectUserPreferences, userPreferencesSetTopStaffHighestPitch } from "../state/userPreferencesSlice";
+import { selectUserPreferences, userPreferencesSetBottomStaffHighestPitch } from "../state/userPreferencesSlice";
 import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../music_new/models";
 import { getPitchCapString, getPitchCapsInRange } from "../music_new/functions";
 
-const TopStaffHighestPitchSelector = () => {
+const BottomStaffHighestPitchSelector = () => {
     const dispatch = useAppDispatch();
-    const { keySignature, topStaffHighestPitch, topStaffLowestPitch, topStaffNotesPerChord } = useAppSelector(selectUserPreferences);
+    const { keySignature, bottomStaffHighestPitch, bottomStaffLowestPitch, bottomStaffNotesPerChord } = useAppSelector(selectUserPreferences);
 
-    const indexOfTopStaffLowestPitch = pitchCapOrder.findIndex(cap => cap.pitchClass === topStaffLowestPitch.pitchClass && cap.register === topStaffLowestPitch.register);
-    const minimum = pitchCapOrder[indexOfTopStaffLowestPitch + topStaffNotesPerChord - 1];
+    const indexOfBottomStaffLowestPitch = pitchCapOrder.findIndex(cap => cap.pitchClass === bottomStaffLowestPitch.pitchClass && cap.register === bottomStaffLowestPitch.register);
+    const minimum = pitchCapOrder[indexOfBottomStaffLowestPitch + bottomStaffNotesPerChord - 1];
 
     const pitchCapMap = new Map<string, PitchCap>();
-    const pitchCaps = getPitchCapsInRange({ pitchClass: "G", register: 3 }, { pitchClass: "C", register: 6 });
+    const pitchCaps = getPitchCapsInRange({ pitchClass: "C", register: 2 }, { pitchClass: "E", register: 4 });
     pitchCaps.forEach(cap => pitchCapMap.set(getPitchCapString(cap, keySignature), cap));
 
     return <OptionsFormControlWrapper>
-        <OptionTypography>Top Staff Highest Pitch</OptionTypography>
+        <OptionTypography>Bottom Staff Highest Pitch</OptionTypography>
         <Select
-            id="options-highest-pitch-top-staff"
-            value={getPitchCapString(topStaffHighestPitch, keySignature)}
+            id="options-highest-pitch-Bottom-staff"
+            value={getPitchCapString(bottomStaffHighestPitch, keySignature)}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
                 const newPitchCap = pitchCapMap.get(e.target.value);
                 if (newPitchCap === undefined) return;
-                dispatch(userPreferencesSetTopStaffHighestPitch(newPitchCap));
+                dispatch(userPreferencesSetBottomStaffHighestPitch(newPitchCap));
             }}
         >
             {pitchCaps.map(cap => {
@@ -38,4 +38,4 @@ const TopStaffHighestPitchSelector = () => {
     </OptionsFormControlWrapper>
 };
 
-export default TopStaffHighestPitchSelector;
+export default BottomStaffHighestPitchSelector;
