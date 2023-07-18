@@ -15,6 +15,7 @@ const Score = () => {
     // regenerage music on preferences change
     useEffect(() => {
         dispatch(randomizeMusic(userPreferences));
+        dispatch(setCursorToStart());
     }, [userPreferences]);
 
     // render
@@ -77,7 +78,6 @@ const Score = () => {
             if (midiData[0] === 144 && midiData[2] > 0) newPlayedMidi = [...playedMidi, midiData[1]].sort();
             if (midiData[0] === 144 && midiData[2] <= 0) newPlayedMidi = playedMidi.filter(m => m !== midiData[1]).sort();
             if (midiData[0] === 128) newPlayedMidi = playedMidi.filter(m => m !== midiData[1]).sort();
-
             if (newPlayedMidi.length !== musicCurrentMidi.length) {
                 setPlayedMidi(newPlayedMidi);
                 return;
