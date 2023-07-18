@@ -170,3 +170,5 @@ Been out of it for a while, but made some decent progress in the last week. Righ
 17th of July, 2023
 
 So, we could store pitch caps for random note selection as pitch class and register. When displaying these to the user we could add flats/sharps based on the key signature. When the user selects a note as a pitch cap, we'll simply find the pitch in the key with the same register and pitch class and set that pitch as the cap. We may need to create the pitch cap as a model and functions to translate caps to pitches given a key.
+
+The logic currently breaks now when changing keys. I believe it has something to our pitch cap system restricting the pitches that can be chosen too aggresively, which forces undefined pitches into the music.

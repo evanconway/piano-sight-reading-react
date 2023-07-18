@@ -17,6 +17,23 @@ export const getMidiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
 };
 
 /**
+ * Returns new pitch object advanced to next step in given key signature.
+ * Ignore accidentals.
+ * 
+ * @param key 
+ * @param pitch 
+ */
+export const getPitchAdvanced = (key: KeySignature, pitch: Pitch) => {
+    const pitchClass = KeyScaleMidiMap.get(key)?.get(pitch.scaleDegree)?.pitchClass;
+    if (pitchClass === undefined) return { ...pitch }; // probably a terrible idea, fix later
+    return { 
+        scaleDegree: pitch.scaleDegree >= 7 ? 1 : pitch.scaleDegree + 1,
+        register: pitchClass === "B" ? pitch.register + 1 : pitch.register,
+        accidental: 0,
+     } as Pitch;
+};
+
+/**
  * Returns a chord of random pitches in the given key. Pitches will not be higher or lower than the given caps. Pitches
  * will not be more than an octave apart. Pitches will be in given harmony if supplied.
  * 
@@ -35,7 +52,6 @@ const getRandomChord = (
     lowest: Pitch,
     harmony?: string, // not implemented yet
 ) => {
-    //debugger;
     const result: Chord = { duration, pitches: [], pathId: "" };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
@@ -43,13 +59,8 @@ const getRandomChord = (
     const midiOfPitchHighest = getMidiOfPitch(keySig, highest);
     let midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
     while (midiOfPitchToAdd <= midiOfPitchHighest) {
-        possiblePitches.push(pitchToAdd);
-        pitchToAdd = {...pitchToAdd};
-        pitchToAdd.scaleDegree++;
-        if (pitchToAdd.scaleDegree > 7) {
-            pitchToAdd.scaleDegree = 1;
-            pitchToAdd.register++;
-        }
+        possiblePitches.push({ ...pitchToAdd });
+        pitchToAdd = getPitchAdvanced(keySig, pitchToAdd);
         midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
     }
     // add pitches to result, ensuring already added pitches, and pitches outside of octave limit are removed
@@ -59,8 +70,11 @@ const getRandomChord = (
         result.pitches.sort((a, b) => getMidiOfPitch(keySig, a) - getMidiOfPitch(keySig, b));
         possiblePitches = possiblePitches.filter((p, i) => {
             if (i === newPitchIndex) return false;
-            if (getMidiOfPitch(keySig, p) > getMidiOfPitch(keySig, result.pitches[0]) + 12) return false;
-            if (getMidiOfPitch(keySig, p) <= getMidiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12) return false;
+            const midiOfPitch = getMidiOfPitch(keySig, p);
+            const midiMax = getMidiOfPitch(keySig, result.pitches[0]) + 12;
+            const midiMin = getMidiOfPitch(keySig, result.pitches[result.pitches.length - 1]) - 12;
+            if (midiOfPitch > midiMax) return false;
+            if (midiOfPitch <= midiMin) return false;
             return true;
         });
     }

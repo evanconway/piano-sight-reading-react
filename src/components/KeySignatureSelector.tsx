@@ -18,7 +18,7 @@ const KeySignatureSelector = () => {
             sx={{ marginLeft: "auto" }}
             onChange={e => dispatch(userPreferencesSetKeySignature(e.target.value as KeySignature))}
         >
-            {KeySignatures.map(key => <MenuItem value={key}>{key}</MenuItem>)}
+            {KeySignatures.map(key => <MenuItem key={key} value={key}>{key}</MenuItem>)}
         </Select>
     </OptionsFormControlWrapper>
 };
