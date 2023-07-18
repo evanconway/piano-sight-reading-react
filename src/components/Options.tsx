@@ -9,6 +9,7 @@ import TopStaffHighestPitchSelector from "./TopStaffHighestPitchSelector";
 import TopStaffLowestPitchSelector from "./TopStaffLowestPitchSelector";
 import BottomStaffHighestPitchSelector from "./BottomStaffHighestPitchSelector";
 import BottomStaffLowestPitchSelector from "./BottomStaffLowestPitchSelector";
+import KeySignatureSelector from "./KeySignatureSelector";
 
 const Options = () => {
     const [exists, setExists] = useState(true);
@@ -57,12 +58,12 @@ const Options = () => {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    minWidth: "350px",
                     padding: "16px",
                     borderRadius: 8,
                 }}
             >
                 <Typography variant="h4">Random Music Options</Typography>
+                <KeySignatureSelector/>
                 <TopStaffDurationSelector/>
                 <BottomStaffDurationSelector/>
                 <TopStaffNotesPerChordSelector/>

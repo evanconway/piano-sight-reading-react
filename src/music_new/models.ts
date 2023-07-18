@@ -75,6 +75,39 @@ export type KeySignature =
 "Ebm" |
 "Abm";
 
+export const KeySignatures: KeySignature[] = [
+    "C",
+    "G",
+    "D",
+    "A",
+    "E",
+    "B",
+    "F#",
+    "C#",
+    "F",
+    "Bb",
+    "Eb",
+    "Ab",
+    "Db",
+    "Gb",
+    "Cb",
+    "Am",
+    "Em",
+    "Bm",
+    "F#m",
+    "C#m",
+    "G#m",
+    "D#m",
+    "A#m",
+    "Dm",
+    "Gm",
+    "Cm",
+    "Fm",
+    "Bbm",
+    "Ebm",
+    "Abm",
+];
+
 export interface Pitch {
     scaleDegree: ScaleDegree,
     register: PitchRegister,
