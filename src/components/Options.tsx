@@ -10,6 +10,7 @@ import TopStaffLowestPitchSelector from "./TopStaffLowestPitchSelector";
 import BottomStaffHighestPitchSelector from "./BottomStaffHighestPitchSelector";
 import BottomStaffLowestPitchSelector from "./BottomStaffLowestPitchSelector";
 import KeySignatureSelector from "./KeySignatureSelector";
+import TimeSignatureSelector from "./TimeSignatureSelector";
 
 const Options = () => {
     const [exists, setExists] = useState(true);
@@ -64,6 +65,7 @@ const Options = () => {
             >
                 <Typography variant="h4">Random Music Options</Typography>
                 <KeySignatureSelector/>
+                <TimeSignatureSelector/>
                 <TopStaffDurationSelector/>
                 <BottomStaffDurationSelector/>
                 <TopStaffNotesPerChordSelector/>

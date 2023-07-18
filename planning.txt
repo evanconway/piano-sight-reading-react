@@ -179,3 +179,5 @@ The logic currently breaks now when changing keys. I believe it has something to
 Looks like we got random music generation fixed, and correctly updating with key changes, but it looks like minor keys are bugged. Note detection does not occur. Also when the music regenerates the cursor is not reset to the starting position.
 
 Turns out we had just entered our data for minor keys incorrectly. Next we should look at the bug where differing durations in top and bottom staff don't advance cursor correctly.
+
+We've discovered that the L: setting of ABC notation doesn't work the way we thought it did. Turns out that is a universal value that doesn't change relative to the time signature. So we should probably set that to be 96 at all times (or whatever value we decide to go with in the end). 

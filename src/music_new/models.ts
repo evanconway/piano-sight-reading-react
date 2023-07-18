@@ -12,20 +12,9 @@ export type PitchCap = {
 export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth";
 
 export type TimeSignature = "4/4" | "3/4" | "6/8";
+export const TimeSignatures: TimeSignature[] = ["3/4", "4/4", "6/8"];
 
-const EIGHTH_BASE = 12;
-
-/**
- * Returns the array size of a measure given a time signature.
- * @param timeSignature
- * @returns {number} Array size of given time signature.
- */
-export const getMeasureDuration = (timeSignature: TimeSignature): number => {
-    if (timeSignature === "3/4") return EIGHTH_BASE * 2 * 3;
-    if (timeSignature === "4/4") return EIGHTH_BASE * 2 * 4;
-    if (timeSignature === "6/8") return EIGHTH_BASE * 6;
-    return 0;
-};
+export const NOTE_DURATION_BASE = 96;
 
 /**
  * Returns the value of a duration given a NoteDuration. This value is the number of entries in
@@ -35,11 +24,23 @@ export const getMeasureDuration = (timeSignature: TimeSignature): number => {
  */
 export const getNoteDurationValue = (noteDuration: NoteDuration): number => {
     // I have genuinely forgotten so much about music, I can't remember if this remains true for all time signatures, review later
-    if (noteDuration === "sixteenth") return EIGHTH_BASE / 2;
-    if (noteDuration === "eighth") return EIGHTH_BASE;
-    if (noteDuration === "quarter") return EIGHTH_BASE * 2;
-    if (noteDuration === "half") return EIGHTH_BASE * 4;
-    if (noteDuration === "whole") return EIGHTH_BASE * 8;
+    if (noteDuration === "sixteenth") return NOTE_DURATION_BASE / 16;
+    if (noteDuration === "eighth") return NOTE_DURATION_BASE / 8;
+    if (noteDuration === "quarter") return NOTE_DURATION_BASE / 4;
+    if (noteDuration === "half") return NOTE_DURATION_BASE / 2;
+    if (noteDuration === "whole") return NOTE_DURATION_BASE;
+    return 0;
+};
+
+/**
+ * Returns the array size of a measure given a time signature.
+ * @param timeSignature
+ * @returns {number} Array size of given time signature.
+ */
+export const getMeasureDuration = (timeSignature: TimeSignature): number => {
+    if (timeSignature === "3/4") return getNoteDurationValue("quarter") * 3;
+    if (timeSignature === "4/4") return getNoteDurationValue("quarter") * 4;
+    if (timeSignature === "6/8") return getNoteDurationValue("eighth") * 6;
     return 0;
 };
 

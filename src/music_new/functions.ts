@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
 import { SCORE_ID, SCREEN_SIZE_STYLES } from "../constants";
 
 /**
@@ -289,7 +289,7 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
 
     let abcString = "T:Sight Reading Practice\n";
     abcString += `M:${firstM.timeSignature}\n`;
-    abcString += `L:1/${getMeasureDuration(firstM.timeSignature)}\n`;
+    abcString += `L:1/${NOTE_DURATION_BASE}\n`;
     abcString += `K:${firstM.keySignature}\n`;
     abcString += `%%staves {1 2}\n`;
 
@@ -310,22 +310,21 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
     while (writing) {
         abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            abcString += getAbcStringFromMeasureStaff(measures[i], "top");// getAbcStringFromChordArray(measures[i].staffTop, measures[i].keySignature);
-            abcString += "|";
+            abcString += getAbcStringFromMeasureStaff(measures[i], "top");
+            abcString += " |";
             if (i === measures.length - 1) abcString += "]";
         }
         abcString += "\n";
         abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
         for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            abcString += getAbcStringFromMeasureStaff(measures[i], "bottom");// getAbcStringFromChordArray(measures[i].staffBottom, measures[i].keySignature);
-            abcString += "|";
+            abcString += getAbcStringFromMeasureStaff(measures[i], "bottom");
+            abcString += " |";
             if (i === measures.length - 1) abcString += "]";
         }
         abcString += "\n";
         measureStartingLine = measureStartingLine + measuresPerLine;
         if (measureStartingLine >= measures.length) writing = false;
     }
-
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
         selectionColor: "#000",
