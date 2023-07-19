@@ -30,6 +30,15 @@ const userPreferencesSlice = createSlice({
         },
         userPreferencesSetTimeSignature: (state, action: PayloadAction<TimeSignature>) => {
             state.timeSignature = action.payload;
+            // also set durations to default values for given tiem signature
+            if (state.timeSignature === "3/4" || state.timeSignature === "4/4") {
+                state.topStaffDuration = "quarter";
+                state.bottomStaffDuration = "quarter";
+            }
+            if (state.timeSignature === "6/8") {
+                state.topStaffDuration = "quarter-dotted";
+                state.bottomStaffDuration = "quarter-dotted";
+            }
         },
         userPreferencesSetTopStaffDuration: (state, action: PayloadAction<NoteDuration>) => {
             state.topStaffDuration = action.payload;

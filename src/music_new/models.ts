@@ -9,12 +9,15 @@ export type PitchCap = {
     register: PitchRegister,
 };
 
-export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth";
-
+export type NoteDuration = "whole" | "half" | "quarter" | "eighth" | "sixteenth" | "quarter-dotted" | "half-dotted";
 export type TimeSignature = "4/4" | "3/4" | "6/8";
 export const TimeSignatures: TimeSignature[] = ["3/4", "4/4", "6/8"];
-
 export const NOTE_DURATION_BASE = 96;
+
+export const durationsAllowedInTimeSignatureMap = new Map<TimeSignature, NoteDuration[]>();
+durationsAllowedInTimeSignatureMap.set("3/4", ["sixteenth", "eighth", "quarter", "half-dotted"]);
+durationsAllowedInTimeSignatureMap.set("4/4", ["whole", "half", "quarter", "eighth", "sixteenth"]);
+durationsAllowedInTimeSignatureMap.set("6/8", ["sixteenth", "eighth", "quarter", "quarter-dotted"]);
 
 /**
  * Returns the value of a duration given a NoteDuration. This value is the number of entries in
@@ -23,12 +26,13 @@ export const NOTE_DURATION_BASE = 96;
  * @returns {number} Number of entries in chord array given note duration occupies.
  */
 export const getNoteDurationValue = (noteDuration: NoteDuration): number => {
-    // I have genuinely forgotten so much about music, I can't remember if this remains true for all time signatures, review later
     if (noteDuration === "sixteenth") return NOTE_DURATION_BASE / 16;
     if (noteDuration === "eighth") return NOTE_DURATION_BASE / 8;
     if (noteDuration === "quarter") return NOTE_DURATION_BASE / 4;
     if (noteDuration === "half") return NOTE_DURATION_BASE / 2;
-    if (noteDuration === "whole") return NOTE_DURATION_BASE;
+    if (noteDuration === "whole") return NOTE_DURATION_BASE; // technically incorrect but more intuitive
+    if (noteDuration === "quarter-dotted") return NOTE_DURATION_BASE / 4 * 3 / 2;
+    if (noteDuration === "half-dotted") return NOTE_DURATION_BASE / 2 * 3 / 2;
     return 0;
 };
 
