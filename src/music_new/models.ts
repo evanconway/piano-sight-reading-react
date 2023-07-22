@@ -150,15 +150,17 @@ export const measuresSetPathColors = (measures: Measure[], color: string) => {
     });
 };
 
+export const NOTE_WIDTH = 65 as number; // arbitrary value indicating width of individual notes in pixels
+
 /**
  * Returns width of given measure in pixels.
+ * 
  * @param measure 
  * @returns 
  */
 export const getMeasureWidth = (measure: Measure) => {
-    const noteWidth = 65 as number; // arbitrary value
-    const topWidth = measure.staffTop.map(c => c ? noteWidth : 0).reduce((prev, curr) => prev + curr, 0);
-    const bottomWidth = measure.staffBottom.map(c => c ? noteWidth : 0).reduce((prev, curr) => prev + curr, 0);
+    const topWidth = measure.staffTop.map(c => c ? NOTE_WIDTH : 0).reduce((prev, curr) => prev + curr, 0);
+    const bottomWidth = measure.staffBottom.map(c => c ? NOTE_WIDTH : 0).reduce((prev, curr) => prev + curr, 0);
     return Math.max(topWidth, bottomWidth);
 };
 

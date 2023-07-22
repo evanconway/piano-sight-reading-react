@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
 import { SCORE_ID, SCREEN_SIZE_STYLES } from "../constants";
 
 /**
@@ -81,6 +81,41 @@ const getRandomChord = (
     return result;
 };
 
+/**
+ * Get number of quarters notes per given note duration.
+ * 
+ * @param noteDuration 
+ * @returns 
+ */
+const getNotesPerQuarter = (noteDuration: NoteDuration) => {
+    if (noteDuration === "whole") return 1/4;
+    if (noteDuration === "half") return 1/2;
+    if (noteDuration === "quarter") return 1;
+    if (noteDuration === "eighth") return 2;
+    if (noteDuration === "sixteenth") return 4;
+    if (noteDuration === "half-dotted") return 1/3;
+    if (noteDuration === "quarter-dotted") return 2/3;
+    return 0;
+};
+
+/**
+ * Determines how wide each measure with the given preferences would be in pixels.
+ * 
+ * @param userPreferences 
+ * @returns 
+ */
+export const getMeasureWidthFromUserSettings = (
+    timeSignature: TimeSignature,
+    topStaffDuration: NoteDuration,
+    bottomStaffDuration: NoteDuration,
+) => {
+    const numberOfQuarters = timeSignature === "4/4" ? 4 : 3;
+    const notesPerQuarterTop = getNotesPerQuarter(topStaffDuration);
+    const notesPerQuarterBottom = getNotesPerQuarter(bottomStaffDuration);
+    const result = notesPerQuarterTop > notesPerQuarterBottom ? numberOfQuarters * notesPerQuarterTop : numberOfQuarters * notesPerQuarterBottom;
+    return Math.max(result * NOTE_WIDTH, 50);
+};
+
 export interface RandomMusicParams {
     numberOfMeasures: number,
     keySignature: KeySignature,
@@ -120,17 +155,10 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     const topValue = getNoteDurationValue(topStaffDuration);
     const bottomValue = getNoteDurationValue(bottomStaffDuration);
 
-    /*
-    We assume an eigth note has a "value" of 12. Based on the given time signature
-    we ensure both the top and bottom staff chord arrays have enough entries. For
-    example a time signature of 4/4 yields an array size of 96.
-    */
     const mSize = getMeasureDuration(timeSignature);
 
     const pathIdBase = "abc-note-path-id-";
     let pathIdCount = 0;
-
-    // this is not creating the id numbers we're expecting, but it still "works" so we'll go with it for now
 
     const result = [...Array(numberOfMeasures)].map(() => {
         const staffTop = [...Array(mSize)].map((_, i) => {
@@ -277,6 +305,16 @@ const getAbcScaleFromWidth = (width: number) => {
 };
 
 /**
+ * A simple division function. But helps ensure consistency.
+ * 
+ * @param lineWidth 
+ * @param measureWidth 
+ */
+export const getMeasuresPerLine = (lineWidth: number, measureWidth: number) => {
+    return Math.floor(lineWidth / measureWidth);
+};
+
+/**
  * Renders the given array of measures to the score.
  * 
  * @param measures 
@@ -297,7 +335,7 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
     const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
     if (!scoreBoundingRect) return;
 
-    const measuresPerLine = Math.ceil(scoreBoundingRect.width / getMeasureWidth(firstM));
+    const measuresPerLine = getMeasuresPerLine(scoreBoundingRect.width, getMeasureWidth(firstM));
 
     let measureStartingLine = 0;
 
@@ -332,7 +370,7 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
         paddingleft: getAbcPaddingXFromWidth(width),
         paddingright: getAbcPaddingXFromWidth(width),
         paddingbottom: getAbcPaddingBottomFromWidth(width),
-        scale: getAbcScaleFromWidth(width),
+        scale: 1,//getAbcScaleFromWidth(width),
         clickListener: onClick,
     });
 

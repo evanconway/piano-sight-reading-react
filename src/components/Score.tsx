@@ -1,9 +1,9 @@
 import "react";
 import { useEffect, useRef, useState } from "react";
-import { renderAbcjs } from "../music_new/functions";
+import { getMeasureWidthFromUserSettings, getMeasuresPerLine, renderAbcjs } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
-import { selectUserPreferences } from "../state/userPreferencesSlice";
+import { selectUserPreferences, userPreferencesSetNumberOfMeasures } from "../state/userPreferencesSlice";
 import { SCORE_ID } from "../constants";
 
 const Score = () => {
@@ -11,6 +11,25 @@ const Score = () => {
     const music = useAppSelector(selectMusic);
     const scoreRef = useRef<HTMLDivElement>(null);
     const userPreferences = useAppSelector(selectUserPreferences);
+
+    // handle choosing number of measures to generate based on screen size
+    useEffect(() => {
+        const onResize = () => {
+            if (scoreRef.current === null) return;
+            const html = document.getElementsByTagName("html")[0];
+            const width = Math.min(html.offsetWidth, 1100);
+            const height = html.offsetHeight * 0.9;
+            const lineHeight = 170; // arbitrary assume lines are 100px high
+            const numOfLines = Math.floor(height / lineHeight);
+            const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfMeasures } = userPreferences;
+            const measuresPerLine = getMeasuresPerLine(width, getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration));
+            const newNumOfMeasures = numOfLines * measuresPerLine;
+            if (newNumOfMeasures !== numberOfMeasures) dispatch(userPreferencesSetNumberOfMeasures(newNumOfMeasures));
+        };
+        window.addEventListener("resize", onResize);
+        onResize();
+        return () => window.removeEventListener("resize", onResize);
+    }, [userPreferences]);
 
     // regenerage music on preferences change
     useEffect(() => {
@@ -120,6 +139,7 @@ const Score = () => {
         style={{
             backgroundColor: "#fff",
             maxWidth: "1100px",
+            height: "100%",
             boxShadow: "10px 10px 10px #888",
             margin: "0 auto",
             borderRadius: 4,

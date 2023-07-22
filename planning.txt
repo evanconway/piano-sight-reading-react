@@ -181,3 +181,20 @@ Looks like we got random music generation fixed, and correctly updating with key
 Turns out we had just entered our data for minor keys incorrectly. Next we should look at the bug where differing durations in top and bottom staff don't advance cursor correctly.
 
 We've discovered that the L: setting of ABC notation doesn't work the way we thought it did. Turns out that is a universal value that doesn't change relative to the time signature. So we should probably set that to be 96 at all times (or whatever value we decide to go with in the end). 
+
+
+19th of July, 2023
+
+Now that we've added selectors for most options in the random music generation, it's time to asses what we've done and figure out what's left to do. Major features we still need are:
+
+1. Harmony generation
+2. Music generates perfect number of measures based on screen size
+3. Options menu must be responsive
+4. Must figure out correct access to options menu for phone, tablet, and desktop sizes
+
+Of those, I think I'd like to work on correct measure numbers next. Numbers 3 and 4 are kind of part fo the same goal. And truthfully the harmony generation should probably be more of a stretch goal.
+
+
+21st of July, 2023
+
+Having trouble with our number of measure calculations. We are sowly making something that works but it does not feel solid or idiomatic for web design. I also noticed a bug where the number of measures changes drastically when resizing at certain points. And these points are my phone and tablet sizes minus 20 pixels (800px and 500px respectively). We'll need to review my responsive code to figure out why this is happening.
