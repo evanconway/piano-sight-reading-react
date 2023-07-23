@@ -1,6 +1,6 @@
 import abcjs from "abcjs";
 import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
-import { SCORE_ID, SCREEN_SIZE_STYLES } from "../constants";
+import { SCORE_ID, SCORE_SCREEN_SIZE_STYLES, getScoreElementHeightStyle } from "../constants";
 
 /**
  * Returns the midi value of the given pitch and key signature.
@@ -286,22 +286,22 @@ const getAbcStringFromMeasureStaff = (measure: Measure, staff: "top" | "bottom")
     return result;
 };
 
-const getAbcPaddingXFromWidth = (width: number) => {
-    if (width < SCREEN_SIZE_STYLES.PHONE.SIZE) return SCREEN_SIZE_STYLES.PHONE.PADDING_X;
-    if (width < SCREEN_SIZE_STYLES.TABLET.SIZE) return SCREEN_SIZE_STYLES.TABLET.PADDING_X;
-    return SCREEN_SIZE_STYLES.DESKTOP.PADDING_X;
+const getScorePaddingXFromWidth = (width: number) => {
+    // if (width < SCREEN_SIZE_STYLES.PHONE.SIZE) return SCREEN_SIZE_STYLES.PHONE.PADDING_X;
+    // if (width < SCREEN_SIZE_STYLES.TABLET.SIZE) return SCREEN_SIZE_STYLES.TABLET.PADDING_X;
+    return SCORE_SCREEN_SIZE_STYLES.DESKTOP.PADDING_X;
 };
 
-const getAbcPaddingBottomFromWidth = (width: number) => {
-    if (width < SCREEN_SIZE_STYLES.PHONE.SIZE) return SCREEN_SIZE_STYLES.PHONE.PADDING_BOTTOM;
-    if (width < SCREEN_SIZE_STYLES.TABLET.SIZE) return SCREEN_SIZE_STYLES.TABLET.PADDING_BOTTOM;
-    return SCREEN_SIZE_STYLES.DESKTOP.PADDING_BOTTOM;
+const getScorePaddingBottomFromWidth = (width: number) => {
+    // if (width < SCREEN_SIZE_STYLES.PHONE.SIZE) return SCREEN_SIZE_STYLES.PHONE.PADDING_BOTTOM;
+    // if (width < SCREEN_SIZE_STYLES.TABLET.SIZE) return SCREEN_SIZE_STYLES.TABLET.PADDING_BOTTOM;
+    return SCORE_SCREEN_SIZE_STYLES.DESKTOP.PADDING_BOTTOM;
 };
 
-const getAbcScaleFromWidth = (width: number) => {
-    if (width < SCREEN_SIZE_STYLES.PHONE.SIZE) return SCREEN_SIZE_STYLES.PHONE.SCALE;
-    if (width < SCREEN_SIZE_STYLES.TABLET.SIZE) return SCREEN_SIZE_STYLES.TABLET.SCALE;
-    return SCREEN_SIZE_STYLES.DESKTOP.SCALE;
+export const getScoreScaleFromWidth = (width: number) => {
+    // if (width < SCREEN_SIZE_STYLES.PHONE.SIZE) return SCREEN_SIZE_STYLES.PHONE.SCALE;
+    // if (width < SCREEN_SIZE_STYLES.TABLET.SIZE) return SCREEN_SIZE_STYLES.TABLET.SCALE;
+    return SCORE_SCREEN_SIZE_STYLES.DESKTOP.SCALE;
 };
 
 /**
@@ -321,11 +321,11 @@ export const getMeasuresPerLine = (lineWidth: number, measureWidth: number) => {
  * @param width 
  * @returns 
  */
-export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abcjs.AbcElem) => void) => {
+export const renderAbcjsToScore = (measures: Measure[], width: number, onClick: (e: abcjs.AbcElem) => void) => {
     //prepare string
     const firstM = measures[0]; // first measure to get values from
 
-    let abcString = "T:Sight Reading Practice\n";
+    let abcString = "";//"T:Sight Reading Practice\n";
     abcString += `M:${firstM.timeSignature}\n`;
     abcString += `L:1/${NOTE_DURATION_BASE}\n`;
     abcString += `K:${firstM.keySignature}\n`;
@@ -366,11 +366,11 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
         selectionColor: "#000",
-        staffwidth: width - getAbcPaddingXFromWidth(width) * 2,
-        paddingleft: getAbcPaddingXFromWidth(width),
-        paddingright: getAbcPaddingXFromWidth(width),
-        paddingbottom: getAbcPaddingBottomFromWidth(width),
-        scale: 1,//getAbcScaleFromWidth(width),
+        staffwidth: width - getScorePaddingXFromWidth(width) * 2,
+        paddingleft: getScorePaddingXFromWidth(width),
+        paddingright: getScorePaddingXFromWidth(width),
+        paddingbottom: getScorePaddingBottomFromWidth(width),
+        scale: getScoreScaleFromWidth(width),
         clickListener: onClick,
     });
 
@@ -389,4 +389,20 @@ export const renderAbcjs = (measures: Measure[], width: number, onClick: (e: abc
         if (c === null) return;
         pathsBot[pathsBotIndex++].id = c.pathId;
     }));
+
+    /*
+    Unfortunately, the abcjs.render function is not pure, and modifies the styles of
+    the target element, which is the score in this case.
+    
+    Firstly, when the scale of the render is less than 1, it adds a width style to 
+    the div. This breaks our resize logic.
+
+    Secondly it changes the height of the element based on the amount of content
+    added. We force the same height to ensure measure calculations are correct.
+    */
+    const scoreElement = document.getElementById(SCORE_ID);
+    if (scoreElement !== null) {
+        scoreElement.style.height = getScoreElementHeightStyle();
+        scoreElement.style.width = "";
+    }
 };

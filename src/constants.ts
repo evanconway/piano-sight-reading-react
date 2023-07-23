@@ -1,6 +1,4 @@
-import { KeySignature, NoteDuration, Pitch, PitchCap, TimeSignature } from "./music_new/models";
-
-export const SCORE_ID = "score";
+import { KeySignature, NoteDuration, PitchCap, TimeSignature } from "./music_new/models";
 
 export const DEFAULT_KEY_SIGNATURE: KeySignature = "C";
 export const DEFAULT_TIME_SIGNATURE: TimeSignature = "4/4";
@@ -13,7 +11,9 @@ export const DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH: PitchCap = { pitchClass: "B", r
 export const DEFAULT_BOTTOM_STAFF_LOWEST_PITCH: PitchCap = { pitchClass: "E", register: 2 };
 export const DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD: number = 2;
 
-export const SCREEN_SIZE_STYLES = {
+export const SCORE_ID = "score";
+
+export const SCORE_SCREEN_SIZE_STYLES = {
     DESKTOP: {
         PADDING_X: 40,
         PADDING_BOTTOM: 60,
@@ -31,6 +31,17 @@ export const SCREEN_SIZE_STYLES = {
         PADDING_BOTTOM: 40,
         SCALE: 0.5,
     },
+};
+
+/**
+ * Returns the height styling for the score element. This function ensures
+ * the height style is the same in different contexts.
+ * 
+ * @returns 
+ */
+export const getScoreElementHeightStyle = () => {
+    const height = document.getElementsByTagName('html')[0].offsetHeight;
+    return `${Math.floor(height * 0.9)}px`;
 };
 
 export type ReactChildren = string | JSX.Element | JSX.Element[];

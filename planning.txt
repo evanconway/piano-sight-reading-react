@@ -198,3 +198,10 @@ Of those, I think I'd like to work on correct measure numbers next. Numbers 3 an
 21st of July, 2023
 
 Having trouble with our number of measure calculations. We are sowly making something that works but it does not feel solid or idiomatic for web design. I also noticed a bug where the number of measures changes drastically when resizing at certain points. And these points are my phone and tablet sizes minus 20 pixels (800px and 500px respectively). We'll need to review my responsive code to figure out why this is happening.
+
+Encoutered a bug clicking on a note highlighted a different note.
+
+
+22nd of July, 2023
+
+It seems like we were able to add a slightly better resize system. It uses the dimensions of the window to set the size of the score. After the size of the score is set we determine the number of measures to add to the music and generate it. After the music is generated we render it to the score element with abcjs, and then force the dimensions of the score element to be the same as before after abcjs has changed it.

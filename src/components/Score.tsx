@@ -1,10 +1,10 @@
 import "react";
 import { useEffect, useRef, useState } from "react";
-import { getMeasureWidthFromUserSettings, getMeasuresPerLine, renderAbcjs } from "../music_new/functions";
+import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScoreScaleFromWidth, renderAbcjsToScore } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences, userPreferencesSetNumberOfMeasures } from "../state/userPreferencesSlice";
-import { SCORE_ID } from "../constants";
+import { SCORE_ID, getScoreElementHeightStyle } from "../constants";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -16,13 +16,13 @@ const Score = () => {
     useEffect(() => {
         const onResize = () => {
             if (scoreRef.current === null) return;
-            const html = document.getElementsByTagName("html")[0];
-            const width = Math.min(html.offsetWidth, 1100);
-            const height = html.offsetHeight * 0.9;
-            const lineHeight = 170; // arbitrary assume lines are 100px high
-            const numOfLines = Math.floor(height / lineHeight);
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfMeasures } = userPreferences;
-            const measuresPerLine = getMeasuresPerLine(width, getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration));
+            const { width, height } = scoreRef.current.getBoundingClientRect();
+            const scale = getScoreScaleFromWidth(width);
+            const lineHeight = 200 * scale;
+            const numOfLines = Math.max(Math.floor(height / lineHeight), 1);
+            const measureWidth = scale * getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration);
+            const measuresPerLine = Math.max(getMeasuresPerLine(width, measureWidth), 1);
             const newNumOfMeasures = numOfLines * measuresPerLine;
             if (newNumOfMeasures !== numberOfMeasures) dispatch(userPreferencesSetNumberOfMeasures(newNumOfMeasures));
         };
@@ -31,7 +31,7 @@ const Score = () => {
         return () => window.removeEventListener("resize", onResize);
     }, [userPreferences]);
 
-    // regenerage music on preferences change
+    // regenerate music on preferences change
     useEffect(() => {
         dispatch(randomizeMusic(userPreferences));
         dispatch(setCursorToStart());
@@ -41,18 +41,11 @@ const Score = () => {
     useEffect(() => {
         const render = () => {
             if (scoreRef.current === null) return;
-            renderAbcjs(
+            renderAbcjsToScore(
                 music,
                 scoreRef.current.getBoundingClientRect().width,
                 (e) => dispatch(setCursorToPathId(e.abselem.elemset[0].id)),
             );
-            /*
-            Unfortunately, the abcjs.render function is not pure, and modifies the styles of
-            the target element, which is the score in this case. When the scale of the render
-            is less than 1, it adds a width style to the div. This breaks our resize logic.
-            To fix this, we remove the width style if it exists.
-            */
-            scoreRef.current.style.width = "";
             dispatch(highlightCurrentChord());
         };
         window.addEventListener("resize", render);
@@ -139,7 +132,7 @@ const Score = () => {
         style={{
             backgroundColor: "#fff",
             maxWidth: "1100px",
-            height: "100%",
+            height: getScoreElementHeightStyle(),
             boxShadow: "10px 10px 10px #888",
             margin: "0 auto",
             borderRadius: 4,
