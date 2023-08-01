@@ -286,13 +286,13 @@ const getAbcStringFromMeasureStaff = (measure: Measure, staff: "top" | "bottom")
     return result;
 };
 
-const getScorePaddingXFromWidth = (width: number) => {
+export const getScorePaddingXFromWidth = (width: number) => {
     // if (width < SCORE_SCREEN_SIZE_STYLES.PHONE.SIZE) return SCORE_SCREEN_SIZE_STYLES.PHONE.PADDING_X;
     // if (width < SCORE_SCREEN_SIZE_STYLES.TABLET.SIZE) return SCORE_SCREEN_SIZE_STYLES.TABLET.PADDING_X;
     return SCORE_SCREEN_SIZE_STYLES.DESKTOP.PADDING_X;
 };
 
-const getScorePaddingBottomFromWidth = (width: number) => {
+export const getScorePaddingBottomFromWidth = (width: number) => {
     // if (width < SCORE_SCREEN_SIZE_STYLES.PHONE.SIZE) return SCORE_SCREEN_SIZE_STYLES.PHONE.PADDING_BOTTOM;
     // if (width < SCORE_SCREEN_SIZE_STYLES.TABLET.SIZE) return SCORE_SCREEN_SIZE_STYLES.TABLET.PADDING_BOTTOM;
     return SCORE_SCREEN_SIZE_STYLES.DESKTOP.PADDING_BOTTOM;
