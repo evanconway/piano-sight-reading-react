@@ -15,6 +15,7 @@ const Score = () => {
     // handle choosing number of measures to generate based on screen size
     useEffect(() => {
         const onResize = () => {
+            debugger;
             if (scoreRef.current === null) return;
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfMeasures } = userPreferences;
             const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();

@@ -205,3 +205,8 @@ Encoutered a bug clicking on a note highlighted a different note.
 22nd of July, 2023
 
 It seems like we were able to add a slightly better resize system. It uses the dimensions of the window to set the size of the score. After the size of the score is set we determine the number of measures to add to the music and generate it. After the music is generated we render it to the score element with abcjs, and then force the dimensions of the score element to be the same as before after abcjs has changed it.
+
+
+30th of December, 2023
+
+Making a note that we should look into possibly specifying the number of measures per line in the random music generation logic. Simply trying to get the right layout by specifying the number of measures don't seem to work well.
