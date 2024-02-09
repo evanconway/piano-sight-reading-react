@@ -5,11 +5,13 @@ export const DEFAULT_TIME_SIGNATURE: TimeSignature = "4/4";
 export const DEFAULT_TOP_STAFF_DURATION: NoteDuration = "quarter";
 export const DEFAULT_TOP_STAFF_HIGHEST_PITCH: PitchCap = { pitchClass: "A", register: 5 };
 export const DEFAULT_TOP_STAFF_LOWEST_PITCH: PitchCap = { pitchClass: "C", register: 4 };
-export const DEFAULT_TOP_STAFF_NOTES_PER_CHORD: number = 2;
+export const DEFAULT_TOP_STAFF_NOTES_PER_CHORD = 2;
 export const DEFAULT_BOTTOM_STAFF_DURATION: NoteDuration = "quarter";
 export const DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH: PitchCap = { pitchClass: "B", register: 3 };
 export const DEFAULT_BOTTOM_STAFF_LOWEST_PITCH: PitchCap = { pitchClass: "E", register: 2 };
-export const DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD: number = 2;
+export const DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD = 2;
+
+export const SCORE_ELEMENT_HEIGHT_STYLE = '90vh';
 
 export const SCORE_ID = "score";
 
@@ -31,17 +33,6 @@ export const SCORE_SCREEN_SIZE_STYLES = {
         PADDING_BOTTOM: 40,
         SCALE: 0.5,
     },
-};
-
-/**
- * Returns the height styling for the score element. This function ensures
- * the height style is the same in different contexts.
- * 
- * @returns 
- */
-export const getScoreElementHeightStyle = () => {
-    const height = document.getElementsByTagName('html')[0].offsetHeight;
-    return `${Math.floor(height * 0.9)}px`;
 };
 
 export type ReactChildren = string | JSX.Element | JSX.Element[];

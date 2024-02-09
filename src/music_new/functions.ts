@@ -1,6 +1,6 @@
 import abcjs from "abcjs";
 import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
-import { SCORE_ID, SCORE_SCREEN_SIZE_STYLES, getScoreElementHeightStyle } from "../constants";
+import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
 
 /**
  * Returns the midi value of the given pitch and key signature.
@@ -266,7 +266,7 @@ const getAbcStringFromMeasureStaff = (measure: Measure, staff: "top" | "bottom")
     let result = "";
 
     // logic to determine where to break beams
-    let beamBreakIndexes: number[] = [];
+    const beamBreakIndexes: number[] = [];
     const divisions = measure.timeSignature === "4/4" ? 4 : measure.timeSignature === "3/4" ? 3 : 2;
     const sdlkfjsdf = chords.length / divisions;
     if (Math.floor(sdlkfjsdf) !== sdlkfjsdf) throw new Error("measure staff lengths must be multiples of 12");
@@ -311,7 +311,7 @@ export const getScoreScaleFromWidth = (width: number) => {
  * @param measureWidth 
  */
 export const getMeasuresPerLine = (lineWidth: number, measureWidth: number) => {
-    return Math.floor(lineWidth / measureWidth);
+    return Math.max(Math.floor(lineWidth / measureWidth), 1);
 };
 
 /**
@@ -360,7 +360,7 @@ export const renderAbcjsToScore = (measures: Measure[], width: number, onClick: 
             if (i === measures.length - 1) abcString += "]";
         }
         abcString += "\n";
-        measureStartingLine = measureStartingLine + measuresPerLine;
+        measureStartingLine += measuresPerLine;
         if (measureStartingLine >= measures.length) writing = false;
     }
     abcjs.renderAbc(SCORE_ID, abcString, {
@@ -402,7 +402,7 @@ export const renderAbcjsToScore = (measures: Measure[], width: number, onClick: 
     */
     const scoreElement = document.getElementById(SCORE_ID);
     if (scoreElement !== null) {
-        scoreElement.style.height = getScoreElementHeightStyle();
+        scoreElement.style.height = SCORE_ELEMENT_HEIGHT_STYLE;
         scoreElement.style.width = "";
     }
 };

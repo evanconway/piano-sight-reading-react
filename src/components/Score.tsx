@@ -1,10 +1,10 @@
 import "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences, userPreferencesSetNumberOfMeasures } from "../state/userPreferencesSlice";
-import { SCORE_ID, getScoreElementHeightStyle } from "../constants";
+import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ID } from "../constants";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -13,9 +13,8 @@ const Score = () => {
     const userPreferences = useAppSelector(selectUserPreferences);
 
     // handle choosing number of measures to generate based on screen size
-    useEffect(() => {
+    useLayoutEffect(() => {
         const onResize = () => {
-            debugger;
             if (scoreRef.current === null) return;
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfMeasures } = userPreferences;
             const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();
@@ -32,13 +31,13 @@ const Score = () => {
         window.addEventListener("resize", onResize);
         onResize();
         return () => window.removeEventListener("resize", onResize);
-    }, [userPreferences]);
+    }, [dispatch, userPreferences]);
 
     // regenerate music on preferences change
     useEffect(() => {
         dispatch(randomizeMusic(userPreferences));
         dispatch(setCursorToStart());
-    }, [userPreferences]);
+    }, [dispatch, userPreferences]);
 
     // render
     useEffect(() => {
@@ -59,7 +58,7 @@ const Score = () => {
                 scoreRef.current.removeChild(scoreRef.current.firstChild);
             }
         };
-    }, [music]);
+    }, [dispatch, music]);
 
     // arrow keys
     useEffect(() => {
@@ -69,7 +68,7 @@ const Score = () => {
         };
         window.addEventListener("keydown", onArrowKeys);
         return () => window.removeEventListener("keydown", onArrowKeys);
-    }, []);
+    }, [dispatch]);
 
     const [midiAccess, setMidiAccess] = useState<MIDIAccess>();
     const [playedMidi, setPlayedMidi] = useState<number[]>([]);
@@ -117,17 +116,7 @@ const Score = () => {
         addMidiHandlers();
         midiAccess.onstatechange = addMidiHandlers;
         return () => Array.from(midiAccess.inputs.values()).forEach(input => input.onmidimessage = null);
-    }, [
-        midiAccess,
-        playedMidi,
-        setPlayedMidi,
-        musicCurrentMidi,
-        dispatch,
-        advanceCursor,
-        randomizeMusic,
-        cursorAtEnd,
-        userPreferences
-    ]);
+    }, [midiAccess, playedMidi, setPlayedMidi, musicCurrentMidi, dispatch, cursorAtEnd, userPreferences]);
 
     return <div
         id={SCORE_ID}
@@ -135,7 +124,7 @@ const Score = () => {
         style={{
             backgroundColor: "#fff",
             maxWidth: "1100px",
-            height: getScoreElementHeightStyle(),
+            height: SCORE_ELEMENT_HEIGHT_STYLE,
             boxShadow: "10px 10px 10px #888",
             margin: "0 auto",
             borderRadius: 4,
