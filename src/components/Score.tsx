@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music_new/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
-import { selectUserPreferences, userPreferencesSetNumberOfMeasures } from "../state/userPreferencesSlice";
+import { selectUserPreferences, userPreferencesSetScoreDimensions } from "../state/userPreferencesSlice";
 import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ID } from "../constants";
 
 const Score = () => {
@@ -16,17 +16,21 @@ const Score = () => {
     useLayoutEffect(() => {
         const onResize = () => {
             if (scoreRef.current === null) return;
-            const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfMeasures } = userPreferences;
+            const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfLines, measuresPerLine } = userPreferences;
             const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();
             const width = scoreWidth - getScorePaddingXFromWidth(scoreWidth) * 2;
             const height = scoreHeight - getScorePaddingBottomFromWidth(scoreWidth);
             const scale = getScoreScaleFromWidth(width);
             const lineHeight = 170 * scale;
-            const numOfLines = Math.max(Math.floor(height / lineHeight), 1);
+            const newNumOfLines = Math.max(Math.floor(height / lineHeight), 1);
             const measureWidth = scale * getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration);
-            const measuresPerLine = Math.max(getMeasuresPerLine(width, measureWidth), 1);
-            const newNumOfMeasures = numOfLines * measuresPerLine;
-            if (newNumOfMeasures !== numberOfMeasures) dispatch(userPreferencesSetNumberOfMeasures(newNumOfMeasures));
+            const newMeasuresPerLine = Math.max(getMeasuresPerLine(width, measureWidth), 1);
+            if (newNumOfLines !== numberOfLines || newMeasuresPerLine !== measuresPerLine) {
+                dispatch(userPreferencesSetScoreDimensions({
+                    numberOfLines: newNumOfLines,
+                    measuresPerLine: newMeasuresPerLine,
+                }));
+            }
         };
         window.addEventListener("resize", onResize);
         onResize();

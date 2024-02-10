@@ -5,7 +5,8 @@ import { KeySignature, NoteDuration, PitchCap, TimeSignature } from "../music_ne
 import { RootState } from "./store";
 
 const initialState: RandomMusicParams = {
-    numberOfMeasures: 1,
+    numberOfLines: 1,
+    measuresPerLine: 1,
     keySignature: DEFAULT_KEY_SIGNATURE,
     timeSignature: DEFAULT_TIME_SIGNATURE,
     topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
@@ -22,8 +23,9 @@ const userPreferencesSlice = createSlice({
     name: "userPreferences",
     initialState,
     reducers: {
-        userPreferencesSetNumberOfMeasures: (state, action: PayloadAction<number>) => {
-            state.numberOfMeasures = action.payload;
+        userPreferencesSetScoreDimensions: (state, action: PayloadAction<{ numberOfLines: number, measuresPerLine: number }>) => {
+            state.numberOfLines = action.payload.numberOfLines;
+            state.measuresPerLine = action.payload.measuresPerLine;
         },
         userPreferencesSetKeySignature: (state, action: PayloadAction<KeySignature>) => {
             state.keySignature = action.payload;
@@ -68,7 +70,7 @@ const userPreferencesSlice = createSlice({
 });
 
 export const {
-    userPreferencesSetNumberOfMeasures,
+    userPreferencesSetScoreDimensions,
     userPreferencesSetKeySignature,
     userPreferencesSetTimeSignature,
     userPreferencesSetTopStaffDuration,

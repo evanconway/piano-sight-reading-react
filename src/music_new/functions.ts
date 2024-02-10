@@ -117,7 +117,8 @@ export const getMeasureWidthFromUserSettings = (
 };
 
 export interface RandomMusicParams {
-    numberOfMeasures: number,
+    numberOfLines: number,
+    measuresPerLine: number,
     keySignature: KeySignature,
     timeSignature: TimeSignature,
     topStaffDuration: NoteDuration,
@@ -138,7 +139,8 @@ export interface RandomMusicParams {
  */
 export const generateRandomMusic = (params: RandomMusicParams) => {
     const {
-        numberOfMeasures,
+        numberOfLines,
+        measuresPerLine,
         keySignature,
         timeSignature,
         topStaffDuration,
@@ -160,44 +162,46 @@ export const generateRandomMusic = (params: RandomMusicParams) => {
     const pathIdBase = "abc-note-path-id-";
     let pathIdCount = 0;
 
-    const result = [...Array(numberOfMeasures)].map(() => {
-        const staffTop = [...Array(mSize)].map((_, i) => {
-            if (i % topValue !== 0) return null;
-            const chord = getRandomChord(
-                topStaffDuration,
+    const music: Measure[][] = [];
+
+    for (let lines = 0; lines < numberOfLines; lines++) {
+        const line: Measure[] = [];
+        for (let measures = 0; measures < measuresPerLine; measures++) {
+            line.push({
                 keySignature,
-                topStaffNotesPerChord,
-                getPitchFromPitchCap(keySignature, topStaffHighestPitch),
-                getPitchFromPitchCap(keySignature, topStaffLowestPitch),
-            );
-            chord.pathId = pathIdBase + pathIdCount;
-            pathIdCount++;
-            return chord;
-        });
+                timeSignature,
+                staffTop: [...Array(mSize)].map((_, i) => {
+                    if (i % topValue !== 0) return null;
+                    const chord = getRandomChord(
+                        topStaffDuration,
+                        keySignature,
+                        topStaffNotesPerChord,
+                        getPitchFromPitchCap(keySignature, topStaffHighestPitch),
+                        getPitchFromPitchCap(keySignature, topStaffLowestPitch),
+                    );
+                    chord.pathId = pathIdBase + pathIdCount;
+                    pathIdCount++;
+                    return chord;
+                }),
+                staffBottom: [...Array(mSize)].map((_, i) => {
+                    if (i % bottomValue !== 0) return null;
+                    const chord = getRandomChord(
+                        bottomStaffDuration,
+                        keySignature,
+                        bottomStaffNotesPerChord,
+                        getPitchFromPitchCap(keySignature, bottomStaffHighestPitch),
+                        getPitchFromPitchCap(keySignature, bottomStaffLowestPitch),
+                    );
+                    chord.pathId = pathIdBase + pathIdCount;
+                    pathIdCount++;
+                    return chord;
+                }),
+            });
+        }
+        music.push(line);
+    }
 
-        const staffBottom = [...Array(mSize)].map((_, i) => {
-            if (i % bottomValue !== 0) return null;
-            const chord = getRandomChord(
-                bottomStaffDuration,
-                keySignature,
-                bottomStaffNotesPerChord,
-                getPitchFromPitchCap(keySignature, bottomStaffHighestPitch),
-                getPitchFromPitchCap(keySignature, bottomStaffLowestPitch),
-            );
-            chord.pathId = pathIdBase + pathIdCount;
-            pathIdCount++;
-            return chord;
-        });
-
-        return {
-            keySignature,
-            timeSignature,
-            staffTop,
-            staffBottom,
-        } as Measure;
-    });
-
-    return result;
+    return music;
 };
 
 /**
@@ -317,13 +321,13 @@ export const getMeasuresPerLine = (lineWidth: number, measureWidth: number) => {
 /**
  * Renders the given array of measures to the score.
  * 
- * @param measures 
+ * @param lines 
  * @param width 
  * @returns 
  */
-export const renderAbcjsToScore = (measures: Measure[], width: number, onClick: (e: abcjs.AbcElem) => void) => {
+export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (e: abcjs.AbcElem) => void) => {
     //prepare string
-    const firstM = measures[0]; // first measure to get values from
+    const firstM = lines[0][0]; // first measure to get values from
 
     let abcString = "";//"T:Sight Reading Practice\n";
     abcString += `M:${firstM.timeSignature}\n`;
@@ -335,34 +339,51 @@ export const renderAbcjsToScore = (measures: Measure[], width: number, onClick: 
     const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
     if (!scoreBoundingRect) return;
 
-    const measuresPerLine = getMeasuresPerLine(scoreBoundingRect.width, getMeasureWidth(firstM));
-
-    let measureStartingLine = 0;
-
     /*
     Because of how abcjs strings are written out, we have to write this out line by line, and staff
     by staff. To be extra clear, we have to do top staff line 1, then bottom staff line 1, then top
     staff line 2, then bottom staff line 2, and so on.
     */
-    let writing = true;
-    while (writing) {
+    lines.forEach(line => {
+        // top staff
         abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
-        for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            abcString += getAbcStringFromMeasureStaff(measures[i], "top");
-            abcString += " |";
-            if (i === measures.length - 1) abcString += "]";
-        }
-        abcString += "\n";
+        line.forEach((measure, i) => {
+            abcString += getAbcStringFromMeasureStaff(measure, 'top');
+            abcString += ' |';
+            if (i === lines.length - 1) abcString += ']';
+        });
+        abcString += '\n';
+        // bottom staff
         abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
-        for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < measures.length; i++) {
-            abcString += getAbcStringFromMeasureStaff(measures[i], "bottom");
-            abcString += " |";
-            if (i === measures.length - 1) abcString += "]";
-        }
-        abcString += "\n";
-        measureStartingLine += measuresPerLine;
-        if (measureStartingLine >= measures.length) writing = false;
-    }
+        line.forEach((measure, i) => {
+            abcString += getAbcStringFromMeasureStaff(measure, 'bottom');
+            abcString += ' |';
+            if (i === lines.length - 1) abcString += ']';
+        });
+        abcString += '\n';
+    });
+
+    // const measuresPerLine = getMeasuresPerLine(scoreBoundingRect.width, getMeasureWidth(firstM));
+    // let measureStartingLine = 0;
+    // let writing = true;
+    // while (writing) {
+    //     abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
+    //     for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < lines.length; i++) {
+    //         abcString += getAbcStringFromMeasureStaff(lines[i], "top");
+    //         abcString += " |";
+    //         if (i === lines.length - 1) abcString += "]";
+    //     }
+    //     abcString += "\n";
+    //     abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
+    //     for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < lines.length; i++) {
+    //         abcString += getAbcStringFromMeasureStaff(lines[i], "bottom");
+    //         abcString += " |";
+    //         if (i === lines.length - 1) abcString += "]";
+    //     }
+    //     abcString += "\n";
+    //     measureStartingLine += measuresPerLine;
+    //     if (measureStartingLine >= lines.length) writing = false;
+    // }
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
         selectionColor: "#000",
@@ -381,14 +402,28 @@ export const renderAbcjsToScore = (measures: Measure[], width: number, onClick: 
     let pathsBotIndex = 0;
 
     // iterate over all top staff chords
-    measures.forEach(m => m.staffTop.forEach(c => {
-        if (c === null) return;
-        pathsTop[pathsTopIndex++].id = c.pathId;
-    }));
-    measures.forEach(m => m.staffBottom.forEach(c => {
-        if (c === null) return;
-        pathsBot[pathsBotIndex++].id = c.pathId;
-    }));
+    // assign path ids to abcjs generated values
+    lines.forEach(line => {
+        line.forEach(measure => {
+            measure.staffTop.forEach(chord => {
+                if (chord === null) return;
+                pathsTop[pathsTopIndex++].id = chord.pathId;
+            });
+            measure.staffBottom.forEach(chord => {
+                if (chord === null) return;
+                pathsBot[pathsBotIndex++].id = chord.pathId;
+            });
+        });
+    });
+
+    // lines.forEach(m => m.staffTop.forEach(c => {
+    //     if (c === null) return;
+    //     pathsTop[pathsTopIndex++].id = c.pathId;
+    // }));
+    // lines.forEach(m => m.staffBottom.forEach(c => {
+    //     if (c === null) return;
+    //     pathsBot[pathsBotIndex++].id = c.pathId;
+    // }));
 
     /*
     Unfortunately, the abcjs.render function is not pure, and modifies the styles of
