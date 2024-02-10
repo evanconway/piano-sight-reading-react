@@ -38,20 +38,6 @@ const musicStateStepCursorForward = (musicState: MusicState) => {
             }
         }
     }
-
-    /*
-    // check if staff index is beyond staff length
-    if (cursor.staffIndex >= music[cursor.measureIndex].staffTop.length) {
-        // if at final measure, revert to last index of last measure
-        if (cursor.measureIndex === music.length - 1) {
-            cursor.staffIndex = music[cursor.measureIndex].staffTop.length - 1;
-        // otherwise advance measure
-        } else {
-            cursor.measureIndex++;
-            cursor.staffIndex = 0;
-        }
-    }
-    */
 };
 
 /**
@@ -81,20 +67,21 @@ const musicStateStepCursorBackward = (musicState: MusicState) => {
             cursor.staffIndex = music[cursor.lineIndex][cursor.measureIndex].staffTop.length - 1;
         }
     }
-    
-    /*
-    // check if staff index is before start
-    if (cursor.staffIndex < 0) {
-        // if at first measure, revert to first index of first measure
-        if (cursor.measureIndex === 0) {
-            cursor.staffIndex = 0;
-        // otherwise retreat measure
-        } else {
-            cursor.measureIndex--;
-            cursor.staffIndex = music[cursor.measureIndex].staffTop.length - 1;
-        }
-    }
-    */
+};
+
+const musicStateCursorIsAtStart = (musicState: MusicState) => {
+    return musicState.cursor.lineIndex === 0 && musicState.cursor.staffIndex === 0 && musicState.cursor.measureIndex === 0;
+};
+
+const musicStateGetLastCursor = (musicState: MusicState): MusicCursor => {
+    const lineLastIndex = musicState.music.length - 1;
+    const measureLastIndex = musicState.music[lineLastIndex].length - 1;
+    const staffLastIndex = musicState.music[lineLastIndex][measureLastIndex].staffTop.length - 1;
+    return {
+        lineIndex: lineLastIndex,
+        measureIndex: measureLastIndex,
+        staffIndex: staffLastIndex,
+    };
 };
 
 /**
@@ -105,11 +92,9 @@ const musicStateStepCursorBackward = (musicState: MusicState) => {
  * @returns 
  */
 const musicStateCursorIsAtEnd = (musicState: MusicState) => {
+    const final = musicStateGetLastCursor(musicState);
     const cursor = musicState.cursor
-    const staffLastIndex = musicState.music[cursor.lineIndex][cursor.measureIndex].staffTop.length - 1;
-    const measureLastIndex = musicState.music[cursor.lineIndex].length - 1;
-    const lineLastIndex = musicState.music.length - 1;
-    return staffLastIndex === cursor.staffIndex && measureLastIndex === cursor.measureIndex && lineLastIndex === cursor.lineIndex;
+    return cursor.lineIndex === final.lineIndex && cursor.measureIndex === final.measureIndex && cursor.staffIndex === final.staffIndex;
 };
 
 /**
@@ -119,21 +104,13 @@ const musicStateCursorIsAtEnd = (musicState: MusicState) => {
  * @returns 
  */
 const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
-    const cursor = musicState.cursor
-    const staffLastIndex = musicState.music[cursor.lineIndex][cursor.measureIndex].staffTop.length - 1;
-    const measureLastIndex = musicState.music[cursor.lineIndex].length - 1;
-    const lineLastIndex = musicState.music.length - 1;
-    const result: MusicCursor = {
-        lineIndex: staffLastIndex,
-        measureIndex: measureLastIndex,
-        staffIndex: lineLastIndex,
-    };
+    const result = musicStateGetLastCursor(musicState);
     const chordValid = (c: MusicCursor) => {
         const topChord = musicState.music[c.lineIndex][c.measureIndex].staffTop[c.staffIndex];
         const bottomChord = musicState.music[c.lineIndex][c.measureIndex].staffBottom[c.staffIndex];
         return topChord !== null || bottomChord !== null;
     };
-    while (!chordValid(result) && result.measureIndex >= 0) {
+    while (!chordValid(result)) {
         result.staffIndex--;
         if (result.staffIndex < 0) {
             result.measureIndex--;
@@ -157,10 +134,6 @@ const musicStateCursorIsAtFinalChord = (musicState: MusicState) => {
     // now measureIndex and staffIndex will be at position of final chord in the the music
     return measureSame && staffSame;
 }
-
-const musicStateCursorIsAtStart = (musicState: MusicState) => {
-    return musicState.cursor.staffIndex === 0 && musicState.cursor.measureIndex === 0;
-};
 
 /**
  * Returns boolean indicating if there is a valid chord at current cursor of given music state.
@@ -253,11 +226,10 @@ export const musicSlice = createSlice({
             state.cursor.measureIndex = 0;
             state.cursor.staffIndex = 0;
             const working = (musicState: MusicState) => {
-                let result = true;
-                if (musicStateGetCursorPathIds(musicState).pathIdTop === action.payload) result = false;
-                if (musicStateGetCursorPathIds(musicState).pathIdBottom === action.payload) result = false;
-                if (musicStateCursorIsAtEnd(musicState)) result = false;
-                return result;
+                if (musicStateGetCursorPathIds(musicState).pathIdTop === action.payload) return false;
+                if (musicStateGetCursorPathIds(musicState).pathIdBottom === action.payload) return false;
+                if (musicStateCursorIsAtEnd(musicState)) return false;
+                return true;
             };
             while (working(state)) musicStateStepCursorForward(state);
             musicStateHighlightCursor(state);

@@ -210,3 +210,10 @@ It seems like we were able to add a slightly better resize system. It uses the d
 30th of December, 2023
 
 Making a note that we should look into possibly specifying the number of measures per line in the random music generation logic. Simply trying to get the right layout by specifying the number of measures don't seem to work well.
+
+
+9th of February, 2024
+
+Finally got back to working on this. I started changing over the entire music storage and rendering system to be a 2D array so that we store music line by line, and render line by line. However I'm doubting this approach. We originally didn't want to do this so that if we ever had non-randomly generated music (maybe user created files?), we could allow the rendering system to take care of it automatically. I suppose we could store the randomly generated music line by line, but it feels awkward. Unfortuantely I think I should rip out the work I just did. Go back to music simply being an array of measures, but also add numOfLines and measuresPerLine variables to our abc rendering function. This way music could be display more automatically, but we have strict control if we need it.
+
+Actually, did the rendering function ever automatically line split? Maybe it did, but it didn't work very well.
