@@ -344,46 +344,25 @@ export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (
     by staff. To be extra clear, we have to do top staff line 1, then bottom staff line 1, then top
     staff line 2, then bottom staff line 2, and so on.
     */
-    lines.forEach(line => {
+    lines.forEach((line, iLine) => {
         // top staff
         abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
-        line.forEach((measure, i) => {
+        line.forEach((measure, iMeasure) => {
             abcString += getAbcStringFromMeasureStaff(measure, 'top');
             abcString += ' |';
-            if (i === lines.length - 1) abcString += ']';
+            if (iLine === lines.length - 1 && iMeasure === line.length - 1) abcString += ']';
         });
         abcString += '\n';
         // bottom staff
         abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
-        line.forEach((measure, i) => {
+        line.forEach((measure, iMeasure) => {
             abcString += getAbcStringFromMeasureStaff(measure, 'bottom');
             abcString += ' |';
-            if (i === lines.length - 1) abcString += ']';
+            if (iLine === lines.length - 1 && iMeasure === line.length - 1) abcString += ']';
         });
         abcString += '\n';
     });
 
-    // const measuresPerLine = getMeasuresPerLine(scoreBoundingRect.width, getMeasureWidth(firstM));
-    // let measureStartingLine = 0;
-    // let writing = true;
-    // while (writing) {
-    //     abcString += `V:1\n[K:${firstM.keySignature} clef=treble]\n`;
-    //     for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < lines.length; i++) {
-    //         abcString += getAbcStringFromMeasureStaff(lines[i], "top");
-    //         abcString += " |";
-    //         if (i === lines.length - 1) abcString += "]";
-    //     }
-    //     abcString += "\n";
-    //     abcString += `V:2\n[K:${firstM.keySignature} clef=bass]\n`;
-    //     for (let i = measureStartingLine; i < measureStartingLine + measuresPerLine && i < lines.length; i++) {
-    //         abcString += getAbcStringFromMeasureStaff(lines[i], "bottom");
-    //         abcString += " |";
-    //         if (i === lines.length - 1) abcString += "]";
-    //     }
-    //     abcString += "\n";
-    //     measureStartingLine += measuresPerLine;
-    //     if (measureStartingLine >= lines.length) writing = false;
-    // }
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
         selectionColor: "#000",
