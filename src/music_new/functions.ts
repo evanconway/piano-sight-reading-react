@@ -320,6 +320,8 @@ export const getMeasuresPerLine = (lineWidth: number, measureWidth: number) => {
 
 /**
  * Renders the given array of measures to the score.
+ * https://paulrosen.github.io/abcjs/
+ * https://abcnotation.com/wiki/abc:standard:v2.1
  * 
  * @param lines 
  * @param width 
