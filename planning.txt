@@ -217,3 +217,8 @@ Making a note that we should look into possibly specifying the number of measure
 Finally got back to working on this. I started changing over the entire music storage and rendering system to be a 2D array so that we store music line by line, and render line by line. However I'm doubting this approach. We originally didn't want to do this so that if we ever had non-randomly generated music (maybe user created files?), we could allow the rendering system to take care of it automatically. I suppose we could store the randomly generated music line by line, but it feels awkward. Unfortuantely I think I should rip out the work I just did. Go back to music simply being an array of measures, but also add numOfLines and measuresPerLine variables to our abc rendering function. This way music could be display more automatically, but we have strict control if we need it.
 
 Actually, did the rendering function ever automatically line split? Maybe it did, but it didn't work very well.
+
+
+10th of February, 2024
+
+I just realized something about the current rendering system, and how I'm being silly agonizing over accomodating measures per line or not. If we do ever add custom music, we're going to need some sort of pagination system. The current system isn't even close to accounting for that. It's laser focused on just rendering a single page. In fact the rendering function assumes the music it's given is a single page. Since randomly generate music will always have a very consisten number of measures per line, and lines per page, we should just make the whole system work around this. And when it comes time to do something completely different, we'll worry about it then.

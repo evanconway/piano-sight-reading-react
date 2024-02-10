@@ -135,17 +135,19 @@ export interface Measure {
 /**
  * Sets color of paths of given measure array
  * 
- * @param measures 
+ * @param lines 
  */
-export const measuresSetPathColors = (measures: Measure[], color: string) => {
-    measures.forEach(m => {
-        m.staffTop.forEach(c => {
-            const paths = document.querySelector(`#${c?.pathId}`)?.children;
-            if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
-        });
-        m.staffBottom.forEach(c => {
-            const paths = document.querySelector(`#${c?.pathId}`)?.children;
-            if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
+export const measuresSetPathColors = (lines: Measure[][], color: string) => {
+    lines.forEach(line => {
+        line.forEach(m => {
+            m.staffTop.forEach(c => {
+                const paths = document.querySelector(`#${c?.pathId}`)?.children;
+                if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
+            });
+            m.staffBottom.forEach(c => {
+                const paths = document.querySelector(`#${c?.pathId}`)?.children;
+                if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
+            });
         });
     });
 };

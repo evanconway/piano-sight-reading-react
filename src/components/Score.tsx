@@ -44,6 +44,14 @@ const Score = () => {
     }, [dispatch, userPreferences]);
 
     // render
+
+    /*
+    Making a note about re-rendering on window resize. Why are we doing this? On resize, we should calculate the new dimensions
+    of the page, determine if the space has changed enough to warrant new music, then generate that music if so. This use effect
+    should honestly only trigger when the music changes, so why did we add a resize event listener here as well? The resize
+    listener here may have been a logic error and may need to be removed.
+    */
+
     useEffect(() => {
         const render = () => {
             if (scoreRef.current === null) return;
