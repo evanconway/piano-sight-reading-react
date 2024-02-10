@@ -363,12 +363,14 @@ export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (
         abcString += '\n';
     });
 
+    const paddingX = getScorePaddingXFromWidth(width);
+
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
         selectionColor: "#000",
-        staffwidth: width - getScorePaddingXFromWidth(width) * 2,
-        paddingleft: getScorePaddingXFromWidth(width),
-        paddingright: getScorePaddingXFromWidth(width),
+        staffwidth: width - paddingX * 2,
+        paddingleft: paddingX,
+        paddingright: paddingX,
         paddingbottom: getScorePaddingBottomFromWidth(width),
         scale: getScoreScaleFromWidth(width),
         clickListener: onClick,
@@ -394,15 +396,6 @@ export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (
             });
         });
     });
-
-    // lines.forEach(m => m.staffTop.forEach(c => {
-    //     if (c === null) return;
-    //     pathsTop[pathsTopIndex++].id = c.pathId;
-    // }));
-    // lines.forEach(m => m.staffBottom.forEach(c => {
-    //     if (c === null) return;
-    //     pathsBot[pathsBotIndex++].id = c.pathId;
-    // }));
 
     /*
     Unfortunately, the abcjs.render function is not pure, and modifies the styles of
