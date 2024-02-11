@@ -11,10 +11,8 @@ interface MusicCursor {
 
 interface MusicState {
     cursor: MusicCursor,
-    music: {
-        measures: Measure[],
-        measuresPerLine?: number,
-    },
+    measures: Measure[],
+    measuresPerLine?: number,
 }
 
 /**
@@ -23,15 +21,14 @@ interface MusicState {
  * @param musicState 
  */
 const musicStateStepCursorForward = (musicState: MusicState) => {
-    const cursor = musicState.cursor;
-    const music = musicState.music.measures;
+    const { cursor, measures } = musicState;
     cursor.staffIndex++;
-    if (cursor.staffIndex >= music[cursor.measureIndex].staffChords.length) {
+    if (cursor.staffIndex >= measures[cursor.measureIndex].staffChords.length) {
         cursor.staffIndex = 0;
         cursor.measureIndex++;
-        if (cursor.measureIndex >= music.length) {
-            cursor.measureIndex = music.length - 1;
-                cursor.staffIndex = music[cursor.measureIndex].staffChords.length - 1;
+        if (cursor.measureIndex >= measures.length) {
+            cursor.measureIndex = measures.length - 1;
+                cursor.staffIndex = measures[cursor.measureIndex].staffChords.length - 1;
         }
     }
 };
@@ -42,8 +39,7 @@ const musicStateStepCursorForward = (musicState: MusicState) => {
  * @param musicState 
  */
 const musicStateStepCursorBackward = (musicState: MusicState) => {
-    const cursor = musicState.cursor;
-    const music = musicState.music.measures;
+    const { cursor, measures } = musicState;
     cursor.staffIndex--;
     if (cursor.staffIndex < 0) {
         cursor.measureIndex--;
@@ -51,7 +47,7 @@ const musicStateStepCursorBackward = (musicState: MusicState) => {
             cursor.measureIndex = 0;
             cursor.staffIndex = 0;
         } else {
-            cursor.staffIndex = music[cursor.measureIndex].staffChords.length - 1;
+            cursor.staffIndex = measures[cursor.measureIndex].staffChords.length - 1;
         }
     }
 };
@@ -63,8 +59,8 @@ const musicStateStepCursorBackward = (musicState: MusicState) => {
  * @returns 
  */
 const musicStateGetLastCursor = (musicState: MusicState): MusicCursor => {
-    const measureLastIndex = musicState.music.measures.length - 1;
-    const staffLastIndex = musicState.music.measures[measureLastIndex].staffChords.length - 1;
+    const measureLastIndex = musicState.measures.length - 1;
+    const staffLastIndex = musicState.measures[measureLastIndex].staffChords.length - 1;
     return { measureIndex: measureLastIndex, staffIndex: staffLastIndex };
 };
 
@@ -99,8 +95,8 @@ const musicStateCursorIsAtEnd = (musicState: MusicState) => {
 const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
     const result = musicStateGetLastCursor(musicState);
     const chordValid = (c: MusicCursor) => {
-        const topChord = musicState.music.measures[c.measureIndex].staffChords[c.staffIndex].top;
-        const bottomChord = musicState.music.measures[c.measureIndex].staffChords[c.staffIndex].bottom;
+        const topChord = musicState.measures[c.measureIndex].staffChords[c.staffIndex].top;
+        const bottomChord = musicState.measures[c.measureIndex].staffChords[c.staffIndex].bottom;
         return topChord !== null || bottomChord !== null;
     };
     while (!chordValid(result)) {
@@ -113,7 +109,7 @@ const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
                 result.measureIndex = 0;
                 result.staffIndex = 0;
             } else {
-                result.staffIndex = musicState.music.measures[result.measureIndex].staffChords.length - 1;
+                result.staffIndex = musicState.measures[result.measureIndex].staffChords.length - 1;
             }
         }
     }
@@ -141,9 +137,9 @@ const musicStateCursorIsAtFinalChord = (musicState: MusicState) => {
  * @returns 
  */
 const musicStateChordAtCursorIsValid = (musicState: MusicState) => {
-    const cursor = musicState.cursor;
-    const chordTop = musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
-    const chordBottom = musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
+    const { cursor, measures } = musicState;
+    const chordTop = measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
+    const chordBottom = measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
     return (chordTop !== null || chordBottom !== null);
 };
 
@@ -154,15 +150,15 @@ const musicStateChordAtCursorIsValid = (musicState: MusicState) => {
  * @returns 
  */
 const musicStateGetCursorPathIds = (musicState: MusicState) => {
-    const cursor = musicState.cursor;
+    const { cursor, measures } = musicState;
     return {
-        pathIdTop: musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].top?.pathId,
-        pathIdBottom: musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].bottom?.pathId,
+        pathIdTop: measures[cursor.measureIndex].staffChords[cursor.staffIndex].top?.pathId,
+        pathIdBottom: measures[cursor.measureIndex].staffChords[cursor.staffIndex].bottom?.pathId,
     };
 };
 
 const musicStateHighlightCursor = (musicState: MusicState) => {
-    measuresSetPathColors(musicState.music.measures, "#000");
+    measuresSetPathColors(musicState.measures, "#000");
     const { pathIdTop, pathIdBottom } = musicStateGetCursorPathIds(musicState);
     const topPaths = document.querySelector(`#${pathIdTop}`)?.children;
     const bottomPaths = document.querySelector(`#${pathIdBottom}`)?.children;
@@ -172,22 +168,21 @@ const musicStateHighlightCursor = (musicState: MusicState) => {
 
 const initialState: MusicState = {
     cursor: { measureIndex: 0, staffIndex: 0 },
-    music: {
-        measures: generateRandomMusic({
-            numberOfLines: 1,
-            measuresPerLine: 1,
-            keySignature: DEFAULT_KEY_SIGNATURE,
-            timeSignature: DEFAULT_TIME_SIGNATURE,
-            topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
-            topStaffHighestPitch: DEFAULT_TOP_STAFF_HIGHEST_PITCH,
-            topStaffLowestPitch: DEFAULT_TOP_STAFF_LOWEST_PITCH,
-            topStaffNotesPerChord: DEFAULT_TOP_STAFF_NOTES_PER_CHORD,
-            bottomStaffDuration: DEFAULT_BOTTOM_STAFF_DURATION,
-            bottomStaffHighestPitch: DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH,
-            bottomStaffLowestPitch: DEFAULT_BOTTOM_STAFF_LOWEST_PITCH,
-            bottomStaffNotesPerChord: DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD,
-        }),
-    },
+    measures: generateRandomMusic({
+        numberOfLines: 1,
+        measuresPerLine: 1,
+        keySignature: DEFAULT_KEY_SIGNATURE,
+        timeSignature: DEFAULT_TIME_SIGNATURE,
+        topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
+        topStaffHighestPitch: DEFAULT_TOP_STAFF_HIGHEST_PITCH,
+        topStaffLowestPitch: DEFAULT_TOP_STAFF_LOWEST_PITCH,
+        topStaffNotesPerChord: DEFAULT_TOP_STAFF_NOTES_PER_CHORD,
+        bottomStaffDuration: DEFAULT_BOTTOM_STAFF_DURATION,
+        bottomStaffHighestPitch: DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH,
+        bottomStaffLowestPitch: DEFAULT_BOTTOM_STAFF_LOWEST_PITCH,
+        bottomStaffNotesPerChord: DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD,
+    }),
+    measuresPerLine: 1,
 };
 
 export const musicSlice = createSlice({
@@ -240,8 +235,8 @@ export const musicSlice = createSlice({
             musicStateHighlightCursor(state);
         },
         randomizeMusic: (state, action: PayloadAction<RandomMusicParams>) => {
-            state.music.measures = generateRandomMusic(action.payload);
-            state.music.measuresPerLine = action.payload.measuresPerLine;
+            state.measures = generateRandomMusic(action.payload);
+            state.measuresPerLine = action.payload.measuresPerLine;
         },
         setCursorToStart: (state) => {
             state.cursor.measureIndex = 0;
@@ -261,27 +256,25 @@ export const {
 } = musicSlice.actions;
 
 export const selectCursor = (state: RootState) => state.music.cursor;
-export const selectMusic = (state: RootState) => state.music.music;
+export const selectMusic = (state: RootState) => state.music;
 export const selectCursorAtFinalChord = (state: RootState) => musicStateCursorIsAtFinalChord(state.music);
-export const selectMusicCurrentMidi = createSelector((state: RootState) => state, (state: RootState) => {
-    const music = state.music.music;
-    const measureIndex = state.music.cursor.measureIndex;
-    const staffIndex = state.music.cursor.staffIndex;
-    const pitchesTop = music.measures[measureIndex].staffChords[staffIndex].top?.pitches;
-    const pitchesBot = music.measures[measureIndex].staffChords[staffIndex].bottom?.pitches;
-    const keySignature = music.measures[measureIndex].keySignature;
+export const selectMusicCurrentMidi = createSelector((state: RootState) => state.music, music => {
+    const { cursor, measures } = music;
+    const { measureIndex, staffIndex} = cursor;
+    const pitchesTop = measures[measureIndex].staffChords[staffIndex].top?.pitches;
+    const pitchesBot = measures[measureIndex].staffChords[staffIndex].bottom?.pitches;
+    const keySignature = measures[measureIndex].keySignature;
     const midiPitchesTop = pitchesTop ? pitchesTop.map(p => getMidiOfPitch(keySignature, p)) : [];
     const midiPitchesBot = pitchesBot ? pitchesBot.map(p => getMidiOfPitch(keySignature, p)) : [];
     // remove duplicates from returned array
     return Array.from(new Set([...midiPitchesTop, ...midiPitchesBot])).sort();
 });
 export const selectMusicCerrentPathId = (state: RootState) => {
-    const music = state.music.music;
-    const measureIndex = state.music.cursor.measureIndex;
-    const staffIndex = state.music.cursor.staffIndex;
+    const { cursor, measures } = state.music;
+    const { measureIndex, staffIndex } = cursor;
     return {
-        topPathId: music.measures[measureIndex].staffChords[staffIndex].top?.pathId,
-        bottomPathId: music.measures[measureIndex].staffChords[staffIndex].bottom?.pathId,
+        topPathId: measures[measureIndex].staffChords[staffIndex].top?.pathId,
+        bottomPathId: measures[measureIndex].staffChords[staffIndex].bottom?.pathId,
     };
 };
 
