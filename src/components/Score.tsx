@@ -17,9 +17,6 @@ const Score = () => {
         const onResize = () => {
             if (scoreRef.current === null) return;
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfLines, measuresPerLine } = userPreferences;
-
-            // consider determining score dimensions from window size
-
             const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();
             const width = scoreWidth - getScorePaddingXFromWidth(scoreWidth) * 2;
             const height = scoreHeight - getScorePaddingBottomFromWidth(scoreWidth);
@@ -51,9 +48,10 @@ const Score = () => {
         const render = () => {
             if (scoreRef.current === null) return;
             renderAbcjsToScore(
-                music,
+                music.measures,
                 scoreRef.current.getBoundingClientRect().width,
                 (e) => dispatch(setCursorToPathId(e.abselem.elemset[0].id)),
+                { measuresPerLine: music.measuresPerLine },
             );
             dispatch(highlightCurrentChord());
         };

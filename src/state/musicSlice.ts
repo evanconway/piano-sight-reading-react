@@ -1,18 +1,20 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { Measure, measuresSetPathColors } from "../music_new/models";
 import { RootState } from "./store";
 import { RandomMusicParams, generateRandomMusic, getMidiOfPitch } from "../music_new/functions";
 import { DEFAULT_BOTTOM_STAFF_DURATION, DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH, DEFAULT_BOTTOM_STAFF_LOWEST_PITCH, DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD, DEFAULT_KEY_SIGNATURE, DEFAULT_TIME_SIGNATURE, DEFAULT_TOP_STAFF_DURATION, DEFAULT_TOP_STAFF_HIGHEST_PITCH, DEFAULT_TOP_STAFF_LOWEST_PITCH, DEFAULT_TOP_STAFF_NOTES_PER_CHORD } from "../constants";
 
 interface MusicCursor {
-    lineIndex: number,
     measureIndex: number,
     staffIndex: number, // index of exact position in top/bottom staff within measure
 }
 
 interface MusicState {
     cursor: MusicCursor,
-    music: Measure[][],
+    music: {
+        measures: Measure[],
+        measuresPerLine?: number,
+    },
 }
 
 /**
@@ -22,20 +24,14 @@ interface MusicState {
  */
 const musicStateStepCursorForward = (musicState: MusicState) => {
     const cursor = musicState.cursor;
-    const music = musicState.music;
+    const music = musicState.music.measures;
     cursor.staffIndex++;
-    // recall  that top and bottoms staffs of music will always be the same length
-    if (cursor.staffIndex >= music[cursor.lineIndex][cursor.measureIndex].staffTop.length) {
+    if (cursor.staffIndex >= music[cursor.measureIndex].staffChords.length) {
         cursor.staffIndex = 0;
         cursor.measureIndex++;
-        if (cursor.measureIndex >= music[cursor.lineIndex].length) {
-            cursor.measureIndex = 0;
-            cursor.lineIndex++;
-            if (cursor.lineIndex >= music.length) {
-                cursor.lineIndex = music.length - 1;
-                cursor.measureIndex = music[cursor.lineIndex].length - 1;
-                cursor.staffIndex = music[cursor.lineIndex][cursor.measureIndex].staffTop.length - 1;
-            }
+        if (cursor.measureIndex >= music.length) {
+            cursor.measureIndex = music.length - 1;
+                cursor.staffIndex = music[cursor.measureIndex].staffChords.length - 1;
         }
     }
 };
@@ -47,26 +43,29 @@ const musicStateStepCursorForward = (musicState: MusicState) => {
  */
 const musicStateStepCursorBackward = (musicState: MusicState) => {
     const cursor = musicState.cursor;
-    const music = musicState.music;
+    const music = musicState.music.measures;
     cursor.staffIndex--;
-
-    // recall  that top and bottoms staffs of music will always be the same length
     if (cursor.staffIndex < 0) {
         cursor.measureIndex--;
         if (cursor.measureIndex < 0) {
-            cursor.lineIndex--;
-            if (cursor.lineIndex < 0) {
-                cursor.lineIndex = 0;
-                cursor.measureIndex = 0;
-                cursor.staffIndex = 0;
-            } else {
-                cursor.measureIndex = music[cursor.lineIndex].length - 1;
-                cursor.staffIndex = music[cursor.lineIndex][cursor.measureIndex].staffTop.length - 1;
-            }
+            cursor.measureIndex = 0;
+            cursor.staffIndex = 0;
         } else {
-            cursor.staffIndex = music[cursor.lineIndex][cursor.measureIndex].staffTop.length - 1;
+            cursor.staffIndex = music[cursor.measureIndex].staffChords.length - 1;
         }
     }
+};
+
+/**
+ * Get a MusicCursor object equal to the last position in the given music state.
+ * 
+ * @param musicState 
+ * @returns 
+ */
+const musicStateGetLastCursor = (musicState: MusicState): MusicCursor => {
+    const measureLastIndex = musicState.music.measures.length - 1;
+    const staffLastIndex = musicState.music.measures[measureLastIndex].staffChords.length - 1;
+    return { measureIndex: measureLastIndex, staffIndex: staffLastIndex };
 };
 
 /**
@@ -76,7 +75,7 @@ const musicStateStepCursorBackward = (musicState: MusicState) => {
  * @returns 
  */
 const musicStateCursorIsAtStart = (musicState: MusicState) => {
-    return musicState.cursor.lineIndex === 0 && musicState.cursor.staffIndex === 0 && musicState.cursor.measureIndex === 0;
+    return  musicState.cursor.measureIndex === 0 && musicState.cursor.staffIndex === 0;
 };
 
 /**
@@ -87,25 +86,8 @@ const musicStateCursorIsAtStart = (musicState: MusicState) => {
  */
 const musicStateCursorIsAtEnd = (musicState: MusicState) => {
     const final = musicStateGetLastCursor(musicState);
-    const cursor = musicState.cursor
-    return cursor.lineIndex === final.lineIndex && cursor.measureIndex === final.measureIndex && cursor.staffIndex === final.staffIndex;
-};
-
-/**
- * Get a MusicCursor object equal to the last position in the given music state.
- * 
- * @param musicState 
- * @returns 
- */
-const musicStateGetLastCursor = (musicState: MusicState): MusicCursor => {
-    const lineLastIndex = musicState.music.length - 1;
-    const measureLastIndex = musicState.music[lineLastIndex].length - 1;
-    const staffLastIndex = musicState.music[lineLastIndex][measureLastIndex].staffTop.length - 1;
-    return {
-        lineIndex: lineLastIndex,
-        measureIndex: measureLastIndex,
-        staffIndex: staffLastIndex,
-    };
+    const cursor = musicState.cursor;
+    return cursor.measureIndex === final.measureIndex && cursor.staffIndex === final.staffIndex;
 };
 
 /**
@@ -117,29 +99,21 @@ const musicStateGetLastCursor = (musicState: MusicState): MusicCursor => {
 const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
     const result = musicStateGetLastCursor(musicState);
     const chordValid = (c: MusicCursor) => {
-        const topChord = musicState.music[c.lineIndex][c.measureIndex].staffTop[c.staffIndex];
-        const bottomChord = musicState.music[c.lineIndex][c.measureIndex].staffBottom[c.staffIndex];
+        const topChord = musicState.music.measures[c.measureIndex].staffChords[c.staffIndex].top;
+        const bottomChord = musicState.music.measures[c.measureIndex].staffChords[c.staffIndex].bottom;
         return topChord !== null || bottomChord !== null;
     };
     while (!chordValid(result)) {
         result.staffIndex--;
-    
         // recall  that top and bottoms staffs of music will always be the same length
         // consider reworking mutate functions to return values which are used to mutate later
         if (result.staffIndex < 0) {
             result.measureIndex--;
             if (result.measureIndex < 0) {
-                result.lineIndex--;
-                if (result.lineIndex < 0) {
-                    result.lineIndex = 0;
-                    result.measureIndex = 0;
-                    result.staffIndex = 0;
-                } else {
-                    result.measureIndex = musicState.music[result.lineIndex].length - 1;
-                    result.staffIndex = musicState.music[result.lineIndex][result.measureIndex].staffTop.length - 1;
-                }
+                result.measureIndex = 0;
+                result.staffIndex = 0;
             } else {
-                result.staffIndex = musicState.music[result.lineIndex][result.measureIndex].staffTop.length - 1;
+                result.staffIndex = musicState.music.measures[result.measureIndex].staffChords.length - 1;
             }
         }
     }
@@ -155,11 +129,9 @@ const musicStateGetFinalChordCursor = (musicState: MusicState): MusicCursor => {
  */
 const musicStateCursorIsAtFinalChord = (musicState: MusicState) => {
     const finalChordCursor = musicStateGetFinalChordCursor(musicState);
-    const lineSame = finalChordCursor.lineIndex === musicState.cursor.lineIndex;
     const measureSame = finalChordCursor.measureIndex === musicState.cursor.measureIndex;
     const staffSame = finalChordCursor.staffIndex === musicState.cursor.staffIndex;
-    // now measureIndex and staffIndex will be at position of final chord in the the music
-    return lineSame && measureSame && staffSame;
+    return  measureSame && staffSame;
 }
 
 /**
@@ -170,8 +142,8 @@ const musicStateCursorIsAtFinalChord = (musicState: MusicState) => {
  */
 const musicStateChordAtCursorIsValid = (musicState: MusicState) => {
     const cursor = musicState.cursor;
-    const chordTop = musicState.music[cursor.lineIndex][cursor.measureIndex].staffTop[cursor.staffIndex];
-    const chordBottom = musicState.music[cursor.lineIndex][cursor.measureIndex].staffBottom[cursor.staffIndex];
+    const chordTop = musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
+    const chordBottom = musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
     return (chordTop !== null || chordBottom !== null);
 };
 
@@ -183,13 +155,14 @@ const musicStateChordAtCursorIsValid = (musicState: MusicState) => {
  */
 const musicStateGetCursorPathIds = (musicState: MusicState) => {
     const cursor = musicState.cursor;
-    const pathIdTop = musicState.music[cursor.lineIndex][cursor.measureIndex].staffTop[cursor.staffIndex]?.pathId;
-    const pathIdBottom = musicState.music[cursor.lineIndex][cursor.measureIndex].staffBottom[cursor.staffIndex]?.pathId;
-    return { pathIdTop, pathIdBottom };
+    return {
+        pathIdTop: musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].top?.pathId,
+        pathIdBottom: musicState.music.measures[cursor.measureIndex].staffChords[cursor.staffIndex].bottom?.pathId,
+    };
 };
 
 const musicStateHighlightCursor = (musicState: MusicState) => {
-    measuresSetPathColors(musicState.music, "#000");
+    measuresSetPathColors(musicState.music.measures, "#000");
     const { pathIdTop, pathIdBottom } = musicStateGetCursorPathIds(musicState);
     const topPaths = document.querySelector(`#${pathIdTop}`)?.children;
     const bottomPaths = document.querySelector(`#${pathIdBottom}`)?.children;
@@ -198,21 +171,23 @@ const musicStateHighlightCursor = (musicState: MusicState) => {
 };
 
 const initialState: MusicState = {
-    cursor: { lineIndex: 0, measureIndex: 0, staffIndex: 0 },
-    music: generateRandomMusic({
-        numberOfLines: 1,
-        measuresPerLine: 1,
-        keySignature: DEFAULT_KEY_SIGNATURE,
-        timeSignature: DEFAULT_TIME_SIGNATURE,
-        topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
-        topStaffHighestPitch: DEFAULT_TOP_STAFF_HIGHEST_PITCH,
-        topStaffLowestPitch: DEFAULT_TOP_STAFF_LOWEST_PITCH,
-        topStaffNotesPerChord: DEFAULT_TOP_STAFF_NOTES_PER_CHORD,
-        bottomStaffDuration: DEFAULT_BOTTOM_STAFF_DURATION,
-        bottomStaffHighestPitch: DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH,
-        bottomStaffLowestPitch: DEFAULT_BOTTOM_STAFF_LOWEST_PITCH,
-        bottomStaffNotesPerChord: DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD,
-    }),
+    cursor: { measureIndex: 0, staffIndex: 0 },
+    music: {
+        measures: generateRandomMusic({
+            numberOfLines: 1,
+            measuresPerLine: 1,
+            keySignature: DEFAULT_KEY_SIGNATURE,
+            timeSignature: DEFAULT_TIME_SIGNATURE,
+            topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
+            topStaffHighestPitch: DEFAULT_TOP_STAFF_HIGHEST_PITCH,
+            topStaffLowestPitch: DEFAULT_TOP_STAFF_LOWEST_PITCH,
+            topStaffNotesPerChord: DEFAULT_TOP_STAFF_NOTES_PER_CHORD,
+            bottomStaffDuration: DEFAULT_BOTTOM_STAFF_DURATION,
+            bottomStaffHighestPitch: DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH,
+            bottomStaffLowestPitch: DEFAULT_BOTTOM_STAFF_LOWEST_PITCH,
+            bottomStaffNotesPerChord: DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD,
+        }),
+    },
 };
 
 export const musicSlice = createSlice({
@@ -229,7 +204,6 @@ export const musicSlice = createSlice({
             valid, then the cursor was already at correct end position. Revert.
             */
             if (!musicStateChordAtCursorIsValid(state) && musicStateCursorIsAtEnd(state)) {
-                state.cursor.lineIndex = originalCursor.lineIndex;
                 state.cursor.measureIndex = originalCursor.measureIndex;
                 state.cursor.staffIndex = originalCursor.staffIndex;
             }
@@ -266,7 +240,8 @@ export const musicSlice = createSlice({
             musicStateHighlightCursor(state);
         },
         randomizeMusic: (state, action: PayloadAction<RandomMusicParams>) => {
-            state.music = generateRandomMusic(action.payload);
+            state.music.measures = generateRandomMusic(action.payload);
+            state.music.measuresPerLine = action.payload.measuresPerLine;
         },
         setCursorToStart: (state) => {
             state.cursor.measureIndex = 0;
@@ -288,27 +263,25 @@ export const {
 export const selectCursor = (state: RootState) => state.music.cursor;
 export const selectMusic = (state: RootState) => state.music.music;
 export const selectCursorAtFinalChord = (state: RootState) => musicStateCursorIsAtFinalChord(state.music);
-export const selectMusicCurrentMidi = (state: RootState) => {
+export const selectMusicCurrentMidi = createSelector((state: RootState) => state, (state: RootState) => {
     const music = state.music.music;
-    const lineIndex = state.music.cursor.lineIndex;
     const measureIndex = state.music.cursor.measureIndex;
     const staffIndex = state.music.cursor.staffIndex;
-    const pitchesTop = music[lineIndex][measureIndex].staffTop[staffIndex]?.pitches;
-    const pitchesBot = music[lineIndex][measureIndex].staffBottom[staffIndex]?.pitches;
-    const keySignature = music[lineIndex][measureIndex].keySignature;
+    const pitchesTop = music.measures[measureIndex].staffChords[staffIndex].top?.pitches;
+    const pitchesBot = music.measures[measureIndex].staffChords[staffIndex].bottom?.pitches;
+    const keySignature = music.measures[measureIndex].keySignature;
     const midiPitchesTop = pitchesTop ? pitchesTop.map(p => getMidiOfPitch(keySignature, p)) : [];
     const midiPitchesBot = pitchesBot ? pitchesBot.map(p => getMidiOfPitch(keySignature, p)) : [];
     // remove duplicates from returned array
     return Array.from(new Set([...midiPitchesTop, ...midiPitchesBot])).sort();
-};
+});
 export const selectMusicCerrentPathId = (state: RootState) => {
     const music = state.music.music;
-    const lineIndex = state.music.cursor.lineIndex;
     const measureIndex = state.music.cursor.measureIndex;
     const staffIndex = state.music.cursor.staffIndex;
     return {
-        topPathId: music[lineIndex][measureIndex].staffTop[staffIndex]?.pathId,
-        bottomPathId: music[lineIndex][measureIndex].staffBottom[staffIndex]?.pathId,
+        topPathId: music.measures[measureIndex].staffChords[staffIndex].top?.pathId,
+        bottomPathId: music.measures[measureIndex].staffChords[staffIndex].bottom?.pathId,
     };
 };
 

@@ -128,28 +128,21 @@ export interface Chord {
 export interface Measure {
     keySignature: KeySignature,
     timeSignature: TimeSignature,
-    staffTop: (Chord | null)[],
-    staffBottom: (Chord | null)[],
+    staffChords: ({ top: Chord | null, bottom: Chord | null })[],
 }
 
 /**
  * Sets color of paths of given measure array
  * 
- * @param lines 
+ * @param measures 
  */
-export const measuresSetPathColors = (lines: Measure[][], color: string) => {
-    lines.forEach(line => {
-        line.forEach(m => {
-            m.staffTop.forEach(c => {
-                const paths = document.querySelector(`#${c?.pathId}`)?.children;
-                if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
-            });
-            m.staffBottom.forEach(c => {
-                const paths = document.querySelector(`#${c?.pathId}`)?.children;
-                if (paths !== undefined) Array.from(paths).forEach(p => p.setAttribute("fill", color));
-            });
-        });
-    });
+export const measuresSetPathColors = (measures: Measure[], color: string) => {
+    measures.forEach(m => m.staffChords.forEach(staffEntry => {
+        const pathsTop = document.querySelector(`#${staffEntry.top?.pathId}`)?.children;
+        if (pathsTop !== undefined) Array.from(pathsTop).forEach(p => p.setAttribute('fill', color));
+        const pathsBottom = document.querySelector(`#${staffEntry.bottom?.pathId}`)?.children;
+        if (pathsBottom !== undefined) Array.from(pathsBottom).forEach(p => p.setAttribute('fill', color));
+    }));
 };
 
 export const NOTE_WIDTH = 65 as number; // arbitrary value indicating width of individual notes in pixels
@@ -161,8 +154,8 @@ export const NOTE_WIDTH = 65 as number; // arbitrary value indicating width of i
  * @returns 
  */
 export const getMeasureWidth = (measure: Measure) => {
-    const topWidth = measure.staffTop.map(c => c ? NOTE_WIDTH : 0).reduce((prev, curr) => prev + curr, 0);
-    const bottomWidth = measure.staffBottom.map(c => c ? NOTE_WIDTH : 0).reduce((prev, curr) => prev + curr, 0);
+    const topWidth = measure.staffChords.reduce((prev, curr) => prev + (curr.top === null ? 0 : NOTE_WIDTH), 0);
+    const bottomWidth = measure.staffChords.reduce((prev, curr) => prev + (curr.bottom === null ? 0 : NOTE_WIDTH), 0);
     return Math.max(topWidth, bottomWidth);
 };
 
