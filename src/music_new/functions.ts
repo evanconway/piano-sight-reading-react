@@ -335,11 +335,8 @@ export const renderAbcjsToScore = (lines: Measure[][], onClick: (e: abcjs.AbcEle
     abcString += `M:${firstM.timeSignature}\n`;
     abcString += `L:1/${NOTE_DURATION_BASE}\n`;
     abcString += `K:${firstM.keySignature}\n`;
+    abcString += `%%stretchlast`;
     abcString += `%%staves {1 2}\n`;
-
-    // prepare layout
-    const scoreBoundingRect = document.querySelector("#score")?.getBoundingClientRect();
-    if (!scoreBoundingRect) return;
 
     /*
     Because of how abcjs strings are written out, we have to write this out line by line, and staff
