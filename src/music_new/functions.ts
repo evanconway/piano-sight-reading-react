@@ -327,7 +327,7 @@ export const getMeasuresPerLine = (lineWidth: number, measureWidth: number) => {
  * @param width 
  * @returns 
  */
-export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (e: abcjs.AbcElem) => void) => {
+export const renderAbcjsToScore = (lines: Measure[][], onClick: (e: abcjs.AbcElem) => void) => {
     //prepare string
     const firstM = lines[0][0]; // first measure to get values from
 
@@ -365,27 +365,18 @@ export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (
         abcString += '\n';
     });
 
-    const paddingX = getScorePaddingXFromWidth(width);
-
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
         selectionColor: "#000",
-        staffwidth: width - paddingX * 2,
-        paddingleft: paddingX,
-        paddingright: paddingX,
-        paddingbottom: getScorePaddingBottomFromWidth(width),
-        scale: getScoreScaleFromWidth(width),
         clickListener: onClick,
     });
 
+    // iterate over all staff chords
+    // assign path ids to abcjs generated values
     const pathsTop = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
     const pathsBot = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v1"));
-
     let pathsTopIndex = 0;
     let pathsBotIndex = 0;
-
-    // iterate over all top staff chords
-    // assign path ids to abcjs generated values
     lines.forEach(line => {
         line.forEach(measure => {
             measure.staffTop.forEach(chord => {
@@ -398,20 +389,4 @@ export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (
             });
         });
     });
-
-    /*
-    Unfortunately, the abcjs.render function is not pure, and modifies the styles of
-    the target element, which is the score in this case.
-    
-    Firstly, when the scale of the render is less than 1, it adds a width style to 
-    the div. This breaks our resize logic.
-
-    Secondly it changes the height of the element based on the amount of content
-    added. We force the same height to ensure measure calculations are correct.
-    */
-    const scoreElement = document.getElementById(SCORE_ID);
-    if (scoreElement !== null) {
-        scoreElement.style.height = SCORE_ELEMENT_HEIGHT_STYLE;
-        scoreElement.style.width = "";
-    }
 };

@@ -17,17 +17,9 @@ const Score = () => {
         const onResize = () => {
             if (scoreRef.current === null) return;
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfLines, measuresPerLine } = userPreferences;
-
-            // consider determining score dimensions from window size
-
-            const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();
-            const width = scoreWidth - getScorePaddingXFromWidth(scoreWidth) * 2;
-            const height = scoreHeight - getScorePaddingBottomFromWidth(scoreWidth);
-            const scale = getScoreScaleFromWidth(width);
-            const lineHeight = 170 * scale;
-            const newNumOfLines = Math.max(Math.floor(height / lineHeight), 1);
-            const measureWidth = scale * getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration);
-            const newMeasuresPerLine = Math.max(getMeasuresPerLine(width, measureWidth), 1);
+            const newNumOfLines = Math.max(Math.floor(window.innerHeight / 170), 1);
+            const measureWidth =  getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration);
+            const newMeasuresPerLine = Math.max(getMeasuresPerLine(window.innerWidth, measureWidth), 1);
             if (newNumOfLines !== numberOfLines || newMeasuresPerLine !== measuresPerLine) {
                 dispatch(userPreferencesSetScoreDimensions({
                     numberOfLines: newNumOfLines,
@@ -52,7 +44,6 @@ const Score = () => {
             if (scoreRef.current === null) return;
             renderAbcjsToScore(
                 music,
-                scoreRef.current.getBoundingClientRect().width,
                 (e) => dispatch(setCursorToPathId(e.abselem.elemset[0].id)),
             );
             dispatch(highlightCurrentChord());
@@ -132,19 +123,7 @@ const Score = () => {
         return () => Array.from(midiAccess.inputs.values()).forEach(input => input.onmidimessage = null);
     }, [midiAccess, playedMidi, setPlayedMidi, musicCurrentMidi, dispatch, cursorAtEnd, userPreferences]);
 
-    return <div
-        id={SCORE_ID}
-        ref={scoreRef}
-        style={{
-            backgroundColor: "#fff",
-            maxWidth: "1100px",
-            height: SCORE_ELEMENT_HEIGHT_STYLE,
-            boxShadow: "10px 10px 10px #888",
-            margin: "0 auto",
-            borderRadius: 4,
-            animation: "animation-fadein 0.6s, animation-risein 0.6s",
-        }}
-    />;
+    return <div id={SCORE_ID} ref={scoreRef} />;
 };
 
 export default Score;
