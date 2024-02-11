@@ -1,6 +1,6 @@
 import abcjs from "abcjs";
 import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
-import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
+import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
 
 /**
  * Returns the midi value of the given pitch and key signature.
@@ -399,6 +399,6 @@ export const renderAbcjsToScore = (
     const scoreElement = document.getElementById(SCORE_ID);
     if (scoreElement !== null) {
         scoreElement.style.height = SCORE_ELEMENT_HEIGHT_STYLE;
-        scoreElement.style.width = "";
+        scoreElement.style.width = SCORE_ELEMENT_WIDTH_STYLE;
     }
 };

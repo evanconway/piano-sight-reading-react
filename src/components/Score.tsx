@@ -4,7 +4,7 @@ import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBot
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences, userPreferencesSetScoreDimensions } from "../state/userPreferencesSlice";
-import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ID } from "../constants";
+import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID } from "../constants";
 
 const Score = () => {
     const dispatch = useAppDispatch();
@@ -130,19 +130,27 @@ const Score = () => {
         return () => Array.from(midiAccess.inputs.values()).forEach(input => input.onmidimessage = null);
     }, [midiAccess, playedMidi, setPlayedMidi, musicCurrentMidi, dispatch, cursorAtEnd, userPreferences]);
 
-    return <div
-        id={SCORE_ID}
-        ref={scoreRef}
-        style={{
-            backgroundColor: "#fff",
-            maxWidth: "1100px",
-            height: SCORE_ELEMENT_HEIGHT_STYLE,
-            boxShadow: "10px 10px 10px #888",
-            margin: "0 auto",
-            borderRadius: 4,
-            animation: "animation-fadein 0.6s, animation-risein 0.6s",
-        }}
-    />;
+    return <div style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+    }}>
+        <div
+            id={SCORE_ID}
+            ref={scoreRef}
+            style={{
+                backgroundColor: "#fff",
+                width: SCORE_ELEMENT_WIDTH_STYLE,
+                height: SCORE_ELEMENT_HEIGHT_STYLE,
+                maxWidth: "1100px",
+                boxShadow: "10px 10px 10px #888",
+                margin: "0 auto",
+                borderRadius: 4,
+                animation: "animation-fadein 0.6s, animation-risein 0.6s",
+            }}
+        />
+    </div>;
 };
 
 export default Score;

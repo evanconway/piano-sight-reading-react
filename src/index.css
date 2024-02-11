@@ -2,8 +2,14 @@ html {
     height: 100%;
 }
 
-:root {
+body {
+    margin: 0;
+    height: 100%;
+}
+
+#root {
     background-color: #ccc;
+    height: 100%;
 }
 
 @keyframes animation-fadein {

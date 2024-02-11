@@ -145,7 +145,7 @@ export const measuresSetPathColors = (measures: Measure[], color: string) => {
     }));
 };
 
-export const NOTE_WIDTH = 65 as number; // arbitrary value indicating width of individual notes in pixels
+export const NOTE_WIDTH = 40 as number; // arbitrary value indicating width of individual notes in pixels
 
 /**
  * Returns width of given measure in pixels.
