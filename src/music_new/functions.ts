@@ -335,6 +335,7 @@ export const renderAbcjsToScore = (lines: Measure[][], width: number, onClick: (
     abcString += `M:${firstM.timeSignature}\n`;
     abcString += `L:1/${NOTE_DURATION_BASE}\n`;
     abcString += `K:${firstM.keySignature}\n`;
+    abcString += `%%stretchlast`;
     abcString += `%%staves {1 2}\n`;
 
     // prepare layout
