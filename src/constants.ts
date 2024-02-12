@@ -1,4 +1,4 @@
-import { KeySignature, NoteDuration, PitchCap, TimeSignature } from "./music_new/models";
+import { KeySignature, NoteDuration, PitchCap, TimeSignature } from "./music/models";
 
 export const DEFAULT_KEY_SIGNATURE: KeySignature = "C";
 export const DEFAULT_TIME_SIGNATURE: TimeSignature = "4/4";

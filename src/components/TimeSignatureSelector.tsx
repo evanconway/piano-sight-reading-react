@@ -1,6 +1,6 @@
 import "react";
 import { Select, MenuItem } from "@mui/material";
-import { TimeSignature, TimeSignatures,  } from "../music_new/models";
+import { TimeSignature, TimeSignatures,  } from "../music/models";
 import { selectUserPreferences, userPreferencesSetTimeSignature } from "../state/userPreferencesSlice";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";

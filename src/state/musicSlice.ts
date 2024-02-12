@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
-import { Measure, measuresSetPathColors } from "../music_new/models";
+import { Measure, measuresSetPathColors } from "../music/models";
 import { RootState } from "./store";
-import { RandomMusicParams, generateRandomMusic, getMidiOfPitch } from "../music_new/functions";
+import { RandomMusicParams, generateRandomMusic, getMidiOfPitch } from "../music/functions";
 import { DEFAULT_BOTTOM_STAFF_DURATION, DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH, DEFAULT_BOTTOM_STAFF_LOWEST_PITCH, DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD, DEFAULT_KEY_SIGNATURE, DEFAULT_TIME_SIGNATURE, DEFAULT_TOP_STAFF_DURATION, DEFAULT_TOP_STAFF_HIGHEST_PITCH, DEFAULT_TOP_STAFF_LOWEST_PITCH, DEFAULT_TOP_STAFF_NOTES_PER_CHORD } from "../constants";
 
 interface MusicCursor {

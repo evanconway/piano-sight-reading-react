@@ -1,6 +1,6 @@
 import "react";
 import { Select, MenuItem } from "@mui/material";
-import { NoteDuration, durationsAllowedInTimeSignatureMap } from "../music_new/models";
+import { NoteDuration, durationsAllowedInTimeSignatureMap } from "../music/models";
 import { selectUserPreferences, userPreferencesSetBottomStaffDuration } from "../state/userPreferencesSlice";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";

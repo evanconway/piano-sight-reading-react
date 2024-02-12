@@ -1,6 +1,6 @@
 import "react";
 import { Select, MenuItem } from "@mui/material";
-import { KeySignature, KeySignatures,  } from "../music_new/models";
+import { KeySignature, KeySignatures,  } from "../music/models";
 import { selectUserPreferences, userPreferencesSetKeySignature } from "../state/userPreferencesSlice";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";

@@ -3,8 +3,8 @@ import OptionTypography from "./OptionTypography";
 import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { selectUserPreferences, userPreferencesSetTopStaffHighestPitch } from "../state/userPreferencesSlice";
-import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../music_new/models";
-import { getPitchCapString, getPitchCapsInRange } from "../music_new/functions";
+import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../music/models";
+import { getPitchCapString, getPitchCapsInRange } from "../music/functions";
 
 const TopStaffHighestPitchSelector = () => {
     const dispatch = useAppDispatch();

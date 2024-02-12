@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music_new/functions";
+import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences, userPreferencesSetScoreDimensions } from "../state/userPreferencesSlice";

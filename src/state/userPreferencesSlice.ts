@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DEFAULT_BOTTOM_STAFF_DURATION, DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH, DEFAULT_BOTTOM_STAFF_LOWEST_PITCH, DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD, DEFAULT_KEY_SIGNATURE, DEFAULT_TIME_SIGNATURE, DEFAULT_TOP_STAFF_DURATION, DEFAULT_TOP_STAFF_HIGHEST_PITCH, DEFAULT_TOP_STAFF_LOWEST_PITCH, DEFAULT_TOP_STAFF_NOTES_PER_CHORD } from "../constants";
-import { RandomMusicParams } from "../music_new/functions";
-import { KeySignature, NoteDuration, PitchCap, TimeSignature } from "../music_new/models";
+import { RandomMusicParams } from "../music/functions";
+import { KeySignature, NoteDuration, PitchCap, TimeSignature } from "../music/models";
 import { RootState } from "./store";
 
 const initialState: RandomMusicParams = {
