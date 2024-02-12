@@ -10,6 +10,8 @@ body {
 #root {
     background-color: #ccc;
     height: 100%;
+    box-sizing: border-box;
+    padding: 8px;
 }
 
 @keyframes animation-fadein {
