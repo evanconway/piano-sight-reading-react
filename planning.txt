@@ -243,4 +243,6 @@ Currently we're mutating the dom after abcjs does its rendering to ensure our sc
 
 Since we have another excuse to go through the entire music system again, I think we should change how chords are stored. Instead of having two staff arrays per measure (one for top and one for bottom) and ensuring they're the same size, let's create a staff object, and each measure is an array of these staff objects each of which have a top and bottom chord.
 
-We managed to redo how music is stored, and add the %%barsperline directive to the abc notation. We were also able to tidy up some of the styling and code. Now we should look into the page directives and bugs. I just realized that trying to play with 4 notes per staff in C minor will not work properly. Perhaps this is a good opportunity to start introductin real tests to the code.
+We managed to redo how music is stored, and add the %%barsperline directive to the abc notation. We were also able to tidy up some of the styling and code. Now we should look into the page directives and bugs. I just realized that trying to play with 4 notes per staff in C minor does not work properly. Perhaps this is a good opportunity to introduce real tests to the code.
+
+We've introduced real tests, fixed some bugs, and tidied the code even more. Now let's properly explore the page dimension directives.
