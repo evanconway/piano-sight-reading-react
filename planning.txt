@@ -245,4 +245,4 @@ Since we have another excuse to go through the entire music system again, I thin
 
 We managed to redo how music is stored, and add the %%barsperline directive to the abc notation. We were also able to tidy up some of the styling and code. Now we should look into the page directives and bugs. I just realized that trying to play with 4 notes per staff in C minor does not work properly. Perhaps this is a good opportunity to introduce real tests to the code.
 
-We've introduced real tests, fixed some bugs, and tidied the code even more. Now let's properly explore the page dimension directives.
+We've introduced real tests, fixed some bugs, and tidied the code even more. Unfortuantely I also did some exploring of the page dimension directives and they don't appear to work at all. Very frustrating. However, our system is working as intended right now. I think we should do some reflecting later and determine what features we should add next. For starters I know we don't have harmony, but I'm sure there's a lot more we could do.
