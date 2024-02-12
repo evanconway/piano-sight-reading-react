@@ -15,8 +15,8 @@ import TimeSignatureSelector from "./TimeSignatureSelector";
 const Options = () => {
     const [exists, setExists] = useState(true);
     const [animation, setAnimation] = useState("");
-    const timeoutRefExist = useRef<number>();
-    const timeoutRefAnimation = useRef<number>();
+    const timeoutRefExist = useRef<NodeJS.Timeout>();
+    const timeoutRefAnimation = useRef<NodeJS.Timeout>();
     const buttonTime = 2000;
 
     useEffect(() => {
