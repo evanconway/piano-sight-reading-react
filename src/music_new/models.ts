@@ -1,5 +1,6 @@
 export type PitchRegister = -1 | 0 | 1 | 2| 3 | 4 | 5 | 6 | 7 | 8;
 export type ScaleDegree = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export const ScaleDegrees: ScaleDegree[] = [1, 2, 3, 4, 5, 6, 7];
 export type Accidental = -2 | -1 | 0 | 1 | 2; // negative for flat, positive for sharp
 type AccidentalSymbol = "#" | "b";
 export type PitchClass = "C" | "D" | "E" | "F" | "G" | "A" | "B";
@@ -168,7 +169,7 @@ KeyScaleMidiMap.set("D", new Map([[1, {midi: 2, pitchClass: "D"}], [2, {midi: 4,
 KeyScaleMidiMap.set("A", new Map([[1, {midi: 9, pitchClass: "A"}], [2, {midi: 11, pitchClass: "B"}], [3, {midi: 1, pitchClass: "C"}], [4, {midi: 2, pitchClass: "D"}], [5, {midi: 4, pitchClass: "E"}], [6, {midi: 6, pitchClass: "F"}], [7, {midi: 8, pitchClass: "G"}]]));
 KeyScaleMidiMap.set("E", new Map([[1, {midi: 4, pitchClass: "E"}], [2, {midi: 6, pitchClass: "F"}], [3, {midi: 8, pitchClass: "G"}], [4, {midi: 9, pitchClass: "A"}], [5, {midi: 11, pitchClass: "B"}], [6, {midi: 1, pitchClass: "C"}], [7, {midi: 3, pitchClass: "D"}]]));
 KeyScaleMidiMap.set("B", new Map([[1, {midi: 11, pitchClass: "B"}], [2, {midi: 1, pitchClass: "C"}], [3, {midi: 3, pitchClass: "D"}], [4, {midi: 4, pitchClass: "E"}], [5, {midi: 6, pitchClass: "F"}], [6, {midi: 8, pitchClass: "G"}], [7, {midi: 10, pitchClass: "A"}]]));
-KeyScaleMidiMap.set("F#", new Map([[1, {midi: 6, pitchClass: "F"}], [2, {midi: 8, pitchClass: "G"}], [3, {midi: 10, pitchClass: "A"}], [4, {midi: 11, pitchClass: "B"}], [5, {midi: 1, pitchClass: "C"}], [6, {midi: 3, pitchClass: "E"}], [7, {midi: 5, pitchClass: "E"}]]));
+KeyScaleMidiMap.set("F#", new Map([[1, {midi: 6, pitchClass: "F"}], [2, {midi: 8, pitchClass: "G"}], [3, {midi: 10, pitchClass: "A"}], [4, {midi: 11, pitchClass: "B"}], [5, {midi: 1, pitchClass: "C"}], [6, {midi: 3, pitchClass: "D"}], [7, {midi: 5, pitchClass: "E"}]]));
 KeyScaleMidiMap.set("C#", new Map([[1, {midi: 1, pitchClass: "C"}], [2, {midi: 3, pitchClass: "D"}], [3, {midi: 5, pitchClass: "E"}], [4, {midi: 6, pitchClass: "F"}], [5, {midi: 8, pitchClass: "G"}], [6, {midi: 10, pitchClass: "A"}], [7, {midi: 0, pitchClass: "B"}]]));
 KeyScaleMidiMap.set("F", new Map([[1, {midi: 5, pitchClass: "F"}], [2, {midi: 7, pitchClass: "G"}], [3, {midi: 9, pitchClass: "A"}], [4, {midi: 10, pitchClass: "B"}], [5, {midi: 0, pitchClass: "C"}], [6, {midi: 2, pitchClass: "D"}], [7, {midi: 4, pitchClass: "E"}]]));
 KeyScaleMidiMap.set("Bb", new Map([[1, {midi: 10, pitchClass: "B"}], [2, {midi: 0, pitchClass: "C"}], [3, {midi: 2, pitchClass: "D"}], [4, {midi: 3, pitchClass: "E"}], [5, {midi: 5, pitchClass: "F"}], [6, {midi: 7, pitchClass: "G"}], [7, {midi: 9, pitchClass: "A"}]]));
@@ -184,7 +185,7 @@ KeyScaleMidiMap.set("Bm", new Map([[3, {midi: 2, pitchClass: "D"}], [4, {midi: 4
 KeyScaleMidiMap.set("F#m", new Map([[3, {midi: 9, pitchClass: "A"}], [4, {midi: 11, pitchClass: "B"}], [5, {midi: 1, pitchClass: "C"}], [6, {midi: 2, pitchClass: "D"}], [7, {midi: 4, pitchClass: "E"}], [1, {midi: 6, pitchClass: "F"}], [2, {midi: 8, pitchClass: "G"}]]));
 KeyScaleMidiMap.set("C#m", new Map([[3, {midi: 4, pitchClass: "E"}], [4, {midi: 6, pitchClass: "F"}], [5, {midi: 8, pitchClass: "G"}], [6, {midi: 9, pitchClass: "A"}], [7, {midi: 11, pitchClass: "B"}], [1, {midi: 1, pitchClass: "C"}], [2, {midi: 3, pitchClass: "D"}]]));
 KeyScaleMidiMap.set("G#m", new Map([[3, {midi: 11, pitchClass: "B"}], [4, {midi: 1, pitchClass: "C"}], [5, {midi: 3, pitchClass: "D"}], [6, {midi: 4, pitchClass: "E"}], [7, {midi: 6, pitchClass: "F"}], [1, {midi: 8, pitchClass: "G"}], [2, {midi: 10, pitchClass: "A"}]]));
-KeyScaleMidiMap.set("D#m", new Map([[3, {midi: 6, pitchClass: "F"}], [4, {midi: 8, pitchClass: "G"}], [5, {midi: 10, pitchClass: "A"}], [6, {midi: 11, pitchClass: "B"}], [7, {midi: 1, pitchClass: "C"}], [1, {midi: 3, pitchClass: "E"}], [2, {midi: 5, pitchClass: "E"}]]));
+KeyScaleMidiMap.set("D#m", new Map([[3, {midi: 6, pitchClass: "F"}], [4, {midi: 8, pitchClass: "G"}], [5, {midi: 10, pitchClass: "A"}], [6, {midi: 11, pitchClass: "B"}], [7, {midi: 1, pitchClass: "C"}], [1, {midi: 3, pitchClass: "D"}], [2, {midi: 5, pitchClass: "E"}]]));
 KeyScaleMidiMap.set("A#m", new Map([[3, {midi: 1, pitchClass: "C"}], [4, {midi: 3, pitchClass: "D"}], [5, {midi: 5, pitchClass: "E"}], [6, {midi: 6, pitchClass: "F"}], [7, {midi: 8, pitchClass: "G"}], [1, {midi: 10, pitchClass: "A"}], [2, {midi: 0, pitchClass: "B"}]]));
 KeyScaleMidiMap.set("Dm", new Map([[3, {midi: 5, pitchClass: "F"}], [4, {midi: 7, pitchClass: "G"}], [5, {midi: 9, pitchClass: "A"}], [6, {midi: 10, pitchClass: "B"}], [7, {midi: 0, pitchClass: "C"}], [1, {midi: 2, pitchClass: "D"}], [2, {midi: 4, pitchClass: "E"}]]));
 KeyScaleMidiMap.set("Gm", new Map([[3, {midi: 10, pitchClass: "B"}], [4, {midi: 0, pitchClass: "C"}], [5, {midi: 2, pitchClass: "D"}], [6, {midi: 3, pitchClass: "E"}], [7, {midi: 5, pitchClass: "F"}], [1, {midi: 7, pitchClass: "G"}], [2, {midi: 9, pitchClass: "A"}]]));

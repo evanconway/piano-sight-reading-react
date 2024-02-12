@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { getMidiOfPitch } from '../src/music_new/functions';
+import { KeyScaleMidiMap, KeySignatures, PitchClass, ScaleDegrees } from '../src/music_new/models';
 
 describe('getMidiOfPitch', () => {
     // roots for all keys
@@ -40,4 +41,20 @@ describe('Cm testing', () => {
     test('register 3 degree 7', () => expect(getMidiOfPitch('Cm', { scaleDegree: 7, register: 3, accidental: 0 })).toBe(58));
     test('register 4 degree 1', () => expect(getMidiOfPitch('Cm', { scaleDegree: 1, register: 4, accidental: 0 })).toBe(60));
     test('register 4 degree 2', () => expect(getMidiOfPitch('Cm', { scaleDegree: 2, register: 4, accidental: 0 })).toBe(62));
+});
+
+describe('key scale midi maps', () => {
+    KeySignatures.forEach(keySignature => {
+        const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
+        test(`${keySignature} midi map is defined`, () => expect(scaleMidiMap).toBeDefined());
+        if (scaleMidiMap === undefined) return;
+        const pitchClassesFound = new Set<PitchClass>();
+        ScaleDegrees.forEach(degree => {
+            const mapping = scaleMidiMap.get(degree);
+            test(`${keySignature} scale degree ${degree} mapping exists`, () => expect(mapping).toBeDefined());
+            if (mapping === undefined) return;
+            pitchClassesFound.add(mapping.pitchClass);
+        });
+        test(`${keySignature} all pitch classes mapped`, () => expect(pitchClassesFound.size).toBe(ScaleDegrees.length));
+    });
 });
