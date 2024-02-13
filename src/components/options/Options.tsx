@@ -47,7 +47,7 @@ const Options = () => {
 
     return <>
         {exists ? <Button 
-            sx={{ position: "absolute", zIndex: 1, animation: animation }}
+            sx={{ position: "absolute", zIndex: 1, animation: animation, top: '16px', left: '16px' }}
             variant="contained"
             onClick={() => setOptionsOpen(true)}
         >Options</Button> : null}
