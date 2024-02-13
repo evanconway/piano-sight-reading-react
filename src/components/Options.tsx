@@ -62,9 +62,8 @@ const Options = () => {
                     transform: "translate(-50%, -50%)",
                     borderRadius: 8,
                     overflowY: 'auto',
-                    maxHeight: '100%',
+                    maxHeight: 'calc(100% - 32px)', // creates top and bottom margin of 16px
                     padding: "16px",
-                    margin: '16px'
                 }}
             >
                 <Typography variant="h4">Random Music Options</Typography>
