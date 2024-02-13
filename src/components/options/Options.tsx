@@ -1,6 +1,6 @@
 import "react";
 import { useEffect, useRef, useState } from "react";
-import { Dialog, Button, DialogTitle, List } from "@mui/material";
+import { Dialog, Button, DialogTitle, List, Divider } from "@mui/material";
 import TopStaffDurationSelector from "./option-items/TopStaffDurationSelector";
 import BottomStaffDurationSelector from "./option-items/BottomStaffDurationSelector";
 import TopStaffNotesPerChordSelector from "./option-items/TopStaffNotesPerChordSelector";
@@ -53,6 +53,7 @@ const Options = () => {
         >Options</Button> : null}
         <Dialog open={optionsOpen} onClose={() => setOptionsOpen(false)}>
             <DialogTitle>Random Music Options</DialogTitle>
+            <Divider/>
             <List>
                 <KeySignatureSelector/>
                 <TimeSignatureSelector/>

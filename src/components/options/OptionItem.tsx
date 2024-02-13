@@ -8,7 +8,7 @@ interface OptionItemProps {
 
 const OptionItem = ({ title, children }: OptionItemProps) => {
     return <ListItem>
-        <ListItemText sx={{ userSelect: 'none' }}>{title}</ListItemText>
+        <ListItemText sx={{ userSelect: 'none', marginRight: '8px' }}>{title}</ListItemText>
         {children}
     </ListItem>;
 };
