@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectCursorAtFinalChord, selectMusic, selectMusicCurrentMidi, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
@@ -17,9 +17,9 @@ const Score = () => {
             if (scoreRef.current === null) return;
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfLines, measuresPerLine } = userPreferences;
             const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();
-            const width = scoreWidth - getScorePaddingXFromWidth(scoreWidth) * 2;
-            const height = scoreHeight - getScorePaddingBottomFromWidth(scoreWidth);
-            const scale = getScoreScaleFromWidth(width);
+            const width = scoreWidth - getScorePaddingXFromWidth() * 2;
+            const height = scoreHeight - getScorePaddingBottomFromWidth();
+            const scale = getScoreScaleFromWidth();
             const lineHeight = 170 * scale;
             const newNumOfLines = Math.max(Math.floor(height / lineHeight), 1);
             const measureWidth = scale * getMeasureWidthFromUserSettings(timeSignature, topStaffDuration, bottomStaffDuration);

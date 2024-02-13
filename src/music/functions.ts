@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getMeasureWidth, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
+import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
 import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
 
 /**
@@ -50,7 +50,6 @@ const getRandomChord = (
     numberOfPitches: number,
     highest: Pitch,
     lowest: Pitch,
-    harmony?: string, // not implemented yet
 ) => {
     const result: Chord = { duration, pitches: [], pathId: "" };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
@@ -276,19 +275,19 @@ const getAbcStringFromMeasureStaff = (measure: Measure, staff: 'top' | 'bottom')
     return result;
 };
 
-export const getScorePaddingXFromWidth = (width: number) => {
+export const getScorePaddingXFromWidth = () => {
     // if (width < SCORE_SCREEN_SIZE_STYLES.PHONE.SIZE) return SCORE_SCREEN_SIZE_STYLES.PHONE.PADDING_X;
     // if (width < SCORE_SCREEN_SIZE_STYLES.TABLET.SIZE) return SCORE_SCREEN_SIZE_STYLES.TABLET.PADDING_X;
     return SCORE_SCREEN_SIZE_STYLES.DESKTOP.PADDING_X;
 };
 
-export const getScorePaddingBottomFromWidth = (width: number) => {
+export const getScorePaddingBottomFromWidth = () => {
     // if (width < SCORE_SCREEN_SIZE_STYLES.PHONE.SIZE) return SCORE_SCREEN_SIZE_STYLES.PHONE.PADDING_BOTTOM;
     // if (width < SCORE_SCREEN_SIZE_STYLES.TABLET.SIZE) return SCORE_SCREEN_SIZE_STYLES.TABLET.PADDING_BOTTOM;
     return SCORE_SCREEN_SIZE_STYLES.DESKTOP.PADDING_BOTTOM;
 };
 
-export const getScoreScaleFromWidth = (width: number) => {
+export const getScoreScaleFromWidth = () => {
     // if (width < SCORE_SCREEN_SIZE_STYLES.PHONE.SIZE) return SCORE_SCREEN_SIZE_STYLES.PHONE.SCALE;
     // if (width < SCORE_SCREEN_SIZE_STYLES.TABLET.SIZE) return SCORE_SCREEN_SIZE_STYLES.TABLET.SCALE;
     return SCORE_SCREEN_SIZE_STYLES.DESKTOP.SCALE;
@@ -353,7 +352,7 @@ export const renderAbcjsToScore = (
     });
     abcString += ']\n';
 
-    const paddingX = getScorePaddingXFromWidth(width);
+    const paddingX = getScorePaddingXFromWidth();
 
     abcjs.renderAbc(SCORE_ID, abcString, {
         add_classes: true,
@@ -361,8 +360,8 @@ export const renderAbcjsToScore = (
         staffwidth: width - paddingX * 2,
         paddingleft: paddingX,
         paddingright: paddingX,
-        paddingbottom: getScorePaddingBottomFromWidth(width),
-        scale: getScoreScaleFromWidth(width),
+        paddingbottom: getScorePaddingBottomFromWidth(),
+        scale: getScoreScaleFromWidth(),
         clickListener: onClick,
     });
 
