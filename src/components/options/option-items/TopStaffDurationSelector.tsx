@@ -1,19 +1,17 @@
 import "react";
 import { Select, MenuItem } from "@mui/material";
-import { NoteDuration, durationsAllowedInTimeSignatureMap } from "../music/models";
-import { selectUserPreferences, userPreferencesSetTopStaffDuration } from "../state/userPreferencesSlice";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
-import OptionTypography from "./OptionTypography";
+import { NoteDuration, durationsAllowedInTimeSignatureMap } from "../../../music/models";
+import { selectUserPreferences, userPreferencesSetTopStaffDuration } from "../../../state/userPreferencesSlice";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import OptionItem from "../OptionItem";
 
 const TopStaffDurationSelector = () => {
     const dispatch = useAppDispatch();
     const { topStaffDuration, timeSignature } = useAppSelector(selectUserPreferences);
 
-    return <OptionsFormControlWrapper>
-        <OptionTypography>Top Staff Duration</OptionTypography>
+    return <OptionItem title='Top Staff Duration'>
         <Select
-            id="options-duration-top-staff"
+            name='options-duration-top-staff'
             value={topStaffDuration}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
@@ -24,7 +22,7 @@ const TopStaffDurationSelector = () => {
                 return <MenuItem key={duration} value={duration}>{duration}</MenuItem>
             })}
         </Select>
-    </OptionsFormControlWrapper>
+    </OptionItem>;
 };
 
 export default TopStaffDurationSelector;

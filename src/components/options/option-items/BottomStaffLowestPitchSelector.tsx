@@ -1,10 +1,9 @@
 import { MenuItem, Select } from "@mui/material";
-import OptionTypography from "./OptionTypography";
-import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { selectUserPreferences, userPreferencesSetBottomStaffLowestPitch } from "../state/userPreferencesSlice";
-import { PitchCap, pitchCapIsHigherThan, pitchCapOrder } from "../music/models";
-import { getPitchCapString, getPitchCapsInRange } from "../music/functions";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { selectUserPreferences, userPreferencesSetBottomStaffLowestPitch } from "../../../state/userPreferencesSlice";
+import { PitchCap, pitchCapIsHigherThan, pitchCapOrder } from "../../../music/models";
+import { getPitchCapString, getPitchCapsInRange } from "../../../music/functions";
+import OptionItem from "../OptionItem";
 
 const BottomStaffLowestPitchSelector = () => {
     const dispatch = useAppDispatch();
@@ -17,10 +16,9 @@ const BottomStaffLowestPitchSelector = () => {
     const pitchCaps = getPitchCapsInRange({ pitchClass: "C", register: 2 }, { pitchClass: "E", register: 4 });
     pitchCaps.forEach(cap => pitchCapMap.set(getPitchCapString(cap, keySignature), cap));
 
-    return <OptionsFormControlWrapper>
-        <OptionTypography>Bottom Staff Lowest Pitch</OptionTypography>
+    return <OptionItem title='Bottom Staff Lowest Pitch'>
         <Select
-            id="options-Lowest-pitch-bottom-staff"
+            name='options-Lowest-pitch-bottom-staff'
             value={getPitchCapString(bottomStaffLowestPitch, keySignature)}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
@@ -35,7 +33,7 @@ const BottomStaffLowestPitchSelector = () => {
                 return <MenuItem key={capString} disabled={disabled} value={capString}>{capString}</MenuItem>
             }).reverse()}
         </Select>
-    </OptionsFormControlWrapper>
+    </OptionItem>
 };
 
 export default BottomStaffLowestPitchSelector;

@@ -1,16 +1,16 @@
 import "react";
 import { useEffect, useRef, useState } from "react";
-import { Modal, Button, Typography } from "@mui/material";
-import TopStaffDurationSelector from "./TopStaffDurationSelector";
-import BottomStaffDurationSelector from "./BottomStaffDurationSelector";
-import TopStaffNotesPerChordSelector from "./TopStaffNotesPerChordSelector";
-import BottomStaffNotesPerChordSelector from "./BottomStaffNotesPerChordSelector";
-import TopStaffHighestPitchSelector from "./TopStaffHighestPitchSelector";
-import TopStaffLowestPitchSelector from "./TopStaffLowestPitchSelector";
-import BottomStaffHighestPitchSelector from "./BottomStaffHighestPitchSelector";
-import BottomStaffLowestPitchSelector from "./BottomStaffLowestPitchSelector";
-import KeySignatureSelector from "./KeySignatureSelector";
-import TimeSignatureSelector from "./TimeSignatureSelector";
+import { Dialog, Button, DialogTitle, List } from "@mui/material";
+import TopStaffDurationSelector from "./option-items/TopStaffDurationSelector";
+import BottomStaffDurationSelector from "./option-items/BottomStaffDurationSelector";
+import TopStaffNotesPerChordSelector from "./option-items/TopStaffNotesPerChordSelector";
+import BottomStaffNotesPerChordSelector from "./option-items/BottomStaffNotesPerChordSelector";
+import TopStaffHighestPitchSelector from "./option-items/TopStaffHighestPitchSelector";
+import TopStaffLowestPitchSelector from "./option-items/TopStaffLowestPitchSelector";
+import BottomStaffHighestPitchSelector from "./option-items/BottomStaffHighestPitchSelector";
+import BottomStaffLowestPitchSelector from "./option-items/BottomStaffLowestPitchSelector";
+import KeySignatureSelector from "./option-items/KeySignatureSelector";
+import TimeSignatureSelector from "./option-items/TimeSignatureSelector";
 
 const Options = () => {
     const [exists, setExists] = useState(true);
@@ -51,22 +51,9 @@ const Options = () => {
             variant="contained"
             onClick={() => setOptionsOpen(true)}
         >Options</Button> : null}
-        <Modal open={optionsOpen} onClose={() => setOptionsOpen(false)}>
-            <div
-                style={{
-                    boxSizing: 'border-box',
-                    position: "absolute",
-                    backgroundColor: "#fff",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    borderRadius: 8,
-                    overflowY: 'auto',
-                    maxHeight: 'calc(100% - 32px)', // creates top and bottom margin of 16px
-                    padding: "16px",
-                }}
-            >
-                <Typography variant="h4">Random Music Options</Typography>
+        <Dialog open={optionsOpen} onClose={() => setOptionsOpen(false)}>
+            <DialogTitle>Random Music Options</DialogTitle>
+            <List>
                 <KeySignatureSelector/>
                 <TimeSignatureSelector/>
                 <TopStaffDurationSelector/>
@@ -77,8 +64,8 @@ const Options = () => {
                 <TopStaffLowestPitchSelector/>
                 <BottomStaffHighestPitchSelector/>
                 <BottomStaffLowestPitchSelector/>
-            </div>
-        </Modal>
+            </List>
+        </Dialog>
     </>;
 };
 

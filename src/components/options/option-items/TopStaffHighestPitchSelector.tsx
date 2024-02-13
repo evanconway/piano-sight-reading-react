@@ -1,10 +1,9 @@
 import { MenuItem, Select } from "@mui/material";
-import OptionTypography from "./OptionTypography";
-import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { selectUserPreferences, userPreferencesSetTopStaffHighestPitch } from "../state/userPreferencesSlice";
-import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../music/models";
-import { getPitchCapString, getPitchCapsInRange } from "../music/functions";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { selectUserPreferences, userPreferencesSetTopStaffHighestPitch } from "../../../state/userPreferencesSlice";
+import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../../../music/models";
+import { getPitchCapString, getPitchCapsInRange } from "../../../music/functions";
+import OptionItem from "../OptionItem";
 
 const TopStaffHighestPitchSelector = () => {
     const dispatch = useAppDispatch();
@@ -17,10 +16,9 @@ const TopStaffHighestPitchSelector = () => {
     const pitchCaps = getPitchCapsInRange({ pitchClass: "G", register: 3 }, { pitchClass: "C", register: 6 });
     pitchCaps.forEach(cap => pitchCapMap.set(getPitchCapString(cap, keySignature), cap));
 
-    return <OptionsFormControlWrapper>
-        <OptionTypography>Top Staff Highest Pitch</OptionTypography>
+    return <OptionItem title='Top Staff Highest Pitch'>
         <Select
-            id="options-highest-pitch-top-staff"
+            name='options-highest-pitch-top-staff'
             value={getPitchCapString(topStaffHighestPitch, keySignature)}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
@@ -35,7 +33,7 @@ const TopStaffHighestPitchSelector = () => {
                 return <MenuItem key={capString} disabled={disabled} value={capString}>{capString}</MenuItem>
             }).reverse()}
         </Select>
-    </OptionsFormControlWrapper>
+    </OptionItem>;
 };
 
 export default TopStaffHighestPitchSelector;

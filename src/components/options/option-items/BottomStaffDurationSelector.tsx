@@ -1,19 +1,17 @@
 import "react";
 import { Select, MenuItem } from "@mui/material";
-import { NoteDuration, durationsAllowedInTimeSignatureMap } from "../music/models";
-import { selectUserPreferences, userPreferencesSetBottomStaffDuration } from "../state/userPreferencesSlice";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
-import OptionTypography from "./OptionTypography";
+import { NoteDuration, durationsAllowedInTimeSignatureMap } from "../../../music/models";
+import { selectUserPreferences, userPreferencesSetBottomStaffDuration } from "../../../state/userPreferencesSlice";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import OptionItem from "../OptionItem";
 
 const BottomStaffDurationSelector = () => {
     const dispatch = useAppDispatch();
     const { bottomStaffDuration, timeSignature } = useAppSelector(selectUserPreferences);
 
-    return <OptionsFormControlWrapper>
-        <OptionTypography>Bottom Staff Duration</OptionTypography>
+    return <OptionItem title='Bottom Staff Duration'>
         <Select
-            id="options-notes-per-chord-bottom-staff"
+            name='options-notes-per-chord-bottom-staff'
             value={bottomStaffDuration}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
@@ -24,7 +22,7 @@ const BottomStaffDurationSelector = () => {
                 return <MenuItem key={duration} value={duration}>{duration}</MenuItem>
             })}
         </Select>
-    </OptionsFormControlWrapper>
+    </OptionItem>;
 };
 
 export default BottomStaffDurationSelector;

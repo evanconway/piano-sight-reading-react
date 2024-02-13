@@ -1,10 +1,9 @@
 import { MenuItem, Select } from "@mui/material";
-import OptionTypography from "./OptionTypography";
-import OptionsFormControlWrapper from "./OptionsFormControlWrapper";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { selectUserPreferences, userPreferencesSetBottomStaffHighestPitch } from "../state/userPreferencesSlice";
-import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../music/models";
-import { getPitchCapString, getPitchCapsInRange } from "../music/functions";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { selectUserPreferences, userPreferencesSetBottomStaffHighestPitch } from "../../../state/userPreferencesSlice";
+import { PitchCap, pitchCapIsLowerThan, pitchCapOrder } from "../../../music/models";
+import { getPitchCapString, getPitchCapsInRange } from "../../../music/functions";
+import OptionItem from "../OptionItem";
 
 const BottomStaffHighestPitchSelector = () => {
     const dispatch = useAppDispatch();
@@ -17,10 +16,9 @@ const BottomStaffHighestPitchSelector = () => {
     const pitchCaps = getPitchCapsInRange({ pitchClass: "C", register: 2 }, { pitchClass: "E", register: 4 });
     pitchCaps.forEach(cap => pitchCapMap.set(getPitchCapString(cap, keySignature), cap));
 
-    return <OptionsFormControlWrapper>
-        <OptionTypography>Bottom Staff Highest Pitch</OptionTypography>
+    return <OptionItem title='Bottom Staff Highest Pitch'>
         <Select
-            id="options-highest-pitch-Bottom-staff"
+            name='options-highest-pitch-Bottom-staff'
             value={getPitchCapString(bottomStaffHighestPitch, keySignature)}
             sx={{ marginLeft: "auto" }}
             onChange={e => {
@@ -35,7 +33,7 @@ const BottomStaffHighestPitchSelector = () => {
                 return <MenuItem key={capString} disabled={disabled} value={capString}>{capString}</MenuItem>
             }).reverse()}
         </Select>
-    </OptionsFormControlWrapper>
+    </OptionItem>
 };
 
 export default BottomStaffHighestPitchSelector;
