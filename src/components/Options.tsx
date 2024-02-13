@@ -54,13 +54,17 @@ const Options = () => {
         <Modal open={optionsOpen} onClose={() => setOptionsOpen(false)}>
             <div
                 style={{
+                    boxSizing: 'border-box',
                     position: "absolute",
                     backgroundColor: "#fff",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    padding: "16px",
                     borderRadius: 8,
+                    overflowY: 'auto',
+                    maxHeight: '100%',
+                    padding: "16px",
+                    margin: '16px'
                 }}
             >
                 <Typography variant="h4">Random Music Options</Typography>
