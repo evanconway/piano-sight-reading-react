@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, randomizeMusic, selectCursorAtFinalChord, selectMusicCurrentMidi, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences } from "../state/userPreferencesSlice";
+import { appSetMidiSupport } from "../state/appSlice";
 
 const Midi = () => {
     const dispatch = useAppDispatch();
@@ -15,9 +16,20 @@ const Midi = () => {
 
     const cursorAtEnd = useAppSelector(selectCursorAtFinalChord);
 
-    if (midiAccess === undefined) navigator.requestMIDIAccess()
-        .then(ma => setMidiAccess(ma))
-        .catch(e => console.log(e));
+    useEffect(() => {
+        if (midiAccess !== undefined) return;
+        if (navigator.requestMIDIAccess === undefined) {
+            dispatch(appSetMidiSupport('unsupported'));
+            return;
+        }
+        navigator.requestMIDIAccess().then(ma => {
+            setMidiAccess(ma);
+            dispatch(appSetMidiSupport('supported'));
+        }).catch(e => {
+            console.error(e);
+            dispatch(appSetMidiSupport('unsupported'));
+        });
+    }, [dispatch, midiAccess]);
 
     // midi handling
     useEffect(() => {
