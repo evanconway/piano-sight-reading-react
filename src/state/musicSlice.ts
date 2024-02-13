@@ -138,9 +138,8 @@ const musicStateCursorIsAtFinalChord = (musicState: MusicState) => {
  */
 const musicStateChordAtCursorIsValid = (musicState: MusicState) => {
     const { cursor, measures } = musicState;
-    const chordTop = measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
-    const chordBottom = measures[cursor.measureIndex].staffChords[cursor.staffIndex].top;
-    return (chordTop !== null || chordBottom !== null);
+    const { top, bottom } = measures[cursor.measureIndex].staffChords[cursor.staffIndex];
+    return (top !== null || bottom !== null);
 };
 
 /**
