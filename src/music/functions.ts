@@ -257,9 +257,9 @@ const getAbcStringFromMeasureStaff = (measure: Measure, staff: 'top' | 'bottom')
     // logic to determine where to break beams
     const beamBreakIndexes: number[] = [];
     const divisions = measure.timeSignature === '4/4' ? 4 : measure.timeSignature === '3/4' ? 3 : 2;
-    const sdlkfjsdf = chords.length / divisions;
-    if (Math.floor(sdlkfjsdf) !== sdlkfjsdf) throw new Error('measure staff lengths must be multiples of 12');
-    for (let i = 1; i < divisions; i++) beamBreakIndexes.push(sdlkfjsdf * i);
+    const breakInterval = chords.length / divisions;
+    if (Math.floor(breakInterval) !== breakInterval) throw new Error('measure staff lengths must be multiples of 12');
+    for (let i = 1; i < divisions; i++) beamBreakIndexes.push(breakInterval * i);
 
     // create staff string from chords
     chords.forEach((chord, i) => {
