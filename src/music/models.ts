@@ -326,3 +326,23 @@ export const pitchCapIsHigherThan = (cap: PitchCap, against: PitchCap) => {
     if (capIndex < 0 || againstIndex < 0) return false;
     return capIndex > againstIndex;
 };
+
+export type Harmony = 'I' | 'ii' | 'iii' | 'IV' | 'V' | 'vi' | 'viio';
+
+const HARMONY_MAJOR = new Map<Harmony, Harmony[]>();
+HARMONY_MAJOR.set('I', ['ii', 'iii', 'IV', 'V', 'vi', 'viio']);
+HARMONY_MAJOR.set('ii', ['viio', 'V']);
+HARMONY_MAJOR.set('iii', ['vi']);
+HARMONY_MAJOR.set('IV', ['ii', 'viio', 'V']);
+HARMONY_MAJOR.set('V', ['I', 'vi']);
+HARMONY_MAJOR.set('vi', ['IV', 'ii']);
+HARMONY_MAJOR.set('viio', ['I']);
+
+export const getNextMajorHarmony = (currentHarmony: Harmony) => {
+    const options = HARMONY_MAJOR.get(currentHarmony);
+    if (options === undefined) {
+        console.error('Major harmony undefined. This should not be possible.');
+        return 'I';
+    }
+    return options[Math.floor(Math.random() * options.length)];
+};
