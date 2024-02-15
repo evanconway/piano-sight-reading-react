@@ -66,6 +66,7 @@ const Options = () => {
                 <BottomStaffHighestPitchSelector/>
                 <BottomStaffLowestPitchSelector/>
             </List>
+            <Button variant="contained" onClick={() => setOptionsOpen(false)}>Back</Button>
         </Dialog>
     </>;
 };
