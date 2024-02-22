@@ -262,17 +262,23 @@ const getAbcStringFromMeasureStaff = (measure: Measure, staff: 'top' | 'bottom')
     for (let i = 1; i < divisions; i++) beamBreakIndexes.push(breakInterval * i);
 
     // create staff string from chords
+    let pitchesEncountered = false;
     chords.forEach((chord, i) => {
         if (beamBreakIndexes.includes(i)) result += ' ';
         if (!chord) return;
+        
+        // TODO: Rewrite. Not sure why I struggle to make this simpler.
         if (chord.pitches.length > 1) result += '[';
         chord.pitches.forEach(p => {
             result += getAbcPitchFromPitch(p, measure.keySignature);
         });
         if (chord.pitches.length > 1) result += ']';
+
         result += getNoteDurationValue(chord.duration);
+        if (chord.pitches.length > 0) pitchesEncountered = true;
     });
-    return result;
+
+    return pitchesEncountered ? result : `z${measure.staffChords.length}`;
 };
 
 export const getScorePaddingXFromWidth = () => {
@@ -372,12 +378,12 @@ export const renderAbcjsToScore = (
     let pathsBotIndex = 0;
 
     // assign path Ids to abcjs generated elements
-    measures.forEach(measure => measure.staffChords.forEach(entry => {
+    if (pathsTop.length > 0) measures.forEach(measure => measure.staffChords.forEach(entry => {
         if (entry.top !== null) {
             pathsTop[pathsTopIndex++].id = entry.top.pathId;
         }
     }));
-    measures.forEach(measure => measure.staffChords.forEach(entry => {
+    if (pathsBot.length > 0) measures.forEach(measure => measure.staffChords.forEach(entry => {
         if (entry.bottom !== null) {
             pathsBot[pathsBotIndex++].id = entry.bottom.pathId;
         }

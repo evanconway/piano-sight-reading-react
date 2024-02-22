@@ -17,6 +17,7 @@ const BottomStaffNotesPerChordSelector = () => {
                 dispatch(userPreferencesSetBottomStaffNotesPerChord(e.target.value as number));
             }}
         >
+            <MenuItem value={0}>0</MenuItem>
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>
             <MenuItem value={3}>3</MenuItem>
