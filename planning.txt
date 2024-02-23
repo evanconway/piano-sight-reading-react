@@ -264,3 +264,10 @@ Actually, this will require more thought. Firstly our cursor system advances to 
 Just making a reminder note so we don't lose track of what to do next. The short version is we never implemented 0 pitches in the top/bottom staff. And we never implemented a way to display rests. This started because we weren't sure how to handle choosing a limited range of pitches while also doing harmony. As an obvious example, if we limit the range to 1 pitch, we'll inevitably choose a harmony which doesn't include the 1 pitch option. I think the best solution for that is actually to limit the minimum range based on the chosen number of pitches, or vice versa. Regardless we'll still need to implement full measure rests and 0 pitch option for top/bottom staff.
 
 A couple other notes. Eventually we need to rework how notes are stored and detected so we can handle overlapping notes more elegantly. Right now we only check for the initial trigger. I also want to add partial measure rests (quarter rests, eighth rests) at some point so we can support more complex music. 
+
+
+23rd of February, 2023
+
+We were able to fix the 0 pitches option in top/bottom staff. Now we need to handle the user trying to select too small a range for too many pitches. Honestly... I think we should just force at least an octave of range in both staves if the user selects harmony. Although it might technically be possible to allow for a smaller range based on number of pitches, we can be confident that any harmony is possible regardless of the number of pitches and harmony if we have at least an octave to work with.
+
+Let's start by adding the harmony feature for major keys, and making the chord function automatically increase it's range if a range less than an octave is given when harmony is active.
