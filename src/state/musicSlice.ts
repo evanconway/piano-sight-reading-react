@@ -12,6 +12,7 @@ interface MusicCursor {
 interface MusicState {
     cursor: MusicCursor,
     measures: Measure[],
+    harmony: boolean,
     measuresPerLine?: number,
 }
 
@@ -172,6 +173,7 @@ const initialState: MusicState = {
         measuresPerLine: 1,
         keySignature: DEFAULT_KEY_SIGNATURE,
         timeSignature: DEFAULT_TIME_SIGNATURE,
+        harmony: true,
         topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
         topStaffHighestPitch: DEFAULT_TOP_STAFF_HIGHEST_PITCH,
         topStaffLowestPitch: DEFAULT_TOP_STAFF_LOWEST_PITCH,
@@ -181,6 +183,7 @@ const initialState: MusicState = {
         bottomStaffLowestPitch: DEFAULT_BOTTOM_STAFF_LOWEST_PITCH,
         bottomStaffNotesPerChord: DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD,
     }),
+    harmony: true,
     measuresPerLine: 1,
 };
 

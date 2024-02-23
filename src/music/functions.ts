@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getMeasureDuration, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
+import { Chord, Harmony, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getIsPitchInHarmony, getMeasureDuration, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
 import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
 
 /**
@@ -11,7 +11,7 @@ import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID, SCORE_
  */
 export const getMidiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
     const scaleMidiMap = KeyScaleMidiMap.get(keySignature);
-    const baseMidi = scaleMidiMap?.get(pitch.scaleDegree)?.midi;
+    const baseMidi = scaleMidiMap?.get(pitch.degree)?.midi;
     if (baseMidi === undefined) return 0;
     return baseMidi + pitch.accidental + (pitch.register + 1) * 12;
 };
@@ -24,10 +24,10 @@ export const getMidiOfPitch = (keySignature: KeySignature, pitch: Pitch) => {
  * @param pitch 
  */
 export const getPitchAdvanced = (key: KeySignature, pitch: Pitch) => {
-    const pitchClass = KeyScaleMidiMap.get(key)?.get(pitch.scaleDegree)?.pitchClass;
+    const pitchClass = KeyScaleMidiMap.get(key)?.get(pitch.degree)?.pitchClass;
     if (pitchClass === undefined) return { ...pitch }; // probably a terrible idea, fix later
     return { 
-        scaleDegree: pitch.scaleDegree >= 7 ? 1 : pitch.scaleDegree + 1,
+        degree: pitch.degree >= 7 ? 1 : pitch.degree + 1,
         register: pitchClass === "B" ? pitch.register + 1 : pitch.register,
         accidental: 0,
      } as Pitch;
@@ -50,6 +50,7 @@ const getRandomChord = (
     numberOfPitches: number,
     highest: Pitch,
     lowest: Pitch,
+    harmony?: Harmony,
 ) => {
     const result: Chord = { duration, pitches: [], pathId: "" };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
@@ -62,6 +63,12 @@ const getRandomChord = (
         pitchToAdd = getPitchAdvanced(keySig, pitchToAdd);
         midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
     }
+
+    // remove non-harmony pitches if defined
+    if (harmony !== undefined) {
+        possiblePitches = possiblePitches.filter(p => getIsPitchInHarmony(p, keySig, harmony));
+    }
+
     // add pitches to result, ensuring already added pitches, and pitches outside of octave limit are removed
     for (let i = 0; i < numberOfPitches; i++) {
         const newPitchIndex = Math.floor(Math.random() * possiblePitches.length);
@@ -120,6 +127,7 @@ export interface RandomMusicParams {
     measuresPerLine: number,
     keySignature: KeySignature,
     timeSignature: TimeSignature,
+    harmony: boolean,
     topStaffDuration: NoteDuration,
     topStaffHighestPitch: PitchCap,
     topStaffLowestPitch: PitchCap,
@@ -142,6 +150,7 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
         measuresPerLine,
         keySignature,
         timeSignature,
+        harmony,
         topStaffDuration,
         topStaffHighestPitch,
         topStaffLowestPitch,
@@ -183,6 +192,10 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
                 getPitchFromPitchCap(keySignature, bottomStaffHighestPitch),
                 getPitchFromPitchCap(keySignature, bottomStaffLowestPitch),
             );
+
+            if (harmony && chordTop !== null && chordBottom !== null) {
+                // do stuff with harmony
+            }
             if (chordBottom !== null) chordBottom.pathId = pathIdBase + pathIdCount++;
             return { top: chordTop, bottom: chordBottom };
         }),
@@ -197,7 +210,7 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
  * @returns 
  */
 const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
-    const pitchData = KeyScaleMidiMap.get(keySignature)?.get(pitch.scaleDegree);
+    const pitchData = KeyScaleMidiMap.get(keySignature)?.get(pitch.degree);
     if (!pitchData) return "";
     let result = pitchData.pitchClass as string;
     if (pitch.register === 0) result += ",,,,";
