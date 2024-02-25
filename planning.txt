@@ -271,3 +271,8 @@ A couple other notes. Eventually we need to rework how notes are stored and dete
 We were able to fix the 0 pitches option in top/bottom staff. Now we need to handle the user trying to select too small a range for too many pitches. Honestly... I think we should just force at least an octave of range in both staves if the user selects harmony. Although it might technically be possible to allow for a smaller range based on number of pitches, we can be confident that any harmony is possible regardless of the number of pitches and harmony if we have at least an octave to work with.
 
 Let's start by adding the harmony feature for major keys, and making the chord function automatically increase it's range if a range less than an octave is given when harmony is active.
+
+
+24th of Feburary, 2023
+
+We've added simply harmony generation. And although it appears to work correctly there are some issues with how we create chords. We created a very ugly hot fix for the V chord in minor keys. The current system starts with the diatonic scale degree at the bottom of the given range, and adds sequential diatonic pitches as options. We were able to add an exception for the V in minor, but this will get gross quickly if we ever want more complex harmonies like borrowed chords. I don't think we need to solve this immediately but it's something to keep in mind.
