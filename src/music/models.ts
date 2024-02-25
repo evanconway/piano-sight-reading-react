@@ -81,7 +81,7 @@ export type KeySignature =
 'Ebm' |
 'Abm';
 
-const isMajorKey = (key: KeySignature) => {
+export const isMajorKey = (key: KeySignature) => {
     if (key === 'C') return true;
     if (key === 'G') return true;
     if (key === 'D') return true;

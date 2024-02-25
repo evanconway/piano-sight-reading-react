@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import { Chord, Harmony, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getIsPitchInHarmony, getMeasureDuration, getNoteDurationValue, getPitchFromPitchCap, raisePitchCap } from "./models";
+import { Chord, Harmony, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getIsPitchInHarmony, getMeasureDuration, getNextMajorHarmony, getNoteDurationValue, getPitchFromPitchCap, isMajorKey, raisePitchCap } from "./models";
 import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
 
 /**
@@ -52,6 +52,7 @@ const getRandomChord = (
     lowest: Pitch,
     harmony?: Harmony,
 ) => {
+    debugger;
     const result: Chord = { duration, pitches: [], pathId: "" };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
@@ -127,7 +128,7 @@ export interface RandomMusicParams {
     measuresPerLine: number,
     keySignature: KeySignature,
     timeSignature: TimeSignature,
-    harmony: boolean,
+    useHarmony: boolean,
     topStaffDuration: NoteDuration,
     topStaffHighestPitch: PitchCap,
     topStaffLowestPitch: PitchCap,
@@ -150,7 +151,7 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
         measuresPerLine,
         keySignature,
         timeSignature,
-        harmony,
+        useHarmony,
         topStaffDuration,
         topStaffHighestPitch,
         topStaffLowestPitch,
@@ -166,7 +167,9 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
     const bottomValue = getNoteDurationValue(bottomStaffDuration);
     const mSize = getMeasureDuration(timeSignature);
     const pathIdBase = "abc-note-path-id-";
+    const keyIsMajor = isMajorKey(keySignature);
     let pathIdCount = 0;
+    let harmony: Harmony =  keyIsMajor ? 'I' : 'i';
 
     /*
     Originally we assigned path ids to the entire top staff then the entire bottom staff. Since changing how music
@@ -183,6 +186,7 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
                 topStaffNotesPerChord,
                 getPitchFromPitchCap(keySignature, topStaffHighestPitch),
                 getPitchFromPitchCap(keySignature, topStaffLowestPitch),
+                useHarmony ? harmony : undefined,
             );
             if (chordTop !== null) chordTop.pathId = pathIdBase + pathIdCount++;
             const chordBottom = i % bottomValue !== 0 ? null : getRandomChord(
@@ -191,10 +195,12 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
                 bottomStaffNotesPerChord,
                 getPitchFromPitchCap(keySignature, bottomStaffHighestPitch),
                 getPitchFromPitchCap(keySignature, bottomStaffLowestPitch),
+                useHarmony ? harmony : undefined,
             );
 
-            if (harmony && chordTop !== null && chordBottom !== null) {
+            if (useHarmony && chordTop !== null && chordBottom !== null) {
                 // do stuff with harmony
+                harmony = keyIsMajor ? getNextMajorHarmony(harmony) : getNextMajorHarmony(harmony);
             }
             if (chordBottom !== null) chordBottom.pathId = pathIdBase + pathIdCount++;
             return { top: chordTop, bottom: chordBottom };
