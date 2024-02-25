@@ -52,7 +52,6 @@ const getRandomChord = (
     lowest: Pitch,
     harmony?: Harmony,
 ) => {
-    debugger;
     const result: Chord = { duration, pitches: [], pathId: "" };
     // prepare array of pitches in given key starting at lowest pitch and ending at highest
     let possiblePitches: Pitch[] = [];
@@ -60,6 +59,13 @@ const getRandomChord = (
     const midiOfPitchHighest = getMidiOfPitch(keySig, highest);
     let midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
     while (midiOfPitchToAdd <= midiOfPitchHighest) {
+
+        // hotfix for major V in minor keys.
+        // TODO: figure out better solution
+        if (!isMajorKey(keySig) && harmony === 'V' && pitchToAdd.degree === 7) {
+            pitchToAdd.accidental++;
+        }
+
         possiblePitches.push({ ...pitchToAdd });
         pitchToAdd = getPitchAdvanced(keySig, pitchToAdd);
         midiOfPitchToAdd = getMidiOfPitch(keySig, pitchToAdd);
@@ -229,7 +235,10 @@ const getAbcPitchFromPitch = (pitch: Pitch, keySignature: KeySignature) => {
     if (pitch.register === 6) result += "'";
     if (pitch.register === 7) result += "''";
     if (pitch.register === 8) result += "'''";
-    // need to add accidentals
+    if (pitch.accidental === -2) result = `__${result}`;
+    if (pitch.accidental === -1) result = `_${result}`;
+    if (pitch.accidental === 1) result = `^${result}`;
+    if (pitch.accidental === 2) result = `^^^${result}`;
     return result;
 };
 
