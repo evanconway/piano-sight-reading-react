@@ -9,6 +9,7 @@ const initialState: RandomMusicParams = {
     measuresPerLine: 1,
     keySignature: DEFAULT_KEY_SIGNATURE,
     timeSignature: DEFAULT_TIME_SIGNATURE,
+    harmony: true,
     topStaffDuration: DEFAULT_TOP_STAFF_DURATION,
     topStaffHighestPitch: DEFAULT_TOP_STAFF_HIGHEST_PITCH,
     topStaffLowestPitch: DEFAULT_TOP_STAFF_LOWEST_PITCH,
