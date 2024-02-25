@@ -11,6 +11,7 @@ import BottomStaffHighestPitchSelector from "./option-items/BottomStaffHighestPi
 import BottomStaffLowestPitchSelector from "./option-items/BottomStaffLowestPitchSelector";
 import KeySignatureSelector from "./option-items/KeySignatureSelector";
 import TimeSignatureSelector from "./option-items/TimeSignatureSelector";
+import UseHarmonySelector from "./option-items/UseHarmonySelector";
 
 const Options = () => {
     const [exists, setExists] = useState(true);
@@ -55,6 +56,7 @@ const Options = () => {
             <DialogTitle>Random Music Options</DialogTitle>
             <Divider/>
             <List>
+                <UseHarmonySelector/>
                 <KeySignatureSelector/>
                 <TimeSignatureSelector/>
                 <TopStaffDurationSelector/>

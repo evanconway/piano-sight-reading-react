@@ -43,6 +43,9 @@ const userPreferencesSlice = createSlice({
                 state.bottomStaffDuration = "quarter-dotted";
             }
         },
+        userPreferencesSetUseHarmony: (state, action: PayloadAction<boolean>) => {
+            state.useHarmony = action.payload;
+        },
         userPreferencesSetTopStaffDuration: (state, action: PayloadAction<NoteDuration>) => {
             state.topStaffDuration = action.payload;
         },
@@ -74,6 +77,7 @@ export const {
     userPreferencesSetScoreDimensions,
     userPreferencesSetKeySignature,
     userPreferencesSetTimeSignature,
+    userPreferencesSetUseHarmony,
     userPreferencesSetTopStaffDuration,
     userPreferencesSetTopStaffHighestPitch,
     userPreferencesSetTopStaffLowestPitch,

@@ -180,28 +180,30 @@ export const generateRandomMusic = (params: RandomMusicParams): Measure[] => {
         keySignature,
         timeSignature,
         staffChords: [...Array(mSize)].map((_, i) => {
-            const chordTop = i % topValue !== 0 ? null : getRandomChord(
+            const addChordTop = i % topValue === 0;
+            const addChordBottom = i % bottomValue === 0;
+
+            if (useHarmony && i > 0 && addChordTop && addChordBottom) {
+                harmony = keyIsMajor ? getNextMajorHarmony(harmony) : getNextMajorHarmony(harmony);
+            }
+
+            const chordTop = addChordTop ? getRandomChord(
                 topStaffDuration,
                 keySignature,
                 topStaffNotesPerChord,
                 getPitchFromPitchCap(keySignature, topStaffHighestPitch),
                 getPitchFromPitchCap(keySignature, topStaffLowestPitch),
                 useHarmony ? harmony : undefined,
-            );
+            ) : null;
             if (chordTop !== null) chordTop.pathId = pathIdBase + pathIdCount++;
-            const chordBottom = i % bottomValue !== 0 ? null : getRandomChord(
+            const chordBottom = addChordBottom ? getRandomChord(
                 bottomStaffDuration,
                 keySignature,
                 bottomStaffNotesPerChord,
                 getPitchFromPitchCap(keySignature, bottomStaffHighestPitch),
                 getPitchFromPitchCap(keySignature, bottomStaffLowestPitch),
                 useHarmony ? harmony : undefined,
-            );
-
-            if (useHarmony && chordTop !== null && chordBottom !== null) {
-                // do stuff with harmony
-                harmony = keyIsMajor ? getNextMajorHarmony(harmony) : getNextMajorHarmony(harmony);
-            }
+            ) : null;
             if (chordBottom !== null) chordBottom.pathId = pathIdBase + pathIdCount++;
             return { top: chordTop, bottom: chordBottom };
         }),
