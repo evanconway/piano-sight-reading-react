@@ -275,4 +275,8 @@ Let's start by adding the harmony feature for major keys, and making the chord f
 
 24th of Feburary, 2023
 
-We've added simply harmony generation. And although it appears to work correctly there are some issues with how we create chords. We created a very ugly hot fix for the V chord in minor keys. The current system starts with the diatonic scale degree at the bottom of the given range, and adds sequential diatonic pitches as options. We were able to add an exception for the V in minor, but this will get gross quickly if we ever want more complex harmonies like borrowed chords. I don't think we need to solve this immediately but it's something to keep in mind.
+We've added simple harmony generation. And although it appears to work correctly there are some issues with how we create chords. We created a very ugly hot fix for the V chord in minor keys. The current system starts with the diatonic scale degree at the bottom of the given range, and adds sequential diatonic pitches as options. We were able to add an exception for the V in minor, but this will get gross quickly if we ever want more complex harmonies like borrowed chords. I don't think we need to solve this immediately but it's something to keep in mind.
+
+
+26th of February, 2023
+Another note about harmony generation. I think it's worth figuring how to make harmony follow good chord voicing rules. I don't think we need to implement full 4-part harmony law, but the chords should favor certain pitches first. Basically root -> third -> fifth -> root again -> not sure after that. I think this'll make the harmony sound much better, read more clearly, and more accurately reflect real music.
