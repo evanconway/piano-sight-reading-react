@@ -11,9 +11,6 @@ export const DEFAULT_BOTTOM_STAFF_HIGHEST_PITCH: PitchCap = { pitchClass: "B", r
 export const DEFAULT_BOTTOM_STAFF_LOWEST_PITCH: PitchCap = { pitchClass: "E", register: 2 };
 export const DEFAULT_BOTTOM_STAFF_NOTES_PER_CHORD = 2;
 
-export const SCORE_ELEMENT_HEIGHT_STYLE = '90vh';
-export const SCORE_ELEMENT_WIDTH_STYLE = '100%';
-
 export const SCORE_ID = "score";
 
 export const SCORE_SCREEN_SIZE_STYLES = {

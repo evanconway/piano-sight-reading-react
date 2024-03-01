@@ -3,20 +3,20 @@ import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBot
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectMusic, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences, userPreferencesSetScoreDimensions } from "../state/userPreferencesSlice";
-import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID } from "../constants";
+import { SCORE_ID } from "../constants";
 
 const Score = () => {
     const dispatch = useAppDispatch();
     const music = useAppSelector(selectMusic);
-    const scoreRef = useRef<HTMLDivElement>(null);
+    const scoreWrapperRef = useRef<HTMLDivElement>(null);
     const userPreferences = useAppSelector(selectUserPreferences);
 
     // handle choosing number of measures to generate based on screen size
     useLayoutEffect(() => {
         const onResize = () => {
-            if (scoreRef.current === null) return;
+            if (scoreWrapperRef.current === null) return;
             const { timeSignature, topStaffDuration, bottomStaffDuration, numberOfLines, measuresPerLine } = userPreferences;
-            const { width: scoreWidth, height: scoreHeight } = scoreRef.current.getBoundingClientRect();
+            const { width: scoreWidth, height: scoreHeight } = scoreWrapperRef.current.getBoundingClientRect();
             const width = scoreWidth - getScorePaddingXFromWidth() * 2;
             const height = scoreHeight - getScorePaddingBottomFromWidth();
             const scale = getScoreScaleFromWidth();
@@ -45,10 +45,10 @@ const Score = () => {
     // render
     useEffect(() => {
         const render = () => {
-            if (scoreRef.current === null) return;
+            if (scoreWrapperRef.current === null) return;
             renderAbcjsToScore(
                 music.measures,
-                scoreRef.current.getBoundingClientRect().width,
+                scoreWrapperRef.current.getBoundingClientRect().width,
                 (e) => dispatch(setCursorToPathId(e.abselem.elemset[0].id)),
                 { measuresPerLine: music.measuresPerLine },
             );
@@ -65,8 +65,9 @@ const Score = () => {
             This line undoes the rendering of renderAbcjsToScore. It doesn't seem to affect performance or
             behavior, but it is technically how useEffect should work.
             */
-            while (scoreRef.current?.firstChild) {
-                scoreRef.current.removeChild(scoreRef.current.firstChild);
+            const scoreElement = document.getElementById(SCORE_ID);
+            while (scoreElement?.firstChild) {
+                scoreElement.removeChild(scoreElement.firstChild);
             }
         };
     }, [dispatch, music]);
@@ -87,20 +88,18 @@ const Score = () => {
         flexDirection: 'column',
         justifyContent: 'center',
     }}>
-        <div
-            id={SCORE_ID}
-            ref={scoreRef}
-            style={{
-                backgroundColor: "#fff",
-                width: SCORE_ELEMENT_WIDTH_STYLE,
-                height: SCORE_ELEMENT_HEIGHT_STYLE,
-                maxWidth: "1100px",
-                boxShadow: "10px 10px 10px #888",
-                margin: "0 auto",
-                borderRadius: 4,
-                animation: "animation-fadein 0.6s, animation-risein 0.6s",
-            }}
-        />
+        <div ref={scoreWrapperRef} style={{
+            backgroundColor: "#fff",
+            width: '100%',
+            height: '90vh',
+            maxWidth: "1100px",
+            boxShadow: "10px 10px 10px #888",
+            margin: "0 auto",
+            borderRadius: 4,
+            animation: "animation-fadein 0.6s, animation-risein 0.6s",
+        }}>
+            <div id={SCORE_ID}/>
+        </div>
     </div>;
 };
 

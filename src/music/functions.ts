@@ -1,6 +1,6 @@
 import abcjs from "abcjs";
 import { Chord, Harmony, KeyScaleMidiMap, KeySignature, Measure, NOTE_DURATION_BASE, NOTE_WIDTH, NoteDuration, Pitch, PitchCap, TimeSignature, getAccidentalsInKey, getIsPitchInHarmony, getMeasureDuration, getNextMajorHarmony, getNoteDurationValue, getPitchFromPitchCap, isMajorKey, raisePitchCap } from "./models";
-import { SCORE_ELEMENT_HEIGHT_STYLE, SCORE_ELEMENT_WIDTH_STYLE, SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
+import { SCORE_ID, SCORE_SCREEN_SIZE_STYLES } from "../constants";
 
 /**
  * Returns the midi value of the given pitch and key signature.
@@ -399,6 +399,7 @@ export const renderAbcjsToScore = (
         paddingbottom: getScorePaddingBottomFromWidth(),
         scale: getScoreScaleFromWidth(),
         clickListener: onClick,
+        responsive: 'resize',
     });
 
     const pathsTop = Array.from(document.querySelectorAll("g.abcjs-note.abcjs-v0"));
@@ -418,22 +419,4 @@ export const renderAbcjsToScore = (
             pathsBot[pathsBotIndex++].id = entry.bottom.pathId;
         }
     }));
-
-    /*
-    COULD POSSIBLY BE FIXED BY %%pageheight <length> DIRECTIVE????
-
-    Unfortunately, the abcjs.render function is not pure, and modifies the styles of
-    the target element, which is the score in this case.
-    
-    Firstly, when the scale of the render is less than 1, it adds a width style to 
-    the div. This breaks our resize logic.
-
-    Secondly it changes the height of the element based on the amount of content
-    added. We force the same height to ensure measure calculations are correct.
-    */
-    const scoreElement = document.getElementById(SCORE_ID);
-    if (scoreElement !== null) {
-        scoreElement.style.height = SCORE_ELEMENT_HEIGHT_STYLE;
-        scoreElement.style.width = SCORE_ELEMENT_WIDTH_STYLE;
-    }
 };
