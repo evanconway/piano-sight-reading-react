@@ -280,3 +280,8 @@ We've added simple harmony generation. And although it appears to work correctly
 
 26th of February, 2024
 Another note about harmony generation. I think it's worth figuring how to make harmony follow good chord voicing rules. I don't think we need to implement full 4-part harmony law, but the chords should favor certain pitches first. Basically root -> third -> fifth -> root again -> not sure after that. I think this'll make the harmony sound much better, read more clearly, and more accurately reflect real music.
+
+
+28th of February, 2024
+
+Making a note about better duration checking. I think we should fill the entire staff array with chord objects. So that even when the durations are different (top staff is quarters, bottom staff is wholes) we always know what pitches either hand should be playing. For generating notation we could simply only generate new notes when we detect a different chord. Or we could somehow flag chords as the "first" chord in the section of an array, noting that it's the start and all others are just for detecting pitch mid-chord.
