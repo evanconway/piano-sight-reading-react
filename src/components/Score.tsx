@@ -83,23 +83,33 @@ const Score = () => {
     }, [dispatch]);
 
     const currentPathIds = useAppSelector(selectMusicCurrentPathId);
+    const mousePositionRef = useRef({ x: 0, y: 0});
 
-    const onHover = useMemo(() => {
-        return (e: React.MouseEvent) => {
-            const { clientX: mouseX, clientY: mouseY } = e;
+    useEffect(() => {
+        let animationID = 0;
+        const animate = () => {
+            const { x: mouseX, y: mouseY } = mousePositionRef.current;
             Array.from(document.getElementsByClassName('abcjs-note')).forEach(chord => {
                 const { x: chordX, y: chordY, width, height } = chord.getBoundingClientRect();
                 const hIn = mouseX >= chordX && mouseX <= (chordX + width);
                 const vIn = mouseY >= chordY && mouseY <= (chordY + height);
-                const fill = vIn && hIn ? '#ccc' : '#000';
+                const fill = vIn && hIn ? '#44c5d4' : '#000';
                 if (chord.id === currentPathIds.topPathId || chord.id === currentPathIds.bottomPathId) return;
                 Array.from(chord.getElementsByClassName('abcjs-notehead')).forEach(e => e.setAttribute('fill', fill));
                 Array.from(chord.getElementsByClassName('abcjs-stem')).forEach(e => e.setAttribute('fill', fill));
             });
+            animationID = requestAnimationFrame(animate);
         };
+        animate();
+        return () => cancelAnimationFrame(animationID);
     }, [currentPathIds]);
 
-    return <div onMouseMove={onHover} style={{
+    return <div onMouseMove={e => {
+        mousePositionRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+        };
+    }} style={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
