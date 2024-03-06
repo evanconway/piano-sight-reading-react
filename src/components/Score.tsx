@@ -82,6 +82,23 @@ const Score = () => {
         return () => window.removeEventListener("keydown", onArrowKeys);
     }, [dispatch]);
 
+    // hover changes note color
+    useEffect(() => {
+        const onHover = (e: MouseEvent) => {
+            const { clientX: mouseX, clientY: mouseY } = e;
+            Array.from(document.getElementsByClassName('abcjs-note')).forEach(chord => {
+                const { x: chordX, y: chordY, width, height } = chord.getBoundingClientRect();
+                const hIn = mouseX >= chordX && mouseX <= (chordX + width);
+                const vIn = mouseY >= chordY && mouseY <= (chordY + height);
+                const fill = vIn && hIn ? '#f00' : '#000';
+                Array.from(chord.getElementsByClassName('abcjs-notehead')).forEach(e => e.setAttribute('fill', fill));
+                Array.from(chord.getElementsByClassName('abcjs-stem')).forEach(e => e.setAttribute('fill', fill));
+            });
+        };
+        window.addEventListener('mouseover', onHover);
+        return () => window.removeEventListener('mouseover', onHover);
+    }, []);
+
     return <div style={{
         height: '100%',
         display: 'flex',

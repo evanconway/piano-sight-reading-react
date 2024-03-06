@@ -279,9 +279,17 @@ We've added simple harmony generation. And although it appears to work correctly
 
 
 26th of February, 2024
+
 Another note about harmony generation. I think it's worth figuring how to make harmony follow good chord voicing rules. I don't think we need to implement full 4-part harmony law, but the chords should favor certain pitches first. Basically root -> third -> fifth -> root again -> not sure after that. I think this'll make the harmony sound much better, read more clearly, and more accurately reflect real music.
 
 
 28th of February, 2024
 
 Making a note about better duration checking. I think we should fill the entire staff array with chord objects. So that even when the durations are different (top staff is quarters, bottom staff is wholes) we always know what pitches either hand should be playing. For generating notation we could simply only generate new notes when we detect a different chord. Or we could somehow flag chords as the "first" chord in the section of an array, noting that it's the start and all others are just for detecting pitch mid-chord.
+
+
+5th of March, 2024
+
+We added the start of some crude logic to make note color change when it's hovered by the mouse. However it's not working properly yet. The color of the note doesn't revert correctly when it's not hovered anymore. It overwrites the highlight color if the hovered note is the cursor note.
+
+Right now we set the color of the highlighted note when state changes occur. I think it might be better to move color changing logic to a separate component, and store information about what color notes should be in the state. We might be able to simply create a selector which returns the chord objects that are currently highlighted. This will contain the path ids of the noteheads. So we'll know which noteheads not to highlight.
