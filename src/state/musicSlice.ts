@@ -271,7 +271,7 @@ export const selectMusicCurrentMidi = createSelector((state: RootState) => state
     // remove duplicates from returned array
     return Array.from(new Set([...midiPitchesTop, ...midiPitchesBot])).sort();
 });
-export const selectMusicCerrentPathId = (state: RootState) => {
+export const selectMusicCurrentPathId = (state: RootState) => {
     const { cursor, measures } = state.music;
     const { measureIndex, staffIndex } = cursor;
     return {

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectMusic, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
+import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectMusic, selectMusicCurrentPathId, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
 import { selectUserPreferences, userPreferencesSetScoreDimensions } from "../state/userPreferencesSlice";
 import { SCORE_ID } from "../constants";
 
@@ -82,22 +82,26 @@ const Score = () => {
         return () => window.removeEventListener("keydown", onArrowKeys);
     }, [dispatch]);
 
+    const currentPathIds = useAppSelector(selectMusicCurrentPathId);
+
     // hover changes note color
     useEffect(() => {
         const onHover = (e: MouseEvent) => {
             const { clientX: mouseX, clientY: mouseY } = e;
             Array.from(document.getElementsByClassName('abcjs-note')).forEach(chord => {
+                console.log(currentPathIds);
                 const { x: chordX, y: chordY, width, height } = chord.getBoundingClientRect();
                 const hIn = mouseX >= chordX && mouseX <= (chordX + width);
                 const vIn = mouseY >= chordY && mouseY <= (chordY + height);
-                const fill = vIn && hIn ? '#f00' : '#000';
+                const fill = vIn && hIn ? '#ccc' : '#000';
+                if (chord.id === currentPathIds.topPathId || chord.id === currentPathIds.bottomPathId) return;
                 Array.from(chord.getElementsByClassName('abcjs-notehead')).forEach(e => e.setAttribute('fill', fill));
                 Array.from(chord.getElementsByClassName('abcjs-stem')).forEach(e => e.setAttribute('fill', fill));
             });
         };
         window.addEventListener('mouseover', onHover);
         return () => window.removeEventListener('mouseover', onHover);
-    }, []);
+    }, [currentPathIds]);
 
     return <div style={{
         height: '100%',
