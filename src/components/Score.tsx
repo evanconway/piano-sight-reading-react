@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { getMeasureWidthFromUserSettings, getMeasuresPerLine, getScorePaddingBottomFromWidth, getScorePaddingXFromWidth, getScoreScaleFromWidth, renderAbcjsToScore } from "../music/functions";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { advanceCursor, highlightCurrentChord, randomizeMusic, retreatCursor, selectMusic, selectMusicCurrentPathId, setCursorToPathId, setCursorToStart } from "../state/musicSlice";
@@ -84,12 +84,10 @@ const Score = () => {
 
     const currentPathIds = useAppSelector(selectMusicCurrentPathId);
 
-    // hover changes note color
-    useEffect(() => {
-        const onHover = (e: MouseEvent) => {
+    const onHover = useMemo(() => {
+        return (e: React.MouseEvent) => {
             const { clientX: mouseX, clientY: mouseY } = e;
             Array.from(document.getElementsByClassName('abcjs-note')).forEach(chord => {
-                console.log(currentPathIds);
                 const { x: chordX, y: chordY, width, height } = chord.getBoundingClientRect();
                 const hIn = mouseX >= chordX && mouseX <= (chordX + width);
                 const vIn = mouseY >= chordY && mouseY <= (chordY + height);
@@ -99,11 +97,9 @@ const Score = () => {
                 Array.from(chord.getElementsByClassName('abcjs-stem')).forEach(e => e.setAttribute('fill', fill));
             });
         };
-        window.addEventListener('mouseover', onHover);
-        return () => window.removeEventListener('mouseover', onHover);
     }, [currentPathIds]);
 
-    return <div style={{
+    return <div onMouseMove={onHover} style={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
