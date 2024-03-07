@@ -293,3 +293,8 @@ Making a note about better duration checking. I think we should fill the entire 
 We added the start of some crude logic to make note color change when it's hovered by the mouse. However it's not working properly yet. The color of the note doesn't revert correctly when it's not hovered anymore. It overwrites the highlight color if the hovered note is the cursor note.
 
 Right now we set the color of the highlighted note when state changes occur. I think it might be better to move color changing logic to a separate component, and store information about what color notes should be in the state. We might be able to simply create a selector which returns the chord objects that are currently highlighted. This will contain the path ids of the noteheads. So we'll know which noteheads not to highlight.
+
+
+6th of March, 2024
+
+I'd like to revisit the note selection and color changing logic later, but I think it's fine enough for now. Next we should fix note detection for held notes. If you have half notes in the left hand, quarters in the right, the system doesn't care if you're still holding the half notes for the second quarter of each half. To solve this, I'm thinking of updating the chord arrays in measures to be Chord objects, or a new object that references a chord. Maybe ChordPointer we'll call it. So all the places that are "null" will instead be references to the Chord that should be held there. This system might also allow us to easily introduce rests later. If null places also now have a chord pointer, we could use the same Cursor system we have now, and still be able to reference the needed midi data for the current chord and the previous chord. 
